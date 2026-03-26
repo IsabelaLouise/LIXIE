@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+header { 
+    width: 100%; 
+    height: 8cqmax; 
+    display: flex; 
+    align-items: center; 
+    padding-left: 20px; 
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;     
+    height: 50vh; 
+    margin-top: 30px;          
+}
+
+.hidden{
+    display: none;
+}

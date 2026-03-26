@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Cadastre-se</title>
 </head>
 <body>
@@ -12,23 +13,28 @@
     <main>
         <h2>Cadastre-se</h2>
         <form action="/cadastro" method="POST"> 
-            <label>Nome:</label><br> 
-            <input type="text" name="nome" required><br><br> 
+            <label class="hidden">Nome:</label><br> 
+            <input type="text" placeholder="Nome" required><br><br> 
 
-            <label>Data de Nascimento:</label><br> <input type="date" name="data_nasc"><br><br> 
+            <label class="hidden">Data de Nascimento:</label><br> 
+            <input name="data_nasc" id="data_nasc" placeholder="Data de Nascimento" required><br><br> 
 
-            <label>Email:</label><br> 
-            <input type="email" name="email" required><br><br> 
+            <label class="hidden">Telefone:</label><br> 
+            <input name="numero" id="numero" placeholder="Número" required><br><br> 
 
-            <label>Senha:</label><br> <input type="password" name="senha" required><br><br> 
+            <label class="hidden">Email:</label><br> 
+            <input type="email" name="email" placeholder="Email" required><br><br> 
 
-            <label>Confirmar Senha:</label><br> <input type="password" name="senha" required><br><br> 
+            <label class="hidden">Senha:</label><br> 
+            <input type="password" name="senha" placeholder="Senha" required><br><br> 
+
+            <label class="hidden">Confirmar Senha:</label><br> 
+            <input type="password" name="senhaConferencia" placeholder="Confirmar sua senha" required><br><br> 
             
-            <button type="submit">Cadastrar</button> 
-            <p> 
-                <a href="login.html">Já tenho conta</a> 
-            </p>
+            <button type="submit">Cadastrar</button><br><br> 
+            <button type="button" onclick="window.location.href='login.html'"> Já tenho conta </button>
         </form>
     </main>
+    <script src="script.js"></script>
 </body>
 </html>
