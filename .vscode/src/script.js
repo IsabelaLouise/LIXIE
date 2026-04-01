@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-  // ===== INPUTS =====
+  // Buscando elementos do formulário
 const form = document.getElementById("formCadastro");
 const nome = document.getElementById("nome");
 const data = document.getElementById("data_nasc");
@@ -11,6 +11,7 @@ const confirmarSenha = document.getElementById("confirmarSenha");
 const cepInput = document.getElementById("cep");
 const ruaInput = document.getElementById("rua");
 
+  // Automaticamente preencher o campo rua ao obter o CEP
 cepInput.addEventListener("blur", async () => {
     const dadosParaEnviar = {
     nome: document.getElementById("nome").value,
@@ -55,7 +56,7 @@ fetch("http://localhost:8000/cadastrar", {
         console.log(error);
     }
 });
-  // ===== MÁSCARA DATA =====
+  // Máscara para data (DD/MM/AAAA)
 data.addEventListener("input", function(e) {
     let v = e.target.value;
     v = v.replace(/\D/g, "");
@@ -66,7 +67,7 @@ data.addEventListener("input", function(e) {
     e.target.value = v;
 });
 
-  // ===== MÁSCARA TELEFONE =====
+  // Máscara para telefone (XX) XXXXX-XXXX
 numero.addEventListener("input", function(e) {
     let v = e.target.value;
     v = v.replace(/\D/g, "");
@@ -77,10 +78,10 @@ numero.addEventListener("input", function(e) {
     e.target.value = v;
 });
 
-  // ===== VALIDAÇÃO =====
+  // Validação do formulário
 form.addEventListener("submit", function(e) {
     e.preventDefault();
-    // 🔴 CEP (validação)
+    // CEP (Não pode ser vazio, deve ter 8 dígitos e só números)
     const cep = document.getElementById("cep").value.replace(/\D/g, "");
 
     if (cep.length !== 8) {
@@ -89,16 +90,17 @@ form.addEventListener("submit", function(e) {
     return;
     }
 
-    // 🔴 NOME (mín 6 letras)
+    // Nome (mín 6 letras)
     if (nome.value.trim().length < 6) {
         alert("Nome deve ter no mínimo 6 caracteres");
         e.preventDefault();
         return;
     }
 
-    // 🔴 DATA (mín 16, máx 30, não pode ser futuro)
+    // Data de Nascimento
     const partes = data.value.split("/");
 
+    // Não tem 3 partes (DD/MM/AAAA)
     if (partes.length !== 3) {
         alert("Data inválida");
         e.preventDefault();
@@ -108,14 +110,14 @@ form.addEventListener("submit", function(e) {
     const nascimento = new Date(partes[2], partes[1] - 1, partes[0]);
     const hoje = new Date();
 
-    // ❌ FUTURO
+    // Pessoa não pode nascer no futuro
     if (nascimento > hoje) {
         alert("Data não pode ser no futuro");
         e.preventDefault();
         return;
     }
 
-    // cálculo idade
+    // Cálculo da idade
     let idade = hoje.getFullYear() - nascimento.getFullYear();
     const m = hoje.getMonth() - nascimento.getMonth();
 
@@ -123,21 +125,21 @@ form.addEventListener("submit", function(e) {
         idade--;
     }
 
-    // ❌ < 16
+    // Não aceita menores de 16
     if (idade < 16) {
         alert("Você precisa ter pelo menos 16 anos");
         e.preventDefault();
         return;
     }
 
-    // ❌ > 30
+    // Não aceita maiores de 120
     if (idade > 120) {
         alert("Idade máxima é 120 anos");
         e.preventDefault();
         return;
     }
 
-    // 🔴 EMAIL (estrutura básica)
+    // Email (verifica se tem "@", domínio e extensão)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.value)) {
         alert("Email inválido");
@@ -145,14 +147,15 @@ form.addEventListener("submit", function(e) {
         return;
     }
 
-    const senhaRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{6,}$/;
+    // Senha (mín 8 caracteres, pelo menos 1 letra minúscula, 1 letra maiúscula, 1 número e 1 caractere especial)
+    const senhaRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
     if (!senhaRegex.test(senha.value)) {
-        alert("Senha deve ter no mínimo 6 caracteres, um número e um caractere especial");
+        alert("Senha deve ter no mínimo 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial");
         e.preventDefault();
         return;
     }
 
-    // 🔴 CONFIRMAR SENHA
+    // Confirmação de senha (deve ser igual à senha)
     if (senha.value !== confirmarSenha.value) {
         alert("As senhas não coincidem");
         e.preventDefault();
@@ -165,6 +168,8 @@ form.addEventListener("submit", function(e) {
     ruaInput.value = "";
     });
 });
+
+    // Função para mostrar/ocultar senha
     function toggleSenha(id, elemento) {
     const input = document.getElementById(id);
 
