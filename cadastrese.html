@@ -1,52 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
     <title>Cadastre-se</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./style.css">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <header>
-        <h2>Logo</h2>
-    </header>
-    <main>
-        <h2>Cadastre-se</h2>
-        <form id="formCadastro" action="/cadastro" method="POST"> 
-            <label class="hidden">Nome:</label>
-            <input type="text" placeholder="Nome*" id="nome" required><br><br> 
 
-            <label class="hidden">Data de Nascimento:</label> 
-            <input name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required><br><br> 
+<header>
+    <h2>Logo</h2>
+</header>
 
-            <label class="hidden">Telefone:</label>
-            <input name="numero" id="numero" placeholder="Telefone*" required><br><br> 
+<main>
+    <h2>Cadastre-se</h2>
 
-            <label class="hidden">CEP:</label>
-            <input name="cep" id="cep" placeholder="CEP*" required><br><br> 
-            <input name="rua" id="rua" placeholder="Rua*" readonly><br><br> 
-            <input name="numeroCasa" id="numeroCasa" placeholder="Número*" required><br><br> 
+    <form id="formCadastro" action="/cadastro" method="POST">
 
-            <label class="hidden">Email:</label>
-            <input type="email" name="email" placeholder="Email*" id="email" required><br><br> 
+        <!-- 🔴 MENSAGEM GERAL -->
+        <div id="mensagem" class="mensagem"></div>
 
-            <div class="senha-container">
-                <input type="password" name="senha" placeholder="Senha*" id="senha" required>
-                <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
-            </div><br><br> 
+        <!-- NOME -->
+        <input type="text" name="nome" id="nome" placeholder="Nome*" required>
+        <div class="erro-texto" id="erro-nome"></div>
 
-            <div class="senha-container">
-                <input type="password" name="senhaConferencia" placeholder="Confirmar sua senha*" id="confirmarSenha" required>
-                <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
-            </div><br><br> 
-            
-            <button type="submit">Cadastrar</button><br><br> 
-            <button type="button" onclick="window.location.href='login.html'"> Já tenho conta </button>
-        </form>
-    </main>
-    <script src="script.js"></script>
+        <!-- DATA -->
+        <input type="text" name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required>
+        <div class="erro-texto" id="erro-data"></div>
+
+        <!-- TELEFONE -->
+        <input type="text" name="numero" id="numero" placeholder="Telefone*" required>
+        <div class="erro-texto" id="erro-numero"></div>
+
+        <!-- CEP -->
+        <input type="text" name="cep" id="cep" placeholder="CEP*" required>
+        <div class="erro-texto" id="erro-cep"></div>
+
+        <!-- ENDEREÇO -->
+        <input type="text" name="rua" id="rua" placeholder="Rua*" readonly>
+        <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número*" required>
+
+        <!-- EMAIL -->
+        <input type="email" name="email" id="email" placeholder="Email*" required>
+        <div class="erro-texto" id="erro-email"></div>
+
+        <!-- SENHA -->
+        <div class="senha-container">
+            <input type="password" name="senha" id="senha" placeholder="Senha*" required>
+            <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+        </div>
+        <div class="erro-texto" id="erro-senha"></div>
+
+        <!-- CONFIRMAR SENHA -->
+        <div class="senha-container">
+            <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Confirmar sua senha*" required>
+            <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
+        </div>
+        <div class="erro-texto" id="erro-confirmar"></div>
+
+        <!-- BOTÕES -->
+        <button type="submit">Cadastrar</button>
+
+        <button type="button" onclick="window.location.href='login.html'">
+            Já tenho conta
+        </button>
+
+    </form>
+</main>
+
+<script src="script.js"></script>
+
 </body>
 </html>

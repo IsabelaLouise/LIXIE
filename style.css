@@ -1,77 +1,82 @@
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f0f0f0; 
-    color: #333; 
-}
-
-*{
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-header { 
-    width: 100%; 
-    height: 90px; 
-    display: flex; 
-    align-items: center; 
-    padding-left: 20px; 
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #e8f5e9, #f0f0f0);
+    color: #333;
 }
 
+/* HEADER */
+header {
+    width: 100%;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+}
+
+/* MAIN */
 main {
     display: flex;
     flex-direction: column;
-    align-items: center;     
-    height: 50vh; 
-    margin-top: 1px; 
-    padding: 10px;         
+    align-items: center;
+    padding: 20px;
 }
 
-.hidden{
-    display: none;
+/* FORM */
+form {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* TITULO */
+h2 {
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
 input {
-    width: 100%;       
-    padding: 12px;      
-    border-radius: 18px;  
+    width: 100%;
+    padding: 12px;
+    border-radius: 18px;
     border: 1px solid #ccc;
     font-size: 16px;
-    box-sizing: border-box; 
+    margin-bottom: 12px;
+    transition: 0.2s;
 }
 
-form { 
-    width: 100%; 
-    max-width: 400px; /* limita o tamanho */ 
+/* EFEITO AO CLICAR */
+input:focus {
+    outline: none;
+    border-color: #5b9e69;
+    box-shadow: 0 0 0 2px rgba(91, 158, 105, 0.2);
 }
 
+/* ERRO NO INPUT */
+input.erro {
+    border-color: #d60000;
+    background-color: #ffe5e5;
+}
+
+/* SENHA */
 .senha-container {
     position: relative;
     width: 100%;
 }
 
-h2 {
-    margin-bottom: 30px;
-}
-
 .senha-container input {
-    width: 100%;
-    padding-right: 40px; /* espaço pro ícone */
+    padding-right: 40px;
 }
 
-button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 50px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    font-weight: bold;
-    box-sizing: border-box;
-    background-color: #5b9e69;
-    color: #d4cbcb;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
+/* OLHINHO */
 .toggle-senha {
     position: absolute;
     right: 15px;
@@ -79,4 +84,88 @@ button {
     transform: translateY(-50%);
     cursor: pointer;
     font-size: 18px;
+}
+
+/* BOTÕES */
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 50px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #5b9e69;
+    color: white;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background-color: #4a8c58;
+}
+
+/* BOTÃO SECUNDÁRIO */
+button[type="button"] {
+    background-color: transparent;
+    color: #5b9e69;
+    border: 1px solid #5b9e69;
+}
+
+button[type="button"]:hover {
+    background-color: #e8f5e9;
+}
+
+/* 🔴 MENSAGEM */
+.mensagem {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ERRO */
+.mensagem.erro {
+    background-color: #ffe5e5;
+    color: #d60000;
+    display: block;
+}
+
+/* SUCESSO */
+.mensagem.sucesso {
+    background-color: #e5ffe7;
+    color: #0a8f2a;
+    display: block;
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* HIDDEN */
+.hidden {
+    display: none;
+}
+
+.erro-texto {
+    font-size: 13px;
+    color: #d60000;
+    margin-top: -8px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+input.erro {
+    border-color: #d60000;
+    background-color: #ffe5e5;
 }
