@@ -16,9 +16,43 @@ main {
     flex-direction: column;
     align-items: center;     
     height: 50vh; 
-    margin-top: 30px;          
+    margin-top: 30px; 
+    padding: 20px;         
 }
 
 .hidden{
     display: none;
+}
+
+input {
+    width: 100%;       
+    padding: 12px;      
+    border-radius: 50px;  
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box; 
+}
+
+form { 
+    width: 100%; 
+    max-width: 400px; /* limita o tamanho */ 
+}
+
+.senha-container {
+    position: relative;
+    width: 100%;
+}
+
+.senha-container input {
+    width: 100%;
+    padding-right: 40px; /* espaço pro ícone */
+}
+
+.toggle-senha {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
 }
