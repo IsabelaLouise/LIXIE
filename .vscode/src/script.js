@@ -139,13 +139,7 @@ form.addEventListener("submit", function(e) {
         return;
     }
 
-<<<<<<< HEAD:script.js
-    // 🔴 EMAIL (estrutura básica)
-=======
-
-
     // Email (verifica se tem "@", domínio e extensão)
->>>>>>> d6ace63021c77cce8a1f446c0be8cd1619b384cd:.vscode/src/script.js
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.value)) {
         alert("Email inválido");
