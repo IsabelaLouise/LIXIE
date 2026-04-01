@@ -44,8 +44,28 @@ document.addEventListener("DOMContentLoaded", function () {
   // limpa ao digitar
   form.addEventListener("input", limparErros);
 
-  // ===== CEP =====
   cepInput.addEventListener("blur", async () => {
+cepInput.addEventListener("blur", async () => {
+    const dadosParaEnviar = {
+    nome: document.getElementById("nome").value,
+    email: document.getElementById("email").value,
+    senha: document.getElementById("senha").value,
+    data_nasc: document.getElementById("data_nasc").value,
+    rua: document.getElementById("rua").value,
+    numeroCasa: document.getElementById("numero").value,
+    cep: document.getElementById("cep").value.replace(/\D/g, ""),
+    telefone: document.getElementById("numero").value 
+};
+
+fetch("http://localhost:8000/cadastrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dadosParaEnviar)
+})
+.then(res => res.json())
+.then(data => alert(data.mensagem || data.erro))
+.catch(err => console.error("Erro ao conectar:", err));
+
     let cep = cepInput.value.replace(/\D/g, "");
 
     if (cep.length !== 8) {
