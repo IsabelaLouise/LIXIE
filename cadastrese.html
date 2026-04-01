@@ -8,35 +8,35 @@
 </head>
 <body>
     <header>
-        <h2>LogoJulia</h2>
+        <h2>Logo</h2>
     </header>
     <main>
         <h2>Cadastre-se</h2>
         <form id="formCadastro" action="/cadastro" method="POST"> 
             <label class="hidden">Nome:</label>
-            <input type="text" placeholder="Nome" id="nome" required><br><br> 
+            <input type="text" placeholder="Nome*" id="nome" required><br><br> 
 
             <label class="hidden">Data de Nascimento:</label> 
-            <input name="data_nasc" id="data_nasc" placeholder="Data de Nascimento" required><br><br> 
+            <input name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required><br><br> 
 
             <label class="hidden">Telefone:</label>
-            <input name="numero" id="numero" placeholder="Telefone" required><br><br> 
+            <input name="numero" id="numero" placeholder="Telefone*" required><br><br> 
 
             <label class="hidden">CEP:</label>
-            <input name="cep" id="cep" placeholder="CEP" required><br><br> 
-            <input name="rua" id="rua" placeholder="Rua" readonly><br><br> 
-            <input name="numeroCasa" id="numeroCasa" placeholder="Número" required><br><br> 
+            <input name="cep" id="cep" placeholder="CEP*" required><br><br> 
+            <input name="rua" id="rua" placeholder="Rua*" readonly><br><br> 
+            <input name="numeroCasa" id="numeroCasa" placeholder="Número*" required><br><br> 
 
             <label class="hidden">Email:</label>
-            <input type="email" name="email" placeholder="Email" id="email" required><br><br> 
+            <input type="email" name="email" placeholder="Email*" id="email" required><br><br> 
 
             <div class="senha-container">
-                <input type="password" name="senha" placeholder="Senha" id="senha" required>
+                <input type="password" name="senha" placeholder="Senha*" id="senha" required>
                 <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
             </div><br><br> 
 
             <div class="senha-container">
-                <input type="password" name="senhaConferencia" placeholder="Confirmar sua senha" id="confirmarSenha" required>
+                <input type="password" name="senhaConferencia" placeholder="Confirmar sua senha*" id="confirmarSenha" required>
                 <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
             </div><br><br> 
             
