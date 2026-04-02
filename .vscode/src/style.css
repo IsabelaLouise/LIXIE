@@ -169,3 +169,35 @@ input.erro {
     border-color: #d60000;
     background-color: #ffe5e5;
 }
+
+/* INPUT OK */
+input.sucesso {
+    border-color: #0a8f2a;
+    background-color: #e5ffe7;
+}
+
+/* ÍCONE (check) */
+.input-container {
+    position: relative;
+}
+
+.input-container span {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+}
+
+/* ANIMAÇÃO ERRO */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+input.erro {
+    animation: shake 0.2s;
+}

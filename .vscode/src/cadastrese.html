@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -27,23 +26,35 @@
 
     <form id="formCadastro" action="/cadastro" method="POST">
 
-        <!-- 🔴 MENSAGEM GERAL -->
+        <!-- 🔴 MENSAGEM -->
         <div id="mensagem" class="mensagem"></div>
 
         <!-- NOME -->
-        <input type="text" name="nome" id="nome" placeholder="Nome*" required>
+        <div class="input-container">
+            <input type="text" name="nome" id="nome" placeholder="Nome*" required>
+            <span id="icon-nome"></span>
+        </div>
         <div class="erro-texto" id="erro-nome"></div>
 
         <!-- DATA -->
-        <input type="text" name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required>
+        <div class="input-container">
+            <input type="text" name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required>
+            <span id="icon-data"></span>
+        </div>
         <div class="erro-texto" id="erro-data"></div>
 
         <!-- TELEFONE -->
-        <input type="text" name="numero" id="numero" placeholder="Telefone*" required>
+        <div class="input-container">
+            <input type="text" name="numero" id="numero" placeholder="Telefone*" required>
+            <span id="icon-numero"></span>
+        </div>
         <div class="erro-texto" id="erro-numero"></div>
 
         <!-- CEP -->
-        <input type="text" name="cep" id="cep" placeholder="CEP*" required>
+        <div class="input-container">
+            <input type="text" name="cep" id="cep" placeholder="CEP*" required>
+            <span id="icon-cep"></span>
+        </div>
         <div class="erro-texto" id="erro-cep"></div>
 
         <!-- ENDEREÇO -->
@@ -51,20 +62,25 @@
         <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número*" required>
 
         <!-- EMAIL -->
-        <input type="email" name="email" id="email" placeholder="Email*" required>
+        <div class="input-container">
+            <input type="email" name="email" id="email" placeholder="Email*" required>
+            <span id="icon-email"></span>
+        </div>
         <div class="erro-texto" id="erro-email"></div>
 
         <!-- SENHA -->
-        <div class="senha-container">
+        <div class="senha-container input-container">
             <input type="password" name="senha" id="senha" placeholder="Senha*" required>
             <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+            <span id="icon-senha"></span>
         </div>
         <div class="erro-texto" id="erro-senha"></div>
 
         <!-- CONFIRMAR SENHA -->
-        <div class="senha-container">
+        <div class="senha-container input-container">
             <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Confirmar sua senha*" required>
             <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
+            <span id="icon-confirmar"></span>
         </div>
         <div class="erro-texto" id="erro-confirmar"></div>
 
@@ -76,14 +92,9 @@
         </button>
 
     </form>
+</main>
 
 <script src="script.js"></script>
 
 </body>
 </html>
-
-
-
-
-
-

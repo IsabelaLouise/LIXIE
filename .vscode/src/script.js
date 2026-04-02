@@ -14,11 +14,33 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== FUNÇÕES =====
 
   function mostrarErro(input, idErro, mensagem) {
+    input.classList.remove("sucesso");
     input.classList.add("erro");
 
     const campoErro = document.getElementById(idErro);
     campoErro.textContent = mensagem;
     campoErro.style.display = "block";
+  }
+
+  function sucessoInput(input, iconId) {
+    input.classList.remove("erro");
+    input.classList.add("sucesso");
+
+    const icon = document.getElementById(iconId);
+    if (icon) icon.textContent = "✅";
+
+    const erro = document.getElementById("erro-" + input.id.replace("confirmarSenha","confirmar"));
+    if (erro) erro.style.display = "none";
+  }
+
+  function limparCampo(input, idErro, iconId) {
+    input.classList.remove("erro", "sucesso");
+
+    const erro = document.getElementById(idErro);
+    if (erro) erro.style.display = "none";
+
+    const icon = document.getElementById(iconId);
+    if (icon) icon.textContent = "";
   }
 
   function mostrarMensagem(texto, tipo) {
@@ -27,31 +49,64 @@ document.addEventListener("DOMContentLoaded", function () {
     mensagem.textContent = texto;
     mensagem.className = "mensagem " + tipo;
 
-    // some sozinho
     setTimeout(() => {
       mensagem.style.display = "none";
     }, 3000);
   }
 
-  function limparErros() {
-    document.querySelectorAll("input").forEach(i => i.classList.remove("erro"));
-    document.querySelectorAll(".erro-texto").forEach(e => {
-      e.textContent = "";
-      e.style.display = "none";
-    });
-  }
+  // ===== VALIDAÇÃO EM TEMPO REAL =====
 
-  // limpa ao digitar
-  form.addEventListener("input", limparErros);
+  nome.addEventListener("input", () => {
+    if (nome.value.trim().length < 6) {
+      mostrarErro(nome, "erro-nome", "Mínimo de 6 caracteres");
+    } else {
+      sucessoInput(nome, "icon-nome");
+    }
+  });
 
-  // ===== CEP =====
+  email.addEventListener("input", () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!regex.test(email.value)) {
+      mostrarErro(email, "erro-email", "Email inválido");
+    } else {
+      sucessoInput(email, "icon-email");
+    }
+  });
+
+  senha.addEventListener("input", () => {
+    const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{6,}$/;
+
+    if (!regex.test(senha.value)) {
+      mostrarErro(senha, "erro-senha", "Senha fraca");
+    } else {
+      sucessoInput(senha, "icon-senha");
+    }
+  });
+
+  confirmarSenha.addEventListener("input", () => {
+    if (senha.value !== confirmarSenha.value) {
+      mostrarErro(confirmarSenha, "erro-confirmar", "As senhas não coincidem");
+    } else {
+      sucessoInput(confirmarSenha, "icon-confirmar");
+    }
+  });
+
+  cepInput.addEventListener("input", () => {
+    let cep = cepInput.value.replace(/\D/g, "");
+
+    if (cep.length === 8) {
+      sucessoInput(cepInput, "icon-cep");
+    } else {
+      mostrarErro(cepInput, "erro-cep", "CEP inválido");
+    }
+  });
+
+  // ===== CEP API =====
   cepInput.addEventListener("blur", async () => {
     let cep = cepInput.value.replace(/\D/g, "");
 
-    if (cep.length !== 8) {
-      mostrarErro(cepInput, "erro-cep", "CEP inválido");
-      return;
-    }
+    if (cep.length !== 8) return;
 
     try {
       let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
@@ -89,77 +144,23 @@ document.addEventListener("DOMContentLoaded", function () {
     e.target.value = v;
   });
 
-  // ===== VALIDAÇÃO =====
+  // ===== SUBMIT =====
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    limparErros();
 
-    const cep = cepInput.value.replace(/\D/g, "");
+    if (
+      nome.value.trim().length >= 6 &&
+      email.value.includes("@") &&
+      senha.value.length >= 6 &&
+      senha.value === confirmarSenha.value
+    ) {
+      mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
 
-    if (cep.length !== 8) {
-      mostrarErro(cepInput, "erro-cep", "CEP inválido");
-      return;
+      form.reset();
+      ruaInput.value = "";
+
+      document.querySelectorAll("span[id^='icon']").forEach(i => i.textContent = "");
     }
-
-    if (nome.value.trim().length < 6) {
-      mostrarErro(nome, "erro-nome", "Nome deve ter no mínimo 6 caracteres");
-      return;
-    }
-
-    const partes = data.value.split("/");
-
-    if (partes.length !== 3) {
-      mostrarErro(data, "erro-data", "Data inválida");
-      return;
-    }
-
-    const nascimento = new Date(partes[2], partes[1] - 1, partes[0]);
-    const hoje = new Date();
-
-    if (nascimento > hoje) {
-      mostrarErro(data, "erro-data", "Data não pode ser no futuro");
-      return;
-    }
-
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const m = hoje.getMonth() - nascimento.getMonth();
-
-    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
-      idade--;
-    }
-
-    if (idade < 16) {
-      mostrarErro(data, "erro-data", "Você precisa ter pelo menos 16 anos");
-      return;
-    }
-
-    if (idade > 120) {
-      mostrarErro(data, "erro-data", "Idade máxima é 120 anos");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.value)) {
-      mostrarErro(email, "erro-email", "Email inválido");
-      return;
-    }
-
-    const senhaRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{6,}$/;
-    if (!senhaRegex.test(senha.value)) {
-      mostrarErro(senha, "erro-senha", "Senha fraca");
-      return;
-    }
-
-    if (senha.value !== confirmarSenha.value) {
-      mostrarErro(confirmarSenha, "erro-confirmar", "As senhas não coincidem");
-      return;
-    }
-
-    // ✅ SUCESSO
-    mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
-
-    form.reset();
-    ruaInput.value = "";
   });
 
 });
