@@ -184,15 +184,23 @@ fetch("http://localhost:8000/cadastrar", {
 
 });
 
-// ===== TOGGLE SENHA =====
-function toggleSenha(id, elemento) {
-  const input = document.getElementById(id);
+  // ===== TOGGLE SENHA =====
+  function toggleSenha(id, elemento) {
+    const senha = document.getElementById("senha");
+    const confirmarSenha = document.getElementById("confirmarSenha");
 
-  if (input.type === "password") {
-    input.type = "text";
-    elemento.textContent = "🔓";
-  } else {
-    input.type = "password";
-    elemento.textContent = "🔒";
+    // Verificar o estado atual baseado no campo senha
+    const isPassword = senha.type === "password";
+
+    // Alternar ambos os campos
+    senha.type = isPassword ? "text" : "password";
+    if (confirmarSenha) {
+      confirmarSenha.type = isPassword ? "text" : "password";
+    }
+
+    // Atualizar todos os ícones de toggle para manter sincronia
+    const toggles = document.querySelectorAll(".toggle-senha");
+    toggles.forEach(t => t.textContent = isPassword ? "🔓" : "🔒");
   }
-}
+
+});

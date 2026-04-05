@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+  // Buscando elementos do formulário
   const form = document.getElementById("formCadastro");
-
   const nome = document.getElementById("nome");
   const data = document.getElementById("data_nasc");
   const numero = document.getElementById("numero");
@@ -11,8 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const cepInput = document.getElementById("cep");
   const ruaInput = document.getElementById("rua");
 
-  // ===== FUNÇÕES =====
+  // FUNÇÕES 
 
+  // Função de preenchimento errado
   function mostrarErro(input, idErro, mensagem) {
     input.classList.remove("sucesso");
     input.classList.add("erro");
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     campoErro.style.display = "block";
   }
 
+  // Função de preenchimento correto
   function sucessoInput(input, iconId) {
     input.classList.remove("erro");
     input.classList.add("sucesso");
@@ -33,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (erro) erro.style.display = "none";
   }
 
+  // Função para limpar erros e ícones
   function limparCampo(input, idErro, iconId) {
     input.classList.remove("erro", "sucesso");
 
@@ -43,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (icon) icon.textContent = "";
   }
 
+  // Função  para mostrar mensagens gerais
   function mostrarMensagem(texto, tipo) {
     const mensagem = document.getElementById("mensagem");
 
@@ -54,8 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 3000);
   }
 
-  // ===== VALIDAÇÃO EM TEMPO REAL =====
+  // VALIDAÇÕES
 
+  // Requer que o nome tenha pelo menos 6 caracteres
   nome.addEventListener("input", () => {
     if (nome.value.trim().length < 6) {
       mostrarErro(nome, "erro-nome", "Mínimo de 6 caracteres");
@@ -64,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Requer que o email teha um formato válido
   email.addEventListener("input", () => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,8 +80,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Requer que a senha tenha pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial
   senha.addEventListener("input", () => {
-    const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{6,}$/;
+    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
     if (!regex.test(senha.value)) {
       mostrarErro(senha, "erro-senha", "Senha fraca");
@@ -84,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Requer que a confirmação de senha seja igual à senha
   confirmarSenha.addEventListener("input", () => {
     if (senha.value !== confirmarSenha.value) {
       mostrarErro(confirmarSenha, "erro-confirmar", "As senhas não coincidem");
@@ -92,6 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // Verificação do CEP
   cepInput.addEventListener("input", () => {
     let cep = cepInput.value.replace(/\D/g, "");
 
@@ -102,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ===== CEP API =====
+  // CEP API - Busca o endereço 
   cepInput.addEventListener("blur", async () => {
     let cep = cepInput.value.replace(/\D/g, "");
 
@@ -124,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ===== MÁSCARA DATA =====
+  // Máscara para data (DD/MM/AAAA)
   data.addEventListener("input", function (e) {
     let v = e.target.value.replace(/\D/g, "");
 
@@ -134,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.target.value = v;
   });
 
-  // ===== MÁSCARA TELEFONE =====
+  // Máscara para telefone (XX) XXXXX-XXXX
   numero.addEventListener("input", function (e) {
     let v = e.target.value.replace(/\D/g, "");
 
@@ -144,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
     e.target.value = v;
   });
 
-  // ===== SUBMIT =====
+  // Validação final ao enviar o formulário
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -165,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-// ===== TOGGLE SENHA =====
+// Função para mostrar/ocultar senha
 function toggleSenha(id, elemento) {
   const input = document.getElementById(id);
 
