@@ -214,33 +214,45 @@ cepInput.addEventListener("input", () => {
 });
 
   // SUBMIT FINAL
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+  form.addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-    const valido =
-      nome.classList.contains("sucesso") &&
-      email.classList.contains("sucesso") &&
-      data.classList.contains("sucesso") &&
-      numero.classList.contains("sucesso") &&
-      senha.classList.contains("sucesso") &&
-      confirmarSenha.classList.contains("sucesso") &&
-      cepInput.classList.contains("sucesso");
+  const valido =
+    nome.classList.contains("sucesso") &&
+    email.classList.contains("sucesso") &&
+    data.classList.contains("sucesso") &&
+    numero.classList.contains("sucesso") &&
+    senha.classList.contains("sucesso") &&
+    confirmarSenha.classList.contains("sucesso") &&
+    cepInput.classList.contains("sucesso");
 
-    if (valido) {
+  if (!valido) {
+    mostrarMensagem("Preencha os campos corretamente ❌", "erro");
+    return;
+  }
+
+  try {
+    const formData = new URLSearchParams(new FormData(form));
+
+    const resposta = await fetch("http://localhost:8000/cadastrar", {
+      method: "POST",
+      body: formData
+    });
+
+    const dados = await resposta.json();
+
+    if (resposta.ok) {
       mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
-
       form.reset();
-      ruaInput.value = "";
-      document.getElementById("requisitosSenha").style.display = "none";
-
-      document.querySelectorAll("input").forEach(i => {
-        i.classList.remove("sucesso", "erro");
-      });
-
+      limparFormulario();
     } else {
-      mostrarMensagem("Preencha os campos corretamente ❌", "erro");
+      mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
     }
-  });
+
+  } catch (erro) {
+    mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
+  }
+});
 
   // ================= ENTER = PRÓXIMO CAMPO =================
 const campos = document.querySelectorAll("#formCadastro input");
@@ -272,4 +284,27 @@ function toggleSenha(id, elemento) {
     input.type = "password";
     elemento.textContent = "🔒";
   }
+}
+
+function limparFormulario() {
+  const inputs = document.querySelectorAll("#formCadastro input");
+
+  inputs.forEach(input => {
+    input.classList.remove("sucesso", "erro");
+  });
+
+  // limpar mensagens de erro
+  const erros = document.querySelectorAll(".mensagem-erro");
+  erros.forEach(e => {
+    e.textContent = "";
+    e.classList.remove("ativo");
+  });
+
+  // esconder requisitos de senha
+  const requisitos = document.getElementById("requisitosSenha");
+  if (requisitos) requisitos.style.display = "none";
+
+  // limpar mensagem geral
+  const mensagem = document.getElementById("mensagem");
+  mensagem.style.display = "none";
 }
