@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Entrar</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./style.css">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header>
+    <h2>Logo</h2>
+</header>
+
+<main>
+    <h2>Entrar</h2>
+
+    <form id="formLogin" action="/login" method="POST" novalidate>
+
+        <!-- MENSAGEM -->
+        <div id="mensagem" class="mensagem"></div>
+
+        <!-- EMAIL -->
+        <div class="campo">
+            <label for="email">Email</label>
+            <div class="input-container">
+                <input type="text" name="email" id="email" placeholder="seuemail@email.com">
+                <span id="icon-email"></span>
+            </div>
+            <div class="erro-texto" id="erro-email"></div>
+        </div>
+
+        <!-- SENHA -->
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="senha-container input-container">
+                <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
+                <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+                <span id="icon-senha"></span>
+            </div>
+            <div class="erro-texto" id="erro-senha"></div>
+        </div>
+
+        <!-- BOTÕES -->
+        <button type="submit" onclick="window.location.href='homePrincipal.html'">
+            Entrar
+        </button>
+
+        <button type="button" onclick="window.location.href='cadastrese.html'">
+            Não tenho conta
+        </button>
+
+        <button>Esqueci minha senha</button>
+    </form>
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>

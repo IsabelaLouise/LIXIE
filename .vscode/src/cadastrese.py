@@ -1,6 +1,7 @@
 import http.server
 import json
 import mysql.connector
+import bcrypt
 from datetime import datetime
 
 # === CONFIGURAÇÕES DO BANCO ===
@@ -29,7 +30,10 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
         if self.path == '/cadastrar':
             content_length = int(self.headers['Content-Length'])
             corpo_requisicao = self.rfile.read(content_length)
-            dados = json.loads(corpo_requisicao)
+            from urllib.parse import parse_qs
+
+            dados_raw = corpo_requisicao.decode()
+            dados = parse_qs(dados_raw)
 
             conexao = None
             try:
@@ -37,7 +41,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor = conexao.cursor()
 
                 # === CONVERSÃO DA DATA ===
-                data_input = dados.get("data_nasc", "").strip()
+                data_input = dados.get("data_nasc", [""])[0].strip()
                 if not data_input:
                     raise ValueError("Data de nascimento não fornecida")
 
@@ -49,31 +53,40 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 data_formatada = data_obj.strftime("%Y-%m-%d")
 
                 # === LIMPEZA DE CAMPOS ===
-                numero = dados.get("numeroCasa", "").strip() or None
-                telefone = dados.get("telefone", "").strip() or None
-                cep = dados.get("cep", "").replace("-", "").strip() or None
-                rua = dados.get("rua", "").strip() or None
-                nome = dados.get("nome", "").strip() or None
-                email = dados.get("email", "").strip() or None
-                senha = dados.get("senha", "").strip() or None
+                nome = dados.get("nome", [""])[0].strip() or None
+                email = dados.get("email", [""])[0].strip() or None
+                telefone = dados.get("numero", [""])[0].strip() or None
+                cep = dados.get("cep", [""])[0].replace("-", "").strip() or None
+                rua = dados.get("rua", [""])[0].strip() or None
+                cidade = dados.get("cidade", [""])[0].strip() or None
+                estado = dados.get("estado", [""])[0].strip() or None
+                numero = dados.get("numeroCasa", [""])[0].strip() or None
+                complemento = dados.get("complemento", [""])[0].strip() or None
+                senha = dados.get("senha", [""])[0]
+                # criptografar senha
+                senha = senha.encode('utf-8')
+                senha_hash = bcrypt.hashpw(senha, bcrypt.gensalt())
 
                 # === SQL INSERT ===
                 sql = """
                 INSERT INTO Usuario 
-                (Nome, Email, Senha, Data_Nasc, Endereco, Numero, CEP, Telefone, Dt_Criacao, Pontuacao_Total_Acumulada_, Nivel)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURDATE(), 0, 1)
+                (Nome, Email, Senha, Data_Nasc, Rua, Numero_casa, Cidade, Estado, Complemento, CEP, Telefone, Dt_Criacao, Pontuacao_Total_Acumulada_, Nivel)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURDATE(), 0, 1)
                 """
 
                 valores = (
-                    dados.get("nome", "").strip() or None,
-                    dados.get("email", "").strip() or None,
-                    dados.get("senha", "").strip() or None,
-                    data_formatada,
-                    dados.get("rua", "").strip() or None,
-                    dados.get("numeroCasa", "").strip() or None,  # 👈 mantém string
-                    dados.get("cep", "").replace("-", "").strip() or None,
-                    dados.get("telefone", "").strip() or None     # 👈 mantém string
-)
+                        nome,
+                        email,
+                        senha_hash.decode('utf-8'),
+                        data_formatada,
+                        rua,
+                        numero,
+                        cidade,
+                        estado,
+                        complemento,
+                        cep,
+                        telefone
+                    )
 
                 cursor.execute(sql, valores)
                 conexao.commit()

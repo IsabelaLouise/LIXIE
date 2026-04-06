@@ -24,7 +24,7 @@
 <main>
     <h2>Cadastre-se</h2>
 
-    <form id="formCadastro" action="/cadastro" method="POST" novalidate>
+    <form id="formCadastro" action="http://localhost:8000/cadastrar" method="POST">
 
         <!-- MENSAGEM -->
         <div id="mensagem" class="mensagem"></div>
@@ -77,17 +77,22 @@
 
         <div class="campo">
             <label for="cidade">Cidade</label>
-            <input type="text" id="cidade" readonly>
+            <input type="text" name="cidade" id="cidade" readonly>
         </div>
 
         <div class="campo">
             <label for="estado">Estado</label>
-            <input type="text" id="estado" readonly>
+            <input type="text" name="estado" id="estado" readonly>
         </div>
 
         <div class="campo">
             <label for="numeroCasa">Número</label>
             <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número da casa">
+        </div>
+
+        <div class="campo">
+            <label for="complemento">Complemento</label>
+            <input type="text" name="complemento" id="complemento" placeholder="Complemento">
         </div>
 
         <!-- EMAIL -->
