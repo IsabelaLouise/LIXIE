@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // Buscando elementos do formulário
+  // ELEMENTOS
   const form = document.getElementById("formCadastro");
   const nome = document.getElementById("nome");
   const data = document.getElementById("data_nasc");
@@ -11,42 +11,25 @@ document.addEventListener("DOMContentLoaded", function () {
   const cepInput = document.getElementById("cep");
   const ruaInput = document.getElementById("rua");
 
-  // FUNÇÕES 
+  // ================= FUNÇÕES =================
 
-  // Função de preenchimento errado
-  function mostrarErro(input, idErro, mensagem) {
-    input.classList.remove("sucesso");
-    input.classList.add("erro");
+function mostrarErro(input, idErro, mensagem) {
+  input.classList.remove("sucesso");
+  input.classList.add("erro");
 
-    const campoErro = document.getElementById(idErro);
-    campoErro.textContent = mensagem;
-    campoErro.style.display = "block";
-  }
+  const campoErro = document.getElementById(idErro);
+  campoErro.textContent = mensagem;
+  campoErro.classList.add("ativo"); // 👈 ESSENCIAL
+}
 
-  // Função de preenchimento correto
-  function sucessoInput(input, iconId) {
-    input.classList.remove("erro");
-    input.classList.add("sucesso");
+function sucessoInput(input, idErro) {
+  input.classList.remove("erro");
+  input.classList.add("sucesso");
 
-    const icon = document.getElementById(iconId);
-    if (icon) icon.textContent = "✅";
+  const erro = document.getElementById(idErro);
+  if (erro) erro.classList.remove("ativo"); // 👈 remove erro
+}
 
-    const erro = document.getElementById("erro-" + input.id.replace("confirmarSenha","confirmar"));
-    if (erro) erro.style.display = "none";
-  }
-
-  // Função para limpar erros e ícones
-  function limparCampo(input, idErro, iconId) {
-    input.classList.remove("erro", "sucesso");
-
-    const erro = document.getElementById(idErro);
-    if (erro) erro.style.display = "none";
-
-    const icon = document.getElementById(iconId);
-    if (icon) icon.textContent = "";
-  }
-
-  // Função  para mostrar mensagens gerais
   function mostrarMensagem(texto, tipo) {
     const mensagem = document.getElementById("mensagem");
 
@@ -58,92 +41,87 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 3000);
   }
 
-  // VALIDAÇÕES
+function atualizarReq(id, valido) {
+  const el = document.getElementById(id);
 
-  // Requer que o nome tenha pelo menos 6 caracteres
+  if (valido) {
+    el.classList.add("ok");
+    el.textContent = "✔️ " + el.textContent.replace("❌ ", "").replace("✔️ ", "");
+  } else {
+    el.classList.remove("ok");
+    el.textContent = "❌ " + el.textContent.replace("✔️ ", "").replace("❌ ", "");
+  }
+}
+
+  // ================= VALIDAÇÕES =================
+
+  // NOME
   nome.addEventListener("input", () => {
-    if (nome.value.trim().length < 6) {
-      mostrarErro(nome, "erro-nome", "Mínimo de 6 caracteres");
-    } else {
-      sucessoInput(nome, "icon-nome");
-    }
-  });
+  if (nome.value.trim().length < 6) {
+    mostrarErro(nome, "erro-nome", "O nome deve ter pelo menos 6 caracteres");
+  } else {
+    sucessoInput(nome, "erro-nome");
+  }
+});
 
-  // Requer que o email teha um formato válido
+  // EMAIL
   email.addEventListener("input", () => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!regex.test(email.value)) {
       mostrarErro(email, "erro-email", "Email inválido");
     } else {
-      sucessoInput(email, "icon-email");
+      sucessoInput(email, "erro-email");
     }
   });
 
-  // Requer que a senha tenha pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial
-  senha.addEventListener("input", () => {
-    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  // DATA + VALIDAÇÃO REAL
+data.addEventListener("input", function (e) {
+  let v = e.target.value.replace(/\D/g, "");
 
-    if (!regex.test(senha.value)) {
-      mostrarErro(senha, "erro-senha", "Senha fraca");
-    } else {
-      sucessoInput(senha, "icon-senha");
+  if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+  if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
+
+  e.target.value = v;
+
+  if (v.length === 10) {
+    const [dia, mes, ano] = v.split("/").map(Number);
+    const hoje = new Date();
+
+    const dataDigitada = new Date(ano, mes - 1, dia);
+
+    const idade = hoje.getFullYear() - ano;
+
+    const dataValida =
+      dataDigitada.getDate() === dia &&
+      dataDigitada.getMonth() === mes - 1 &&
+      dataDigitada.getFullYear() === ano;
+
+    if (!dataValida) {
+      mostrarErro(data, "erro-data", "Data inválida");
+      return;
     }
-  });
 
-  // Requer que a confirmação de senha seja igual à senha
-  confirmarSenha.addEventListener("input", () => {
-    if (senha.value !== confirmarSenha.value) {
-      mostrarErro(confirmarSenha, "erro-confirmar", "As senhas não coincidem");
-    } else {
-      sucessoInput(confirmarSenha, "icon-confirmar");
+    if (ano > hoje.getFullYear()) {
+      mostrarErro(data, "erro-data", "Data no futuro não é permitida");
+      return;
     }
-  });
 
-  // Verificação do CEP
-  cepInput.addEventListener("input", () => {
-    let cep = cepInput.value.replace(/\D/g, "");
-
-    if (cep.length === 8) {
-      sucessoInput(cepInput, "icon-cep");
-    } else {
-      mostrarErro(cepInput, "erro-cep", "CEP inválido");
+    if (idade < 16) {
+      mostrarErro(data, "erro-data", "Você precisa ter pelo menos 16 anos");
+      return;
     }
-  });
 
-  // CEP API - Busca o endereço 
-  cepInput.addEventListener("blur", async () => {
-    let cep = cepInput.value.replace(/\D/g, "");
-
-    if (cep.length !== 8) return;
-
-    try {
-      let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      let data = await response.json();
-
-      if (data.erro) {
-        mostrarErro(cepInput, "erro-cep", "CEP não encontrado");
-        return;
-      }
-
-      ruaInput.value = data.logradouro;
-
-    } catch (error) {
-      mostrarErro(cepInput, "erro-cep", "Erro ao buscar CEP");
+    if (idade > 120) {
+      mostrarErro(data, "erro-data", "Idade inválida");
+      return;
     }
-  });
 
-  // Máscara para data (DD/MM/AAAA)
-  data.addEventListener("input", function (e) {
-    let v = e.target.value.replace(/\D/g, "");
+    sucessoInput(data, "erro-data");
+  }
+});
 
-    if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
-    if (v.length > 5) v = v.slice(0, 5) + "/" + v.slice(5, 9);
-
-    e.target.value = v;
-  });
-
-  // Máscara para telefone (XX) XXXXX-XXXX
+  // TELEFONE
   numero.addEventListener("input", function (e) {
     let v = e.target.value.replace(/\D/g, "");
 
@@ -151,30 +129,139 @@ document.addEventListener("DOMContentLoaded", function () {
     if (v.length > 10) v = v.slice(0, 10) + "-" + v.slice(10, 15);
 
     e.target.value = v;
+
+    if (v.length >= 14) {
+      sucessoInput(numero, "erro-numero");
+    }
   });
 
-  // Validação final ao enviar o formulário
+  // SENHA DINÂMICA
+  senha.addEventListener("input", () => {
+    const valor = senha.value;
+    const requisitos = document.getElementById("requisitosSenha");
+
+    requisitos.style.display = valor.length > 0 ? "block" : "none";
+
+    const maiuscula = /[A-Z]/.test(valor);
+    const minuscula = /[a-z]/.test(valor);
+    const numero = /[0-9]/.test(valor);
+    const especial = /[!@#$%^&*]/.test(valor);
+    const tamanho = valor.length >= 8;
+
+    atualizarReq("req-maiuscula", maiuscula);
+    atualizarReq("req-minuscula", minuscula);
+    atualizarReq("req-numero", numero);
+    atualizarReq("req-especial", especial);
+    atualizarReq("req-tamanho", tamanho);
+
+    if (maiuscula && minuscula && numero && especial && tamanho) {
+      sucessoInput(senha, "erro-senha");
+    } else {
+      mostrarErro(senha, "erro-senha", "Senha não atende os requisitos");
+    }
+  });
+
+  // CONFIRMAR SENHA
+  confirmarSenha.addEventListener("input", () => {
+    if (senha.value !== confirmarSenha.value) {
+      mostrarErro(confirmarSenha, "erro-confirmar", "As senhas não coincidem");
+    } else {
+      sucessoInput(confirmarSenha, "erro-confirmar");
+    }
+  });
+
+  // CEP
+cepInput.addEventListener("blur", async () => {
+  let cep = cepInput.value.replace(/\D/g, "");
+
+  // limpa campos antes de validar
+  ruaInput.value = "";
+  document.getElementById("cidade").value = "";
+  document.getElementById("estado").value = "";
+
+  if (cep.length !== 8) {
+    mostrarErro(cepInput, "erro-cep", "CEP deve conter 8 números");
+    return;
+  }
+
+  try {
+    let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    let dataCep = await response.json();
+
+    if (dataCep.erro) {
+      mostrarErro(cepInput, "erro-cep", "CEP não encontrado");
+      return;
+    }
+
+    // preenche automaticamente
+    ruaInput.value = dataCep.logradouro;
+    document.getElementById("cidade").value = dataCep.localidade;
+    document.getElementById("estado").value = dataCep.uf;
+
+    // marca como sucesso (verde)
+    sucessoInput(cepInput, "erro-cep");
+
+  } catch (error) {
+    mostrarErro(cepInput, "erro-cep", "Erro ao buscar CEP");
+  }
+});
+
+//LIMPA O CEP DEPOIS
+cepInput.addEventListener("input", () => {
+  ruaInput.value = "";
+  document.getElementById("cidade").value = "";
+  document.getElementById("estado").value = "";
+});
+
+  // SUBMIT FINAL
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    if (
-      nome.value.trim().length >= 6 &&
-      email.value.includes("@") &&
-      senha.value.length >= 6 &&
-      senha.value === confirmarSenha.value
-    ) {
+    const valido =
+      nome.classList.contains("sucesso") &&
+      email.classList.contains("sucesso") &&
+      data.classList.contains("sucesso") &&
+      numero.classList.contains("sucesso") &&
+      senha.classList.contains("sucesso") &&
+      confirmarSenha.classList.contains("sucesso") &&
+      cepInput.classList.contains("sucesso");
+
+    if (valido) {
       mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
 
       form.reset();
       ruaInput.value = "";
+      document.getElementById("requisitosSenha").style.display = "none";
 
-      document.querySelectorAll("span[id^='icon']").forEach(i => i.textContent = "");
+      document.querySelectorAll("input").forEach(i => {
+        i.classList.remove("sucesso", "erro");
+      });
+
+    } else {
+      mostrarMensagem("Preencha os campos corretamente ❌", "erro");
     }
   });
 
+  // ================= ENTER = PRÓXIMO CAMPO =================
+const campos = document.querySelectorAll("#formCadastro input");
+
+campos.forEach((campo, index) => {
+  campo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const proximo = campos[index + 1];
+
+      if (proximo) {
+        proximo.focus();
+      }
+    }
+  });
 });
 
-// Função para mostrar/ocultar senha
+});
+
+// TOGGLE SENHA
 function toggleSenha(id, elemento) {
   const input = document.getElementById(id);
 

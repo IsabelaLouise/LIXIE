@@ -24,65 +24,111 @@
 <main>
     <h2>Cadastre-se</h2>
 
-    <form id="formCadastro" action="/cadastro" method="POST">
+    <form id="formCadastro" action="/cadastro" method="POST" novalidate>
 
-        <!-- 🔴 MENSAGEM -->
+        <!-- MENSAGEM -->
         <div id="mensagem" class="mensagem"></div>
 
         <!-- NOME -->
-        <div class="input-container">
-            <input type="text" name="nome" id="nome" placeholder="Nome*" required>
-            <span id="icon-nome"></span>
+        <div class="campo">
+            <label for="nome">Nome</label>
+            <div class="input-container">
+                <input type="text" name="nome" id="nome" placeholder="Digite seu nome">
+                <span id="icon-nome"></span>
+            </div>
+            <div class="erro-texto" id="erro-nome"></div>
         </div>
-        <div class="erro-texto" id="erro-nome"></div>
 
         <!-- DATA -->
-        <div class="input-container">
-            <input type="text" name="data_nasc" id="data_nasc" placeholder="Data de Nascimento*" required>
-            <span id="icon-data"></span>
+        <div class="campo">
+            <label for="data_nasc">Data de nascimento</label>
+            <div class="input-container">
+                <input type="text" name="data_nasc" id="data_nasc" placeholder="DD/MM/AAAA">
+                <span id="icon-data"></span>
+            </div>
+            <div class="erro-texto" id="erro-data"></div>
         </div>
-        <div class="erro-texto" id="erro-data"></div>
 
         <!-- TELEFONE -->
-        <div class="input-container">
-            <input type="text" name="numero" id="numero" placeholder="Telefone*" required>
-            <span id="icon-numero"></span>
+        <div class="campo">
+            <label for="numero">Telefone</label>
+            <div class="input-container">
+                <input type="text" name="numero" id="numero" placeholder="(00) 00000-0000">
+                <span id="icon-numero"></span>
+            </div>
+            <div class="erro-texto" id="erro-numero"></div>
         </div>
-        <div class="erro-texto" id="erro-numero"></div>
 
         <!-- CEP -->
-        <div class="input-container">
-            <input type="text" name="cep" id="cep" placeholder="CEP*" required>
-            <span id="icon-cep"></span>
+        <div class="campo">
+            <label for="cep">CEP</label>
+            <div class="input-container">
+                <input type="text" name="cep" id="cep" placeholder="00000-000">
+                <span id="icon-cep"></span>
+            </div>
+            <div class="erro-texto" id="erro-cep"></div>
         </div>
-        <div class="erro-texto" id="erro-cep"></div>
 
         <!-- ENDEREÇO -->
-        <input type="text" name="rua" id="rua" placeholder="Rua*" readonly>
-        <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número*" required>
+        <div class="campo">
+            <label for="rua">Rua</label>
+            <input type="text" name="rua" id="rua" readonly>
+        </div>
+
+        <div class="campo">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" readonly>
+        </div>
+
+        <div class="campo">
+            <label for="estado">Estado</label>
+            <input type="text" id="estado" readonly>
+        </div>
+
+        <div class="campo">
+            <label for="numeroCasa">Número</label>
+            <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número da casa">
+        </div>
 
         <!-- EMAIL -->
-        <div class="input-container">
-            <input type="email" name="email" id="email" placeholder="Email*" required>
-            <span id="icon-email"></span>
+        <div class="campo">
+            <label for="email">Email</label>
+            <div class="input-container">
+                <input type="text" name="email" id="email" placeholder="seuemail@email.com">
+                <span id="icon-email"></span>
+            </div>
+            <div class="erro-texto" id="erro-email"></div>
         </div>
-        <div class="erro-texto" id="erro-email"></div>
 
         <!-- SENHA -->
-        <div class="senha-container input-container">
-            <input type="password" name="senha" id="senha" placeholder="Senha*" required>
-            <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
-            <span id="icon-senha"></span>
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="senha-container input-container">
+                <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
+                <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+                <span id="icon-senha"></span>
+            </div>
+            <div class="erro-texto" id="erro-senha"></div>
+
+            <div class="requisitos-senha" id="requisitosSenha">
+                <p id="req-maiuscula">❌ Letra maiúscula</p>
+                <p id="req-minuscula">❌ Letra minúscula</p>
+                <p id="req-numero">❌ Número</p>
+                <p id="req-especial">❌ Caractere especial</p>
+                <p id="req-tamanho">❌ Mínimo 8 caracteres</p>
+            </div>
         </div>
-        <div class="erro-texto" id="erro-senha"></div>
 
         <!-- CONFIRMAR SENHA -->
-        <div class="senha-container input-container">
-            <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Confirmar sua senha*" required>
-            <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
-            <span id="icon-confirmar"></span>
+        <div class="campo">
+            <label for="confirmarSenha">Confirmar senha</label>
+            <div class="senha-container input-container">
+                <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Repita sua senha">
+                <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
+                <span id="icon-confirmar"></span>
+            </div>
+            <div class="erro-texto" id="erro-confirmar"></div>
         </div>
-        <div class="erro-texto" id="erro-confirmar"></div>
 
         <!-- BOTÕES -->
         <button type="submit">Cadastrar</button>
