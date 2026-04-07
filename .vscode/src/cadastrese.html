@@ -29,114 +29,137 @@
         <!-- MENSAGEM -->
         <div id="mensagem" class="mensagem"></div>
 
-        <!-- NOME -->
-        <div class="campo">
-            <label for="nome">Nome</label>
-            <div class="input-container">
-                <input type="text" name="nome" id="nome" placeholder="Digite seu nome">
-                <span id="icon-nome"></span>
+        <div class="stepper">
+            <div class="step active">1<br><span>Email</span></div>
+            <div class="step">2<br><span>Dados</span></div>
+            <div class="step">3<br><span>CEP</span></div>
+            <div class="step">4<br><span>Senha</span></div>
+        </div>
+
+        <div class="form-page active" id="page-email">
+            <div class="campo">
+                <label for="email">Email</label>
+                <div class="input-container">
+                    <input type="text" name="email" id="email" placeholder="seuemail@email.com">
+                    <span id="icon-email"></span>
+                </div>
+                <div class="erro-texto" id="erro-email"></div>
             </div>
-            <div class="erro-texto" id="erro-nome"></div>
-        </div>
 
-        <!-- DATA -->
-        <div class="campo">
-            <label for="data_nasc">Data de nascimento</label>
-            <div class="input-container">
-                <input type="text" name="data_nasc" id="data_nasc" placeholder="DD/MM/AAAA">
-                <span id="icon-data"></span>
-            </div>
-            <div class="erro-texto" id="erro-data"></div>
-        </div>
-
-        <!-- TELEFONE -->
-        <div class="campo">
-            <label for="numero">Telefone</label>
-            <div class="input-container">
-                <input type="text" name="numero" id="numero" placeholder="(00) 00000-0000">
-                <span id="icon-numero"></span>
-            </div>
-            <div class="erro-texto" id="erro-numero"></div>
-        </div>
-
-        <!-- CEP -->
-        <div class="campo">
-            <label for="cep">CEP</label>
-            <div class="input-container">
-                <input type="text" name="cep" id="cep" placeholder="00000-000">
-                <span id="icon-cep"></span>
-            </div>
-            <div class="erro-texto" id="erro-cep"></div>
-        </div>
-
-        <!-- ENDEREÇO -->
-        <div class="campo">
-            <label for="rua">Rua</label>
-            <input type="text" name="rua" id="rua" readonly>
-        </div>
-
-        <div class="campo">
-            <label for="cidade">Cidade</label>
-            <input type="text" name="cidade" id="cidade" readonly>
-        </div>
-
-        <div class="campo">
-            <label for="estado">Estado</label>
-            <input type="text" name="estado" id="estado" readonly>
-        </div>
-
-        <div class="campo">
-            <label for="numeroCasa">Número</label>
-            <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número da casa">
-        </div>
-
-        <div class="campo">
-            <label for="complemento">Complemento</label>
-            <input type="text" name="complemento" id="complemento" placeholder="Complemento">
-        </div>
-
-        <!-- EMAIL -->
-        <div class="campo">
-            <label for="email">Email</label>
-            <div class="input-container">
-                <input type="text" name="email" id="email" placeholder="seuemail@email.com">
-                <span id="icon-email"></span>
-            </div>
-            <div class="erro-texto" id="erro-email"></div>
-        </div>
-
-        <!-- SENHA -->
-        <div class="campo">
-            <label for="senha">Senha</label>
-            <div class="senha-container input-container">
-                <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
-                <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
-                <span id="icon-senha"></span>
-            </div>
-            <div class="erro-texto" id="erro-senha"></div>
-
-            <div class="requisitos-senha" id="requisitosSenha">
-                <p id="req-maiuscula">❌ Letra maiúscula</p>
-                <p id="req-minuscula">❌ Letra minúscula</p>
-                <p id="req-numero">❌ Número</p>
-                <p id="req-especial">❌ Caractere especial</p>
-                <p id="req-tamanho">❌ Mínimo 8 caracteres</p>
+            <div class="button-row">
+                <button type="button" class="btn-next" id="page1Next">Próximo</button>
             </div>
         </div>
 
-        <!-- CONFIRMAR SENHA -->
-        <div class="campo">
-            <label for="confirmarSenha">Confirmar senha</label>
-            <div class="senha-container input-container">
-                <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Repita sua senha">
-                <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
-                <span id="icon-confirmar"></span>
+        <div class="form-page" id="page-dados">
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <div class="input-container">
+                    <input type="text" name="nome" id="nome" placeholder="Digite seu nome" autocomplete="name">
+                    <span id="icon-nome"></span>
+                </div>
+                <div class="erro-texto" id="erro-nome"></div>
             </div>
-            <div class="erro-texto" id="erro-confirmar"></div>
+
+            <div class="campo">
+                <label for="data_nasc">Data de nascimento</label>
+                <div class="input-container">
+                    <input type="text" name="data_nasc" id="data_nasc" placeholder="DD/MM/AAAA">
+                    <span id="icon-data"></span>
+                </div>
+                <div class="erro-texto" id="erro-data"></div>
+            </div>
+
+            <div class="campo">
+                <label for="numero">Telefone</label>
+                <div class="input-container">
+                    <input type="tel" inputmode="numeric" maxlength="15" name="numero" id="numero" placeholder="(00) 00000-0000">
+                    <span id="icon-numero"></span>
+                </div>
+                <div class="erro-texto" id="erro-numero"></div>
+            </div>
+
+            <div class="button-row">
+                <button type="button" class="btn-prev" id="page2Prev">Voltar</button>
+                <button type="button" class="btn-next" id="page2Next">Próximo</button>
+            </div>
         </div>
 
-        <!-- BOTÕES -->
-        <button type="submit">Cadastrar</button>
+        <div class="form-page" id="page-cep">
+            <div class="campo">
+                <label for="cep">CEP</label>
+                <div class="input-container">
+                    <input type="text" name="cep" id="cep" placeholder="00000-000" maxlength="9">
+                    <span id="icon-cep"></span>
+                </div>
+                <div class="erro-texto" id="erro-cep"></div>
+            </div>
+
+            <div class="campo">
+                <label for="rua">Rua</label>
+                <input type="text" name="rua" id="rua" readonly>
+            </div>
+
+            <div class="campo">
+                <label for="cidade">Cidade</label>
+                <input type="text" name="cidade" id="cidade" readonly>
+            </div>
+
+            <div class="campo">
+                <label for="estado">Estado</label>
+                <input type="text" name="estado" id="estado" readonly>
+            </div>
+
+            <div class="campo">
+                <label for="numeroCasa">Número</label>
+                <input type="text" name="numeroCasa" id="numeroCasa" placeholder="Número da casa">
+            </div>
+
+            <div class="campo">
+                <label for="complemento">Complemento</label>
+                <input type="text" name="complemento" id="complemento" placeholder="Complemento">
+            </div>
+
+            <div class="button-row">
+                <button type="button" class="btn-prev" id="page3Prev">Voltar</button>
+                <button type="button" class="btn-next" id="page3Next">Próximo</button>
+            </div>
+        </div>
+
+        <div class="form-page" id="page-senha">
+            <div class="campo">
+                <label for="senha">Senha</label>
+                <div class="senha-container input-container">
+                    <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
+                    <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+                    <span id="icon-senha"></span>
+                </div>
+                <div class="erro-texto" id="erro-senha"></div>
+
+                <div class="requisitos-senha" id="requisitosSenha">
+                    <p id="req-maiuscula">❌ Letra maiúscula</p>
+                    <p id="req-minuscula">❌ Letra minúscula</p>
+                    <p id="req-numero">❌ Número</p>
+                    <p id="req-especial">❌ Caractere especial</p>
+                    <p id="req-tamanho">❌ Mínimo 8 caracteres</p>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="confirmarSenha">Confirmar senha</label>
+                <div class="senha-container input-container">
+                    <input type="password" name="senhaConferencia" id="confirmarSenha" placeholder="Repita sua senha">
+                    <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
+                    <span id="icon-confirmar"></span>
+                </div>
+                <div class="erro-texto" id="erro-confirmar"></div>
+            </div>
+
+            <div class="button-row">
+                <button type="button" class="btn-prev" id="page4Prev">Voltar</button>
+                <button type="submit">Cadastrar</button>
+            </div>
+        </div>
 
         <button type="button" onclick="window.location.href='login.html'">
             Já tenho conta
