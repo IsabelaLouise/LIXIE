@@ -20,6 +20,11 @@ header {
     font-weight: bold;
 }
 
+.logo-img {
+    max-height: 55px;
+    width: auto;
+}
+
 /* MAIN */
 main {
     display: flex;
@@ -45,6 +50,13 @@ form {
 /* TÍTULO */
 h2 {
     margin: 0 0 18px;
+}
+
+main > p {
+    margin: 0 0 24px;
+    max-width: 520px;
+    text-align: center;
+    color: #4f6a4f;
 }
 
 /* INPUT */
@@ -93,15 +105,22 @@ input.sucesso {
 
 /* SENHA */
 .senha-container {
-    position: central;
+    position: relative;
 }
 
 .toggle-senha {
     position: absolute;
-    right: 40px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    line-height: 1;
+    font-size: 16px;
 }
 
 /* BOTÕES */
@@ -133,6 +152,17 @@ button[type="button"] {
 
 button[type="button"]:hover {
     background-color: #e8f5e9;
+}
+
+/* BOTÃO PRIMÁRIO */
+button.btn-primary {
+    background-color: #5b9e69;
+    color: white;
+    border: none;
+}
+
+button.btn-primary:hover {
+    background-color: #4a8c58;
 }
 
 /* MENSAGEM */

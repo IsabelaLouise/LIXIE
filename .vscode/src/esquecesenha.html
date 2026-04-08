@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esqueci a senha</title>
+    <link rel="stylesheet" href="./cadastro.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <img src="logo.png" alt="Lixie" class="logo-img">
+</header>
+<main>
+    <h2>Recuperar senha</h2>
+    <p>Informe o mesmo email usado no cadastro para verificar sua conta.</p>
+    <form id="formEsqueci" novalidate>
+        <div id="mensagem" class="mensagem"></div>
+
+        <div class="form-page active" id="step-email">
+            <div class="campo">
+                <label for="email">Email</label>
+                <div class="input-container">
+                    <input type="email" name="email" id="email" placeholder="seuemail@email.com">
+                    <span id="icon-email"></span>
+                </div>
+                <div class="erro-texto" id="erro-email"></div>
+            </div>
+
+            <button type="button" id="btnConfirmarEmail" class="btn-primary">Confirmar email</button>
+            <button type="button" onclick="window.location.href='login.html'">Voltar para login</button>
+        </div>
+
+        <div class="form-page" id="step-senha">
+            <div class="campo">
+                <label for="senha">Nova senha</label>
+                <div class="senha-container input-container">
+                    <input type="password" name="senha" id="senha" placeholder="Digite sua nova senha">
+                    <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+                    <span id="icon-senha"></span>
+                </div>
+                <div class="erro-texto" id="erro-senha"></div>
+            </div>
+
+            <div class="campo">
+                <label for="confirmarSenha">Confirmar senha</label>
+                <div class="senha-container input-container">
+                    <input type="password" name="confirmarSenha" id="confirmarSenha" placeholder="Repita sua nova senha">
+                    <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">🔒</span>
+                    <span id="icon-confirmar"></span>
+                </div>
+                <div class="erro-texto" id="erro-confirmar"></div>
+            </div>
+
+            <div class="requisitos-senha" id="requisitosSenha">
+                <p id="req-maiuscula">❌ Letra maiúscula</p>
+                <p id="req-minuscula">❌ Letra minúscula</p>
+                <p id="req-numero">❌ Número</p>
+                <p id="req-especial">❌ Caractere especial</p>
+                <p id="req-tamanho">❌ Mínimo 8 caracteres</p>
+            </div>
+
+            <button type="button" id="btnAlterarSenha" class="btn-primary">Alterar senha</button>
+            <button type="button" onclick="window.location.href='login.html'">Voltar para login</button>
+        </div>
+    </form>
+</main>
+<script src="esquecesenha.js"></script>
+</body>
+</html>

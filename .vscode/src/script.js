@@ -335,6 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const dados = await resposta.json();
 
       if (resposta.ok) {
+        localStorage.setItem('cadastroEmail', email.value.trim());
         mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
         form.reset();
         limparFormulario();
