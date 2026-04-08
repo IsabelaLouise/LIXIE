@@ -162,6 +162,37 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 if conexao and conexao.is_connected():
                     cursor.close()
                     conexao.close()
+        elif self.path == '/dados-usuario':
+            content_length = int(self.headers['Content-Length'])
+            corpo_requisicao = self.rfile.read(content_length)
+            from urllib.parse import parse_qs
+
+            dados = parse_qs(corpo_requisicao.decode())
+            email = dados.get("email", [""])[0]
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                SELECT Nome, Pontuacao_Total_Acumulada_, Nivel 
+                FROM Usuario WHERE Email = %s
+            """, (email,))
+
+            usuario = cursor.fetchone()
+
+            resposta = {
+                "nome": usuario[0],
+                "pontos": usuario[1],
+                "nivel": usuario[2]
+            }
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(resposta).encode())
+
+            cursor.close()
+            conexao.close()
 
 
 # === INICIALIZAÇÃO ===
