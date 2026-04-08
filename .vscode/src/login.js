@@ -17,7 +17,8 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     const dados = await resposta.json();
 
     if (dados.sucesso) {
-      window.location.href = "homePrincipal.html";
+    localStorage.setItem("usuarioEmail", email); // salva quem logou
+    window.location.href = "homePrincipal.html";
     } else {
       mensagem.textContent = dados.mensagem;
       mensagem.style.display = "block";
@@ -28,3 +29,4 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     mensagem.style.display = "block";
   }
 });
+
