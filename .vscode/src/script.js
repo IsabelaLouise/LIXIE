@@ -81,6 +81,47 @@ document.addEventListener("DOMContentLoaded", function () {
     return true;
   }
 
+  function validarData() {
+    const dataValor = data.value.trim();
+    const partes = dataValor.split("/");
+
+    if (partes.length !== 3) {
+      mostrarErro(data, "erro-data", "Data inválida");
+      return false;
+    }
+
+    const dia = Number(partes[0]);
+    const mes = Number(partes[1]);
+    const ano = Number(partes[2]);
+    const hoje = new Date();
+    const nascimento = new Date(ano, mes - 1, dia);
+    const idade = hoje.getFullYear() - ano - (hoje.getMonth() < mes - 1 || (hoje.getMonth() === mes - 1 && hoje.getDate() < dia) ? 1 : 0);
+
+    const dataValida = nascimento.getFullYear() === ano && nascimento.getMonth() === mes - 1 && nascimento.getDate() === dia;
+    if (!dataValida) {
+      mostrarErro(data, "erro-data", "Data inválida");
+      return false;
+    }
+
+    if (nascimento > hoje) {
+      mostrarErro(data, "erro-data", "Data no futuro não é permitida");
+      return false;
+    }
+
+    if (idade < 16) {
+      mostrarErro(data, "erro-data", "Você precisa ter pelo menos 16 anos");
+      return false;
+    }
+
+    if (idade > 120) {
+      mostrarErro(data, "erro-data", "Idade inválida");
+      return false;
+    }
+
+    sucessoInput(data, "erro-data");
+    return true;
+  }
+
   function validarDadosPessoais() {
     let valido = true;
 
@@ -91,35 +132,8 @@ document.addEventListener("DOMContentLoaded", function () {
       sucessoInput(nome, "erro-nome");
     }
 
-    const dataValor = data.value.trim();
-    const partes = dataValor.split("/");
-    if (partes.length !== 3) {
-      mostrarErro(data, "erro-data", "Data inválida");
+    if (!validarData()) {
       valido = false;
-    } else {
-      const dia = Number(partes[0]);
-      const mes = Number(partes[1]);
-      const ano = Number(partes[2]);
-      const hoje = new Date();
-      const nascimento = new Date(ano, mes - 1, dia);
-      const idade = hoje.getFullYear() - ano - (hoje.getMonth() < mes - 1 || (hoje.getMonth() === mes - 1 && hoje.getDate() < dia) ? 1 : 0);
-
-      const dataValida = nascimento.getFullYear() === ano && nascimento.getMonth() === mes - 1 && nascimento.getDate() === dia;
-      if (!dataValida) {
-        mostrarErro(data, "erro-data", "Data inválida");
-        valido = false;
-      } else if (nascimento > hoje) {
-        mostrarErro(data, "erro-data", "Data no futuro não é permitida");
-        valido = false;
-      } else if (idade < 16) {
-        mostrarErro(data, "erro-data", "Você precisa ter pelo menos 16 anos");
-        valido = false;
-      } else if (idade > 120) {
-        mostrarErro(data, "erro-data", "Idade inválida");
-        valido = false;
-      } else {
-        sucessoInput(data, "erro-data");
-      }
     }
 
     if (numero.value.replace(/\D/g, "").length < 10) {
@@ -198,7 +212,16 @@ document.addEventListener("DOMContentLoaded", function () {
       nome.value = valor;
     }
 
-    if (valor.trim().length < 6) {
+    const valorTrim = valor.trim();
+    if (valorTrim.length === 0) {
+      nome.classList.remove("erro", "sucesso");
+      const erro = document.getElementById("erro-nome");
+      erro.textContent = "";
+      erro.classList.remove("ativo");
+      return;
+    }
+
+    if (valorTrim.length < 6) {
       mostrarErro(nome, "erro-nome", "O nome deve ter pelo menos 6 caracteres e sem números");
     } else {
       sucessoInput(nome, "erro-nome");
@@ -217,8 +240,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     e.target.value = v;
 
+    if (v.length === 0) {
+      data.classList.remove("erro", "sucesso");
+      const erro = document.getElementById("erro-data");
+      erro.textContent = "";
+      erro.classList.remove("ativo");
+      return;
+    }
+
     if (v.length === 10) {
-      validarDadosPessoais();
+      validarData();
     }
   });
 
@@ -231,7 +262,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     e.target.value = v;
 
-    if (v.replace(/\D/g, "").length >= 10) {
+    const digits = v.replace(/\D/g, "");
+    if (digits.length === 0) {
+      numero.classList.remove("erro", "sucesso");
+      const erro = document.getElementById("erro-numero");
+      erro.textContent = "";
+      erro.classList.remove("ativo");
+      return;
+    }
+
+    if (digits.length >= 10) {
       sucessoInput(numero, "erro-numero");
     }
   });
