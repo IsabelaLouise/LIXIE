@@ -10,11 +10,11 @@ from datetime import datetime
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
-    "host": "localhost",
+    "host": "mainline.proxy.rlwy.net",
     "user": "root",
-    "password": "Ilcs050607",
+    "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
     "database": "Lixie",
-    "port": 3306
+    "port": 28939
 }
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
