@@ -168,12 +168,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const el = document.getElementById(id);
       if (!el) return;
 
+      const textoBase = el.textContent.replace(/^(?:[❌✔️]\s*)+/, "").trim();
+
       if (valido) {
         el.classList.add("ok");
-        el.textContent = "✔️ " + el.textContent.replace(/^❌\s*/, "");
+        el.textContent = "✔️ " + textoBase;
       } else {
         el.classList.remove("ok");
-        el.textContent = "❌ " + el.textContent.replace(/^✔️\s*/, "");
+        el.textContent = "❌ " + textoBase;
       }
     };
 
