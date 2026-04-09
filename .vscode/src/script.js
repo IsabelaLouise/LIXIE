@@ -405,15 +405,31 @@ document.addEventListener("DOMContentLoaded", function () {
   mostrarPagina(currentPage);
 });
 
-function toggleSenha(id, elemento) {
-  const input = document.getElementById(id);
+function toggleSenha() {
+  const senha = document.getElementById("senha");
+  const confirmar = document.getElementById("confirmarSenha");
 
-  if (input.type === "password") {
-    input.type = "text";
-    elemento.textContent = "🔓";
+  const icones = document.querySelectorAll(".toggle-senha");
+
+  const mostrando = senha.type === "text";
+
+  if (mostrando) {
+    senha.type = "password";
+    confirmar.type = "password";
+
+    icones.forEach(icon => {
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    });
+
   } else {
-    input.type = "password";
-    elemento.textContent = "🔒";
+    senha.type = "text";
+    confirmar.type = "text";
+
+    icones.forEach(icon => {
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    });
   }
 }
 
