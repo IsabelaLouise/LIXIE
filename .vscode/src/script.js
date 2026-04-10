@@ -381,6 +381,9 @@ document.addEventListener("DOMContentLoaded", function () {
         limparFormulario();
         currentPage = 0;
         mostrarPagina(currentPage);
+        setTimeout(() => {
+      window.location.href = "homeLogado.html";
+      }, 1500);
       } else {
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
       }
