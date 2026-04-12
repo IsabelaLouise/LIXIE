@@ -30,5 +30,5 @@ if (!email) {
 
 function logout() {
   localStorage.removeItem("usuarioEmail");
-  window.location.href = "/.vscode/src/cadastrese.html";
+  window.location.href = "/.vscode/src/homeNaoLogado.html";
 }
