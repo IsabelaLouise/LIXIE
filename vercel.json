@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/.vscode/src/homNaoLogado.html"
+      "destination": "/.vscode/src/homeNaoLogado.html"
     },
     {
       "source": "/(.*)",
