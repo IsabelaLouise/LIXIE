@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Cadastre-se</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./PerfilUsuário.css">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Lixie" class="logo-img">
+    </header>
+    <main>
+        <h2>Perfil do Usuário</h2>
+
+        <div class="ContainerPerfil">  
+            <form id="formPerfil" novalidate>
+
+                <!-- FT PERFIL -->
+                <img src="avatar.png" width="120" height="120" alt="Avatar do usuário" class="avatar-img">
+                <button type="button" class="btn-alterar-foto">Alterar Foto</button>
+                <br>
+
+                <!-- NOME -->
+                <div class="campo">
+                    <label for="nome">Nome</label>
+                    <div class="input-container">
+                        <input type="text" name="nome" id="nome" placeholder="Nome da pessoa logada">
+                        <span id="icon-nome"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-nome"></div>
+                </div>
+
+                <!-- EMAIL -->
+                <div class="campo">
+                    <label for="email">Email</label>
+                    <div class="input-container">
+                        <input type="text" name="email" id="email" placeholder="Email da pessoa logada">
+                        <span id="icon-email"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-email"></div>
+                </div>
+
+                <!-- TEL -->
+                <div class="campo">
+                    <label for="tel">Telefone</label>
+                    <div class="input-container">
+                        <input type="text" name="tel" id="tel" placeholder="Telefone da pessoa logada">
+                        <span id="icon-tel"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-tel"></div>
+                </div>
+
+                <!-- DATA NASCIMENTO -->
+                <div class="campo">
+                    <label for="dataNascimento">Data de Nascimento</label>
+                    <div class="input-container">
+                        <input type="date" name="dataNascimento" id="dataNascimento" placeholder="Data de nascimento da pessoa logada"disabled>
+                        <span id="icon-dataNascimento"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-dataNascimento"></div>
+                </div>           
+
+                <div class="ContainerInfoEndereco">
+                    <!-- CEP -->
+                    <div class="campo">
+                        <label for="cep">CEP</label>
+                        <div class="input-container">
+                            <input type="text" name="cep" id="cep" placeholder="CEP da pessoa logada">
+                            <span id="icon-cep"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-cep"></div>
+                    </div>
+                    <!-- NUM -->
+                    <div class="campo">
+                        <label for="num">Num</label>
+                        <div class="input-container">
+                            <input type="text" name="num" id="num" placeholder="Número da casa da pessoa logada">
+                            <span id="icon-num"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-num"></div>
+                    </div>
+                    <!-- COMPLEMENTO -->
+                    <div class="campo">
+                        <label for="complemento">Complemento</label>
+                        <div class="input-container">
+                            <input type="text" name="complemento" id="complemento" placeholder="Complemento da casa da pessoa logada">
+                            <span id="icon-complemento"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-complemento"></div>
+                    </div>
+                </div>
+
+                <!-- SENHA -->
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <div class="input-container">
+                        <input type="password" name="senha" id="senha" placeholder="Senha da pessoa logada" disabled>
+                        <span id="icon-senha"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-senha"></div>
+                </div>
+                <button type="button" class="btn-alterar-senha">Alterar Senha</button>
+
+                <br>
+                <button type="submit" class="btn-salvar">Salvar Alterações</button>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
