@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/.vscode/src/cadastrese.html"
+    }
+  ]
+}
