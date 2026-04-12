@@ -1,5 +1,5 @@
 // homeLogado.js (Privado)
-const email = localStorage.getItem("usuarioEmail");
+const email = localStorage.setItem('usuarioEmail', email.value.trim());;
 
 if (!email) {
   // 🚫 Se tentar entrar sem logar, vai para a página de entrada
