@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", function () {
         currentPage = 0;
         mostrarPagina(currentPage);
         setTimeout(() => {
-      window.location.href = "homeLogado.html";
+      window.location.href = "/.vscode/src/homeLogado.html";
       }, 1500);
       } else {
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");

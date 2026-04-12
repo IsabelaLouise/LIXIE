@@ -2,7 +2,7 @@ const email = localStorage.getItem("usuarioEmail");
 
 if (!email) {
   // 🚫 não está logado
-  window.location.href = "login.html";
+  window.location.href = "/.vscode/src/login.html";
 } else {
 
   // ✅ só executa se tiver logado
@@ -27,5 +27,5 @@ if (!email) {
 
 function logout() {
   localStorage.removeItem("usuarioEmail"); // apaga quem está logado
-  window.location.href = "login.html"; // volta pro login
+  window.location.href = "/.vscode/src/login.html"; // volta pro login
 }

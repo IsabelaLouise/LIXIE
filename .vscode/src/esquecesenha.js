@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mostrarMensagem("Senha alterada com sucesso!", "sucesso");
 
         setTimeout(() => {
-          window.location.href = "login.html";
+          window.location.href = "/.vscode/src/login.html";
         }, 1500);
 
       } else {

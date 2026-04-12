@@ -18,7 +18,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
 
     if (dados.sucesso) {
     localStorage.setItem("usuarioEmail", email); // salva quem logou
-    window.location.href = "homeLogado.html";
+    window.location.href = "/.vscode/src/homeLogado.html";
     } else {
       mensagem.textContent = dados.mensagem;
       mensagem.style.display = "block";
