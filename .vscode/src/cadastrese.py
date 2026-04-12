@@ -22,8 +22,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
     
     # === CORS ===
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Origin', '*') # Permite qualquer site (Vercel) acessar
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         super().end_headers()
 
@@ -358,24 +358,11 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
-    endereco = ('localhost', 8000)
-    servidor = http.server.HTTPServer(endereco, ServidorCadastro)
-    print(f"Servidor rodando em http://{endereco[0]}:{endereco[1]}")
-    servidor.serve_forever()
-
-if __name__ == "__main__":
-    # O Railway passa a porta via variável de ambiente PORT
-    porta = int(os.environ.get("PORT", 8000)) 
-    server_address = ('0.0.0.0', porta) # '0.0.0.0' permite conexões externas
-    httpd = http.server.HTTPServer(server_address, ServidorCadastro)
-    print(f"Servidor rodando na porta {porta}...")
-    httpd.serve_forever()
-
-if __name__ == "__main__":
-    # O Railway injeta o número da porta nesta variável de ambiente
-    port = int(os.environ.get("PORT", 8080)) 
+    # O Railway injeta o número da porta nesta variável de ambiente. 
+    # Se não houver, ele usa a 8000 por padrão.
+    port = int(os.environ.get("PORT", 8000)) 
     
-    # '0.0.0.0' é fundamental para que o servidor seja acessível externamente
+    # '0.0.0.0' é OBRIGATÓRIO para o Railway conseguir te dar um domínio.
     server_address = ('0.0.0.0', port)
     httpd = http.server.HTTPServer(server_address, ServidorCadastro)
     print(f"Servidor rodando na porta {port}...")
