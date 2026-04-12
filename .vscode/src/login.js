@@ -6,7 +6,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   const mensagem = document.getElementById("mensagem");
 
   try {
-    const resposta = await fetch("http://localhost:8000/login", {
+    const resposta = await fetch("https://lixie-production.up.railway.app/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
