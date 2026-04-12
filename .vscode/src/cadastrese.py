@@ -36,7 +36,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
         # =========================
         # CADASTRO
         # =========================
-        if self.path == '/cadastrar':
+        if self.path.rstrip('/') == '/cadastrar':
             content_length = int(self.headers['Content-Length'])
             corpo_requisicao = self.rfile.read(content_length)
             from urllib.parse import parse_qs
