@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const formData = new URLSearchParams(new FormData(form));
 
-      const resposta = await fetch("mysql://root:UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm@mysql.railway.internal:3306/railway", {
+      const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
         method: "POST",
         body: formData
       });
