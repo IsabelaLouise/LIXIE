@@ -5,6 +5,7 @@ import bcrypt
 import smtplib
 import ssl
 import secrets
+import os
 from email.mime.text import MIMEText
 from datetime import datetime
 
@@ -279,7 +280,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 conexao.commit()
 
                 # 🔗 link de recuperação
-                link = f"http://localhost:5501/.vscode/src/esquecesenha.html?token={token}"
+                link = f"http://SEU-IP:5501/esquecesenha.html?token={token}"
 
                 # 📧 EMAIL REAL
                 remetente = "isabelalouise.cs@gmail.com"
@@ -361,3 +362,21 @@ if __name__ == "__main__":
     servidor = http.server.HTTPServer(endereco, ServidorCadastro)
     print(f"Servidor rodando em http://{endereco[0]}:{endereco[1]}")
     servidor.serve_forever()
+
+if __name__ == "__main__":
+    # O Railway passa a porta via variável de ambiente PORT
+    porta = int(os.environ.get("PORT", 8000)) 
+    server_address = ('0.0.0.0', porta) # '0.0.0.0' permite conexões externas
+    httpd = http.server.HTTPServer(server_address, ServidorCadastro)
+    print(f"Servidor rodando na porta {porta}...")
+    httpd.serve_forever()
+
+if __name__ == "__main__":
+    # O Railway injeta o número da porta nesta variável de ambiente
+    port = int(os.environ.get("PORT", 8080)) 
+    
+    # '0.0.0.0' é fundamental para que o servidor seja acessível externamente
+    server_address = ('0.0.0.0', port)
+    httpd = http.server.HTTPServer(server_address, ServidorCadastro)
+    print(f"Servidor rodando na porta {port}...")
+    httpd.serve_forever()

@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const formData = new URLSearchParams(new FormData(form));
 
-      const resposta = await fetch("http://localhost:8000/cadastrar", {
+      const resposta = await fetch("mysql://root:UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm@mysql.railway.internal:3306/railway", {
         method: "POST",
         body: formData
       });
