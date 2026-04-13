@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -43,8 +44,8 @@
         <div class="campo">
             <label for="senha">Senha</label>
             <div class="senha-container input-container">
-                <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
-                <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
+                <input type="password" id="senha" placeholder="Digite sua senha">
+                <i class="fa fa-eye toggle-senha" onclick="toggleSenhaLogin(this)"></i>
                 <span id="icon-senha"></span>
             </div>
             <div class="erro-texto" id="erro-senha"></div>

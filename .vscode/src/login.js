@@ -17,8 +17,8 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     const dados = await resposta.json();
 
     if (dados.sucesso) {
-    localStorage.setItem("usuarioEmail", email); // salva quem logou
-    window.location.href = "/.vscode/src/homeLogado.html";
+      localStorage.setItem("usuarioEmail", email);
+      window.location.href = "/.vscode/src/homeLogado.html";
     } else {
       mensagem.textContent = dados.mensagem;
       mensagem.style.display = "block";
@@ -30,3 +30,20 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   }
 });
 
+
+// 👇 FORA DO EVENTO (IMPORTANTE)
+function toggleSenhaLogin(elemento) {
+  console.log("clicou");
+
+  const input = document.getElementById("senha");
+
+  if (input.type === "password") {
+    input.type = "text";
+    elemento.classList.remove("fa-eye");
+    elemento.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    elemento.classList.remove("fa-eye-slash");
+    elemento.classList.add("fa-eye");
+  }
+}
