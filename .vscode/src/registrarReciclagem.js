@@ -4,13 +4,13 @@ let pontosTotais = 0;
 // pontos por material (base em KG)
 const pontosPorMaterial = {
   plastico: 10,
-  papel: 5,
+  papel: 4,
   vidro: 8,
   metal: 15,
   organico: 6
 };
 
-// 🔥 converter para KG
+// converter para KG
 function converterParaKg(valor, unidade) {
   switch (unidade) {
     case "g":
@@ -57,10 +57,10 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
     return;
   }
 
-  // 🔥 CONVERSÃO CORRETA
+  // CONVERSÃO CORRETA
   const quantidadeKg = converterParaKg(quantidade, unidade);
 
-  // 🔥 CÁLCULO CORRETO
+  // CÁLCULO CORRETO
   const pontos = Math.round(
     quantidadeKg * (pontosPorMaterial[tipoSelecionado] || 0)
   );
@@ -71,13 +71,19 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
 
   // mensagem final
   resultado.className = "sucesso";
-  resultado.innerHTML = `
-    ✅ Registrado com sucesso! <br>
-    ♻️ Material: ${tipoSelecionado} <br>
-    ⚖️ Quantidade: ${quantidade} ${unidade} <br>
-    📦 Equivalente: ${quantidadeKg.toFixed(2)} kg <br>
-    ⭐ Pontos ganhos: ${pontos}
-  `;
+  let mensagem = `
+  ✅ Registrado com sucesso! <br>
+  ♻️ Material: ${tipoSelecionado} <br>
+  ⚖️ Quantidade: ${quantidade} ${unidade} <br>
+`;
+
+if (unidade !== "un") {
+  mensagem += `📦 Equivalente: ${quantidadeKg.toFixed(2)} kg <br>`;
+}
+
+mensagem += `⭐ Pontos ganhos: ${pontos}`;
+
+resultado.innerHTML = mensagem;
 
   // limpar formulário
   document.getElementById("quantidade").value = "";
