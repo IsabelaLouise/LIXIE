@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!validarEmailFormato()) return;
 
-    fetch("http://localhost:8000/esqueci-senha", {
+    fetch("https://lixie-production.up.railway.app/esqueci-senha", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!validarSenha()) return;
 
-    fetch("http://localhost:8000/redefinir-com-token", {
+    fetch("https://lixie-production.up.railway.app/redefinir-com-token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -141,14 +141,13 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .then(res => res.json())
     .then(data => {
-      if (data.sucesso) {
+    if (data.sucesso) {
         mostrarMensagem("Senha alterada com sucesso!", "sucesso");
-
         setTimeout(() => {
-          window.location.href = "/.vscode/src/login.html";
+            // Caminho simplificado para a Vercel
+            window.location.href = "/login.html"; 
         }, 1500);
-
-      } else {
+    } else {
         mostrarMensagem(data.mensagem || "Erro ao alterar senha", "erro");
       }
     })
