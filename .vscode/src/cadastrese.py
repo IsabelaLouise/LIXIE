@@ -20,13 +20,14 @@ DB_CONFIG = {
 }
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
-    
-    # === CORS ===
+
+# === CORS ===
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        super().end_headers()
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Max-Age', '86400') 
+        super().end_headers() # APENAS UMA VEZ AQUI
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -303,14 +304,21 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     """
                     mensagem.attach(MIMEText(corpo_html, 'html'))
 
-                    # ENVIO REAL
-                    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-                        server.login(meu_email, minha_senha)
-                        server.sendmail(meu_email, email_destino, mensagem.as_string())
-
-                    resposta = {"sucesso": True}
-                else:
-                    resposta = {"sucesso": False, "mensagem": "Email não encontrado"}
+                    # Substitua o bloco de ENVIO REAL por este:
+                    # --- CONFIGURAÇÃO E ENVIO REAL ---
+                    try:
+                        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                            server.starttls() 
+                            server.login(meu_email, minha_senha)
+                            server.sendmail(meu_email, email_destino, mensagem.as_string())
+                        
+                        # Se chegou aqui, deu certo
+                        resposta = {"sucesso": True}
+                        
+                    except Exception as e:
+                        print(f"❌ Erro específico no SMTP: {e}")
+                        # Se deu erro no envio, repassa para o except geral
+                        raise e
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
