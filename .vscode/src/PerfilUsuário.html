@@ -21,58 +21,59 @@
     <main>
         <h2>Perfil do Usuário</h2>
 
-        <div class="ContainerPerfil">  
+        <div class="perfil-container">  
             <form id="formPerfil" novalidate>
 
-                <!-- FT PERFIL -->
-                <img src="avatar.png" width="120" height="120" alt="Avatar do usuário" class="avatar-img" id="avatar">
-                <label for="foto-perfil">Alterar Foto</label>
-                <input type="file" accept="image/jpeg,image/png" class="input-file" id="foto-perfil">
-                <br>
-
-                <!-- NOME -->
-                <div class="campo">
-                    <label for="nome">Nome</label>
-                    <div class="input-container">
-                        <input type="text" name="nome" id="nome" placeholder="Nome da pessoa logada">
-                        <span id="icon-nome"></span>
+                <div class="grid-container">
+                    <!-- FT PERFIL -->
+                    <div class="campo" id="campo-1">
+                        <img src="/.vscode/src/img/avatar.png" alt="Avatar do usuário" class="avatar-img" id="avatar">
+                        <label for="foto-perfil">Alterar Foto</label>
+                        <input type="file" accept="image/jpeg,image/png" class="input-file" id="foto-perfil">
                     </div>
-                    <div class="erro-texto" id="erro-nome"></div>
-                </div>
 
-                <!-- EMAIL -->
-                <div class="campo">
-                    <label for="email">Email</label>
-                    <div class="input-container">
-                        <input type="text" name="email" id="email" placeholder="Email da pessoa logada">
-                        <span id="icon-email"></span>
+                    <!-- NOME -->
+                    <div class="campo" id="campo-2">
+                        <label for="nome">Nome</label>
+                        <div class="input-container">
+                            <input type="text" name="nome" id="nome" placeholder="Nome da pessoa logada">
+                            <span id="icon-nome"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-nome"></div>
                     </div>
-                    <div class="erro-texto" id="erro-email"></div>
-                </div>
 
-                <!-- TEL -->
-                <div class="campo">
-                    <label for="tel">Telefone</label>
-                    <div class="input-container">
-                        <input type="text" name="tel" id="tel" placeholder="Telefone da pessoa logada">
-                        <span id="icon-tel"></span>
+                    <!-- EMAIL -->
+                    <div class="campo" id="campo-3">
+                        <label for="email">Email</label>
+                        <div class="input-container">
+                            <input type="text" name="email" id="email" placeholder="Email da pessoa logada">
+                            <span id="icon-email"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-email"></div>
                     </div>
-                    <div class="erro-texto" id="erro-tel"></div>
-                </div>
 
-                <!-- DATA NASCIMENTO -->
-                <div class="campo">
-                    <label for="dataNascimento">Data de Nascimento</label>
-                    <div class="input-container">
-                        <input type="date" name="dataNascimento" id="dataNascimento" placeholder="Data de nascimento da pessoa logada"disabled>
-                        <span id="icon-dataNascimento"></span>
+                    <!-- TEL -->
+                    <div class="campo" id="campo-4">
+                        <label for="tel">Telefone</label>
+                        <div class="input-container">
+                            <input type="text" name="tel" id="tel" placeholder="Telefone da pessoa logada">
+                            <span id="icon-tel"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-tel"></div>
                     </div>
-                    <div class="erro-texto" id="erro-dataNascimento"></div>
-                </div>           
 
-                <div class="ContainerInfoEndereco">
+                    <!-- DATA NASCIMENTO -->
+                    <div class="campo" id="campo-5">
+                        <label for="dataNascimento">Data de Nascimento</label>
+                        <div class="input-container">
+                            <input type="date" name="dataNascimento" id="dataNascimento" placeholder="Data de nascimento da pessoa logada"disabled>
+                            <span id="icon-dataNascimento"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-dataNascimento"></div>
+                    </div>           
+
                     <!-- CEP -->
-                    <div class="campo">
+                    <div class="campo" id="campo-6">
                         <label for="cep">CEP</label>
                         <div class="input-container">
                             <input type="text" name="cep" id="cep" placeholder="CEP da pessoa logada">
@@ -82,17 +83,17 @@
                     </div>
 
                     <!-- NUM -->
-                    <div class="campo">
+                    <div class="campo" id="campo-7">
                         <label for="num">Num</label>
                         <div class="input-container">
                             <input type="text" name="num" id="num" placeholder="Número da casa da pessoa logada">
-                             <span id="icon-num"></span>
+                            <span id="icon-num"></span>
                         </div>
                         <div class="erro-texto" id="erro-num"></div>
                     </div>
 
                     <!-- COMPLEMENTO -->
-                    <div class="campo">
+                    <div class="campo" id="campo-8">
                         <label for="complemento">Complemento</label>
                         <div class="input-container">
                             <input type="text" name="complemento" id="complemento" placeholder="Complemento da casa da pessoa logada">
@@ -100,22 +101,23 @@
                         </div>
                         <div class="erro-texto" id="erro-complemento"></div>
                     </div>
-                </div>
-
-                <!-- SENHA -->
-                <div class="campo">
-                    <label for="senha">Senha</label>
-                    <div class="input-container">
-                        <input type="password" name="senha" id="senha" placeholder="Senha da pessoa logada" disabled>
-                        <span id="icon-senha"></span>
+                    
+                    <!-- SENHA -->
+                    <div class="campo" id="campo-9">
+                        <label for="senha">Senha</label>
+                        <div class="input-container">
+                            <input type="password" name="senha" id="senha" placeholder="Senha da pessoa logada" disabled>
+                            <span id="icon-senha"></span>
+                        </div>
+                        <div class="erro-texto" id="erro-senha"></div>
+                        <button type="button" class="btn-alterar-senha">Alterar Senha</button>
                     </div>
-                    <div class="erro-texto" id="erro-senha"></div>
+
+                    <div class="campo" id="campo-10">
+                        <button type="submit" class="btn-salvar" id="Submit-Perfil">Salvar Alterações</button>
+                    </div>
+
                 </div>
-                <button type="button" class="btn-alterar-senha">Alterar Senha</button>
-
-                <br>
-                <button type="submit" class="btn-salvar">Salvar Alterações</button>
-
             </form>
         </div>
     </main>
