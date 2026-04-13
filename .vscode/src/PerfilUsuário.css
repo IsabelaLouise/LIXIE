@@ -328,3 +328,41 @@ input.erro {
     display: block;
     color: #5b9e69;
 }
+
+label[for="foto-perfil"] {
+    width: 70%;
+    height: 38px;
+    padding:0 16px;
+    border-radius: 50px;
+    border: none;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #5b9e69;
+    color: white;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* BOTÃO SECUNDÁRIO */
+label[for="foto-perfil"] {
+    background: rgba(72, 159, 88, 0.08);
+    color: #5b9e69;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+label[for="foto-perfil"]:hover {
+    background-color:rgba(38, 133, 59, 0.15);
+    transform: none;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+button.btn-alterar-senha {
+    width: 70%;
+}

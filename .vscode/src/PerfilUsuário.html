@@ -25,8 +25,9 @@
             <form id="formPerfil" novalidate>
 
                 <!-- FT PERFIL -->
-                <img src="avatar.png" width="120" height="120" alt="Avatar do usuário" class="avatar-img">
-                <button type="button" class="btn-alterar-foto">Alterar Foto</button>
+                <img src="avatar.png" width="120" height="120" alt="Avatar do usuário" class="avatar-img" id="avatar">
+                <label for="foto-perfil">Alterar Foto</label>
+                <input type="file" accept="image/jpeg,image/png" class="input-file" id="foto-perfil">
                 <br>
 
                 <!-- NOME -->
@@ -120,4 +121,6 @@
     </main>
 
 </body>
+
+<script src="PerfilUsuário.js"></script>
 </html>
