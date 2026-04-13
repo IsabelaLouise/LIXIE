@@ -21,10 +21,14 @@
     <main>
         <h2>Perfil do Usuário</h2>
 
+        
         <div class="perfil-container">  
+            <a href="homeLogado.html" id="bnt-fechar">X</a>
             <form id="formPerfil" novalidate>
-
+                
                 <div class="grid-container">
+                    
+
                     <!-- FT PERFIL -->
                     <div class="campo" id="campo-1">
                         <img src="/.vscode/src/img/avatar.png" alt="Avatar do usuário" class="avatar-img" id="avatar">
@@ -86,7 +90,7 @@
                     <div class="campo" id="campo-7">
                         <label for="rua">Rua</label>
                         <div class="input-container">
-                            <input type="text" name="rua" id="rua" placeholder="Rua da pessoa logada">
+                            <input type="text" name="rua" id="rua" placeholder="Rua da pessoa logada" disabled>
                             <span id="icon-rua"></span>
                         </div>
                         <div class="erro-texto" id="erro-rua"></div>
@@ -96,7 +100,7 @@
                     <div class="campo" id="campo-8">
                         <label for="cidade">Cidade</label>
                         <div class="input-container">
-                            <input type="text" name="cidade" id="cidade" placeholder="Cidade da pessoa logada">
+                            <input type="text" name="cidade" id="cidade" placeholder="Cidade da pessoa logada"disabled>
                             <span id="icon-cidade"></span>
                         </div>
                         <div class="erro-texto" id="erro-cidade"></div>
@@ -106,7 +110,7 @@
                     <div class="campo" id="campo-9">
                         <label for="estado">Estado</label>
                         <div class="input-container">
-                            <input type="text" name="estado" id="estado" placeholder="Estado da pessoa logada">
+                            <input type="text" name="estado" id="estado" placeholder="Estado da pessoa logada"disabled>
                             <span id="icon-estado"></span>
                         </div>
                         <div class="erro-texto" id="erro-estado"></div>
@@ -149,6 +153,8 @@
 
                 </div>
             </form>
+
+
         </div>
     </main>
 
