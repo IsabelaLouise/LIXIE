@@ -158,10 +158,11 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
+                print(f"Erro no Esqueci Senha: {e}") # Isso vai aparecer nos logs do Railway
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"erro": str(e)}).encode())
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": str(e)}).encode())
 
             finally:
                 if conexao and conexao.is_connected():
@@ -254,61 +255,69 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
 
         elif self.path == '/esqueci-senha':
-            content_length = int(self.headers['Content-Length'])
-            corpo = self.rfile.read(content_length)
-            from urllib.parse import parse_qs
+            try:
+                content_length = int(self.headers['Content-Length'])
+                corpo = self.rfile.read(content_length)
+                from urllib.parse import parse_qs
 
-            dados = parse_qs(corpo.decode())
-            email = dados.get("email", [""])[0].strip()
+                dados = parse_qs(corpo.decode())
+                email = dados.get("email", [""])[0].strip()
 
-            conexao = mysql.connector.connect(**DB_CONFIG)
-            cursor = conexao.cursor()
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
 
-            cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
-            usuario = cursor.fetchone()
+                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
+                usuario = cursor.fetchone()
 
-            if usuario:
-                # 🔑 gera token seguro
-                token = secrets.token_urlsafe(32)
+                if usuario:
+                    token = secrets.token_urlsafe(32)
 
-                # ⏳ expira em 1 hora
-                cursor.execute("""
-                    UPDATE Usuario 
-                    SET Token_Recuperacao = %s, Token_Expira = DATE_ADD(NOW(), INTERVAL 1 HOUR)
-                    WHERE Email = %s
-                """, (token, email))
-                conexao.commit()
+                    cursor.execute("""
+                        UPDATE Usuario 
+                        SET Token_Recuperacao = %s, Token_Expira = DATE_ADD(NOW(), INTERVAL 1 HOUR)
+                        WHERE Email = %s
+                    """, (token, email))
+                    conexao.commit()
 
-                # 🔗 link de recuperação
-                link = f"http://SEU-IP:5501/esquecesenha.html?token={token}"
+                    link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"
 
-                # 📧 EMAIL REAL
-                remetente = "isabelalouise.cs@gmail.com"
-                senha_email = "tdeoedsljhsxxipd"
+                    remetente = "isabelalouise.cs@gmail.com"
+                    senha_email = "tdeoedsljhsxxipd"
 
-                msg = MIMEText(f"Clique para redefinir sua senha:\n\n{link}")
-                msg["Subject"] = "Recuperação de senha - Lixie"
-                msg["From"] = remetente
-                msg["To"] = email
+                    msg = MIMEText(f"Clique para redefinir sua senha:\n\n{link}")
+                    msg["Subject"] = "Recuperação de senha - Lixie"
+                    msg["From"] = remetente
+                    msg["To"] = email
 
-                contexto = ssl.create_default_context()
+                    contexto = ssl.create_default_context()
 
-                with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=contexto) as server:
-                    server.login(remetente, senha_email)
-                    server.sendmail(remetente, email, msg.as_string())
+                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=contexto) as server:
+                        server.login(remetente, senha_email)
+                        server.sendmail(remetente, email, msg.as_string())
 
-                resposta = {"sucesso": True}
+                    resposta = {"sucesso": True}
 
-            else:
-                resposta = {"sucesso": False, "mensagem": "Email não encontrado"}
+                else:
+                    resposta = {"sucesso": False, "mensagem": "Email não encontrado"}
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(resposta).encode())
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(resposta).encode())
 
-            cursor.close()
-            conexao.close()
+                cursor.close()
+                conexao.close()
+
+            except Exception as e:
+                print("❌ ERRO NO ESQUECI-SENHA:", e)
+
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "sucesso": False,
+                    "mensagem": str(e)
+                }).encode())
 
         elif self.path == '/redefinir-com-token':
             content_length = int(self.headers['Content-Length'])
