@@ -2,12 +2,9 @@ import http.server
 import json
 import mysql.connector
 import bcrypt
-import smtplib
-import ssl
 import secrets
 import resend
 import os
-from email.mime.text import MIMEText
 from datetime import datetime
 
 
@@ -283,17 +280,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     """, (token, email))
                     conexao.commit()
 
-                    link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"
+                    link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"     
 
-                    remetente = "isabelalouise.cs@gmail.com"
-                    senha_email = "tdeoedsljhsxxipd"
-
-                    msg = MIMEText(f"Clique para redefinir sua senha:\n\n{link}")
-                    msg["Subject"] = "Recuperação de senha - Lixie"
-                    msg["From"] = remetente
-                    msg["To"] = email
-
-                    contexto = ssl.create_default_context()
 
                     resend.Emails.send({
                         "from": "Lixie <onboarding@resend.dev>",
