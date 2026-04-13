@@ -278,7 +278,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     """, (token, email_destino))
                     conexao.commit()
 
-                    link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"
+                    # Verifique se o nome do arquivo dentro de /.vscode/src/ é exatamente este
+                    link = f"https://lixie-chi.vercel.app/esquecesenha.html?token={token}"
 
                     # --- CONFIGURAÇÃO DO GMAIL ---
                     meu_email = "isabelalouise.cs@gmail.com"
