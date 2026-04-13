@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Reciclagem</title>
+    <link rel="stylesheet" href="registrarReciclagem.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div id="painelPontos">
+  <h3>Seu Progresso</h3>
+
+  <p id="nivel">Nível: Iniciante 🌱</p>
+  <p id="pontos">Pontos: 0</p>
+
+  <div id="barraContainer">
+    <div id="barraProgresso"></div>
+  </div>
+</div>
+
+<form id="formReciclagem">
+
+  <h2>Registrar Reciclagem</h2>
+
+  <div id="materiais">
+    <button type="button" data-tipo="plastico">♻️ Plástico</button>
+    <button type="button" data-tipo="papel">📄 Papel</button>
+    <button type="button" data-tipo="vidro">🍾 Vidro</button>
+    <button type="button" data-tipo="metal">🥫 Metal</button>
+    <button type="button" data-tipo="organico">🌱 Orgânico</button>
+  </div>
+
+<div class="linha">
+  <input type="number" id="quantidade" placeholder="Quantidade" required>
+
+  <select id="unidade">
+    <option value="kg">Kg (Kilogramas)</option>
+    <option value="g">g (Gramas)</option>
+    <option value="ton">Ton (Toneladas)</option>
+    <option value="un">Unidades</option>
+  </select>
+</div>
+    <p id="resultado"></p>
+
+    <button type="submit">Registrar</button>
+    
+    </form>
+</div>
+
+<script src="registrarReciclagem.js"></script>
+
+</body>
+
+</html>

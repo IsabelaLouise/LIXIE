@@ -1,0 +1,160 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* FUNDO */
+body {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CONTAINER GERAL */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* PAINEL DE PONTOS (AGORA EM CIMA) */
+#painelPontos {
+  background: white;
+  padding: 15px;
+  border-radius: 15px;
+  width: 350px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+#painelPontos h3 {
+  margin-bottom: 10px;
+  color: #2e7d32;
+}
+
+/* BARRA */
+#barraContainer {
+  width: 100%;
+  height: 15px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+#barraProgresso {
+  height: 100%;
+  width: 0%;
+  background: #4CAF50;
+  transition: width 0.5s ease;
+}
+
+/* CARD PRINCIPAL */
+form {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  width: 350px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* TÍTULO */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2e7d32;
+}
+
+/* BOTÕES DE MATERIAL */
+#materiais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#materiais button {
+  flex: 1 1 45%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f1f1;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+#materiais button:hover {
+  background: #dcedc8;
+}
+
+#materiais button.ativo {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* INPUT + SELECT */
+input, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+/* LINHA QUANTIDADE (AGORA CORRETA) */
+.linha {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* RESULTADO (AVISO BONITO) */
+#resultado {
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+  width: 100%;
+}
+
+/* SUCESSO */
+#resultado.sucesso {
+  display: block;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* ERRO */
+#resultado.erro {
+  display: block;
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* BOTÃO */
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #4CAF50;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button[type="submit"]:hover {
+  background: #388e3c;
+}
