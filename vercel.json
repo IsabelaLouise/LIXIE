@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/src/homeNaoLogado.html"
+      "destination": "/.vscode/src/homeNaoLogado.html"
     },
     {
       "source": "/(.*)",
-      "destination": "/src/$1"
+      "destination": "/.vscode/src/$1"
     }
   ]
 }
