@@ -5,7 +5,7 @@
             "destination": "/.vscode/src/homeNaoLogado.html" 
         }, 
         { 
-            "source": "/esquecesenha", 
+            "source": "/esquecesenha.html", 
             "destination": "/.vscode/src/esquecesenha.html" 
         },
         { 
