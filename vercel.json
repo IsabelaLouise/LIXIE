@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/.vscode/src/homeNaoLogado.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/.vscode/src/$1"
+    }
+  ]
+}

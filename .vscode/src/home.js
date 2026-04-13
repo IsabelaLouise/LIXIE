@@ -1,31 +1,29 @@
-const email = localStorage.getItem("usuarioEmail");
+// 1. TENTA LER o email que deveria estar salvo
+const email = localStorage.getItem('usuarioEmail'); 
 
-if (!email) {
-  // 🚫 não está logado
-  window.location.href = "login.html";
+// 2. VERIFICAÇÃO: Se não houver email, ele te chuta para fora na hora
+if (!email || email === "undefined" || email === null) {
+    console.log("Acesso negado! Redirecionando...");
+    window.location.href = "/.vscode/src/homeNaoLogado.html"; // Nome da sua home pública
 } else {
-
-  // ✅ só executa se tiver logado
-  fetch("http://localhost:8000/dados-usuario", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: `email=${encodeURIComponent(email)}`
-  })
-  .then(res => res.json())
-  .then(dados => {
-    document.getElementById("nome").textContent = dados.nome;
-    document.getElementById("pontos").textContent = dados.pontos;
-    document.getElementById("nivel").textContent = dados.nivel;
-  })
-  .catch(() => {
-    console.log("Erro ao buscar dados");
-  });
-
+    // 3. SE ESTIVER LOGADO, busca os dados no Railway
+    fetch("https://lixie-production.up.railway.app/dados-usuario", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(dados => {
+        document.getElementById("nome").textContent = dados.nome;
+        document.getElementById("pontos").textContent = dados.pontos;
+        document.getElementById("nivel").textContent = dados.nivel;
+    })
+    .catch(err => console.error("Erro ao conectar ao Railway:", err));
 }
 
 function logout() {
-  localStorage.removeItem("usuarioEmail"); // apaga quem está logado
-  window.location.href = "login.html"; // volta pro login
+    localStorage.removeItem("usuarioEmail");
+    window.location.href = "/.vscode/src/homeNaoLogado.html";
 }
