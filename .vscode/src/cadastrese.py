@@ -5,9 +5,13 @@ import bcrypt
 import smtplib
 import ssl
 import secrets
+import resend
 import os
 from email.mime.text import MIMEText
 from datetime import datetime
+
+
+resend.api_key = "re_aZMQGcj6_JsaxakpwsJTMb2NcDq5VAhCX"
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
@@ -291,9 +295,16 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                     contexto = ssl.create_default_context()
 
-                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=contexto) as server:
-                        server.login(remetente, senha_email)
-                        server.sendmail(remetente, email, msg.as_string())
+                    resend.Emails.send({
+                        "from": "Lixie <onboarding@resend.dev>",
+                        "to": [email],
+                        "subject": "Recuperação de senha - Lixie",
+                        "html": f"""
+                            <h2>Recuperação de senha</h2>
+                            <p>Clique no link abaixo para redefinir sua senha:</p>
+                            <a href="{link}">Redefinir senha</a>
+                        """
+                    })
 
                     resposta = {"sucesso": True}
 
