@@ -399,7 +399,9 @@ label[for="foto-perfil"]:hover {
         "campo-4 campo-5"
         "campo-6 campo-7"
         "campo-8 campo-9"
-        "campo-10 campo-10";
+        "campo-10 campo-11"
+        "campo-12 campo-12"
+        "campo-13 campo-13";
 }
 
 #campo-1 { grid-area: campo-1; }
@@ -412,13 +414,26 @@ label[for="foto-perfil"]:hover {
 #campo-8 { grid-area: campo-8; }
 #campo-9 { grid-area: campo-9; }
 #campo-10 { grid-area: campo-10; }
+#campo-11 { grid-area: campo-11; }
+#campo-12 { grid-area: campo-12; }
+#campo-13 { grid-area: campo-13; }
+
 
 .campo{
     width: 100%;
 }
+
 #avatar{
     width: 150px;
     height: 150px;
+    border-radius: 50%;
+}
+
+#campo-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /* =========================
