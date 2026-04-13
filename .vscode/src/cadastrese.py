@@ -280,7 +280,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     """, (token, email))
                     conexao.commit()
 
-                    link = f"https://lixie.vercel.app/esquecesenha?token={token}"
+                    link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"
 
 
                     resend.Emails.send({
