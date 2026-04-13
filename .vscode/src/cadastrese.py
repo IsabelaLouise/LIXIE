@@ -3,12 +3,12 @@ import json
 import mysql.connector
 import bcrypt
 import secrets
-import resend
 import os
 from datetime import datetime
 
-
-resend.api_key = "re_aZMQGcj6_JsaxakpwsJTMb2NcDq5VAhCX"
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
@@ -256,46 +256,58 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
 
         elif self.path == '/esqueci-senha':
+
+            conexao = None
             try:
                 content_length = int(self.headers['Content-Length'])
-                corpo = self.rfile.read(content_length)
+                corpo = self.rfile.read(content_length).decode()
                 from urllib.parse import parse_qs
-
-                dados = parse_qs(corpo.decode())
-                email = dados.get("email", [""])[0].strip()
+                dados = parse_qs(corpo)
+                email_destino = dados.get("email", [""])[0].strip()
 
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
-                usuario = cursor.fetchone()
-
-                if usuario:
+                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email_destino,))
+                if cursor.fetchone():
                     token = secrets.token_urlsafe(32)
-
                     cursor.execute("""
                         UPDATE Usuario 
                         SET Token_Recuperacao = %s, Token_Expira = DATE_ADD(NOW(), INTERVAL 1 HOUR)
                         WHERE Email = %s
-                    """, (token, email))
+                    """, (token, email_destino))
                     conexao.commit()
 
                     link = f"https://lixie.vercel.app/esquecesenha.html?token={token}"
 
+                    # --- CONFIGURAÇÃO DO GMAIL ---
+                    meu_email = "isabelalouise.cs@gmail.com"
+                    minha_senha = "ljwspppjpixwheel"
 
-                    resend.Emails.send({
-                        "from": "Lixie <onboarding@resend.dev>",
-                        "to": [email],
-                        "subject": "Recuperação de senha - Lixie",
-                        "html": f"""
-                            <h2>Recuperação de senha</h2>
-                            <p>Clique no link abaixo para redefinir sua senha:</p>
-                            <a href="{link}">Redefinir senha</a>
-                        """
-                    })
+                    mensagem = MIMEMultipart()
+                    mensagem['From'] = f"Lixie <{meu_email}>"
+                    mensagem['To'] = email_destino
+                    mensagem['Subject'] = "Recuperação de Senha - Lixie"
+
+                    corpo_html = f"""
+                    <html>
+                        <body style="font-family: Arial; color: #333;">
+                            <h2>Olá!</h2>
+                            <p>Recebemos um pedido para redefinir sua senha.</p>
+                            <p>Clique no link abaixo para prosseguir:</p>
+                            <a href="{link}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Minha Senha</a>
+                            <p>Este link expira em 1 hora.</p>
+                        </body>
+                    </html>
+                    """
+                    mensagem.attach(MIMEText(corpo_html, 'html'))
+
+                    # ENVIO REAL
+                    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                        server.login(meu_email, minha_senha)
+                        server.sendmail(meu_email, email_destino, mensagem.as_string())
 
                     resposta = {"sucesso": True}
-
                 else:
                     resposta = {"sucesso": False, "mensagem": "Email não encontrado"}
 
@@ -304,19 +316,15 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(json.dumps(resposta).encode())
 
-                cursor.close()
-                conexao.close()
-
             except Exception as e:
-                print("❌ ERRO NO ESQUECI-SENHA:", e)
-
+                print(f"❌ Erro no Gmail: {e}")
                 self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({
-                    "sucesso": False,
-                    "mensagem": str(e)
-                }).encode())
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "Erro ao enviar e-mail"}).encode())
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
         elif self.path == '/redefinir-com-token':
             content_length = int(self.headers['Content-Length'])
