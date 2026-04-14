@@ -371,14 +371,21 @@ label[for="foto-perfil"]:hover {
 #campo-12 { grid-area: campo-12; }
 #campo-13 { grid-area: campo-13; }
 
+.perfil-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto
+}
+
 #bnt-fechar {
     position: absolute;
-    top: 2fr;
-    left: 65%;
+    top: 15px;
+    right: 15px;
     cursor: pointer;
     text-decoration: none;
     width: 4%;
-    height: 38px; 
+    height: 31px; 
     padding: 0 16px;
     border-radius: 50px;
     font-size: 15px;

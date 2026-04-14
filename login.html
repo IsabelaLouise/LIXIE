@@ -23,9 +23,27 @@
                 <input type="password" name="senha" placeholder="Senha*" id="senha" required>
                 <span class="toggle-senha" onclick="toggleSenha('senha', this)">🔒</span>
             </div><br><br> 
-            <button type="button" onclick="window.location.href='login.html'"> Entrar</button>
+            <button type="button" onclick="doLogin()"> Entrar</button>
             </form>
     </main>
-    
+    <script>
+        // Função simples de mock de login (armazena email no localStorage e redireciona)
+        function doLogin() {
+            const emailInput = document.getElementById('email');
+            const email = emailInput ? emailInput.value.trim() : '';
+
+            if (!email) {
+                alert('Por favor, informe seu email.');
+                return;
+            }
+
+            // Salva email como indicador de sessão (mock)
+            localStorage.setItem('usuarioEmail', email);
+
+            // Redireciona para a página logada (rota pública; vercel.json faz o rewrite para o diretório)
+            window.location.href = '/homeLogado.html';
+        }
+    </script>
+
 </body>
 </html>
