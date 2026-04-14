@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     email.disabled = true;
 
         if (usuario.foto) {
-    fotoPerfil.src = "https://lixie-production.up.railway.app/" + usuario.foto;
-  }
+          fotoPerfil.src = "https://lixie-production.up.railway.app/" + usuario.foto;
+        }
 
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);

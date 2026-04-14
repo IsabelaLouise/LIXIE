@@ -468,7 +468,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         if b'filename="' in headers:
                             nome_arquivo = headers.split(b'filename="')[1].split(b'"')[0].decode()
 
-                            nome_arquivo = str(uuid.uuid4()) + "_" + nome_arquivo
+                            nome_arquivo = nome_arquivo.replace(" ", "_")
+                            nome_arquivo = str(uuid.uuid4()) + "_" + nome_arquivo   
 
                             pasta = "uploads"
                             if not os.path.exists(pasta):
