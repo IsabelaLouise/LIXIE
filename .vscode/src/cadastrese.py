@@ -394,6 +394,39 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             cursor.close()
             conexao.close()
+        
+
+
+# ===RANKING ===
+        elif self.path == '/ranking':
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                SELECT Nome, Pontuacao_Total_Acumulada_
+                FROM Usuario
+                ORDER BY Pontuacao_Total_Acumulada_ DESC
+                LIMIT 10
+            """)
+
+            resultados = cursor.fetchall()
+
+            ranking = []
+            for i, user in enumerate(resultados):
+                ranking.append({
+                "posicao": i + 1,
+                "nome": user[0],
+                "pontos": user[1]
+                })
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(ranking).encode())
+
+            cursor.close()
+            conexao.close()
+
 
         elif self.path == '/perfil':
             content_length = int(self.headers['Content-Length'])
