@@ -4,19 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Reciclagem</title>
+    <link rel="stylesheet" href="/.vscode/src/home.css">
     <link rel="stylesheet" href="registrarReciclagem.css">
 </head>
-<header class="header">
-    <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+  <header>
+    <div class="header-container">
+      <a href="/.vscode/src/homeLogado.html" class="logo-link">
+        <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+      </a>
 
-    <nav>
-      <a href="#">Ranking</a>
-      <a href="#">Mapa de Coleta</a>
-      <a href="#">Recompensas</a>
-      <a href="#" class="active">Registrar reciclagem</a>
-    </nav>
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
 
-    <a class="profile"></a>
+      <nav class="navbar" id="navbar">
+        <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
+        <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
+        <a href="#" class="nav-link active">Registrar Reciclagem</a>
+        <a href="#" class="nav-link">Mapa de Coleta</a>
+        <a href="#" class="nav-link">Recompensas</a>
+      </nav>
+
+      <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
+        <div class="profile"></div>
+      </a>
+    </div>
   </header>
 <body>
 
@@ -85,6 +97,37 @@
 </div>
 
 <script src="registrarReciclagem.js"></script>
+
+<script>
+    // MENU MOBILE TOGGLE
+    const menuToggle = document.getElementById('menuToggle');
+    const navbar = document.getElementById('navbar');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Toggle menu ao clicar no botão
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navbar.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    }
+
+    // Fechar menu ao clicar em um link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        });
+    });
+
+    // Fechar menu ao redimensionar para desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
+</script>
 
 </body>
 

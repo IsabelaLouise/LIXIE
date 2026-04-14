@@ -20,15 +20,19 @@
         <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
       </a>
 
-      <nav class="navbar">
+      <button class="menu-toggle" id="rankingMenuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <nav class="navbar" id="rankingNavbar">
         <a href="/.vscode/src/homeNaoLogado.html" class="nav-link">Home</a>
         <a href="#" class="nav-link active">Ranking</a>
+        <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
         <a href="#" class="nav-link">Mapa de Coleta</a>
         <a href="#" class="nav-link">Recompensas</a>
-        <a href="#" class="nav-link">Registrar reciclagem</a>
       </nav>
 
-      <a href="/.vscode/src/PerfilUsuario.html" class="profile-link" aria-label="Ir para perfil de usuário">
+      <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
         <div class="profile"></div>
       </a>
     </div>
@@ -113,6 +117,36 @@
 
   </div>
 
+  <script>
+    // MENU MOBILE TOGGLE
+    const menuToggle = document.getElementById('rankingMenuToggle');
+    const navbar = document.getElementById('rankingNavbar');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Toggle menu ao clicar no botão
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navbar.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    }
+
+    // Fechar menu ao clicar em um link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        });
+    });
+
+    // Fechar menu ao redimensionar para desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
+  </script>
 </body>
 </html>
 
