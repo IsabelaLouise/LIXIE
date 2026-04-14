@@ -6,6 +6,7 @@ inputFoto.onchange = function () {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const mensagem = document.getElementById("mensagem-sucesso");
 
   const form = document.getElementById("formPerfil");
 
@@ -24,6 +25,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 🔥 PEGA EMAIL SALVO NO LOGIN
   const emailUsuario = localStorage.getItem("email");
+
+  const btnAlterarSenha = document.querySelector(".btn-alterar-senha");
+
+  if (btnAlterarSenha) {
+    btnAlterarSenha.addEventListener("click", () => {
+      window.location.href = "esquecesenha.html";
+    });
+  }
 
   // =========================
   // 🔥 BUSCAR DADOS DO BANCO
@@ -185,58 +194,69 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+// =========================
+// MENSAGEM SUCESSO
+// =========================
+  function mensagemSucesso() {
+  mensagem.style.display = "block";
+
+    setTimeout(() => {
+      window.location.href = "homeLogado.html";
+    }, 5000);
+  }
+
   // =========================
   // 🔥 SALVAR NO BANCO
   // =========================
 
   form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const valido =
-      validarNome() &&
-      validarTelefone() &&
-      validarCep() &&
-      validarNumeroCasa();
+  const valido =
+    validarNome() &&
+    validarTelefone() &&
+    validarCep() &&
+    validarNumeroCasa();
 
-    if (!valido) {
-      alert("Preencha os campos corretamente");
-      return;
-    }
+  if (!valido) {
+    alert("Preencha os campos corretamente");
+    return;
+  }
 
-    const dados = new URLSearchParams({
-      email: email.value,
-      nome: nome.value,
-      telefone: tel.value,
-      cep: cep.value,
-      rua: rua.value,
-      cidade: cidade.value,
-      estado: estado.value,
-      numero: num.value,
-      complemento: complemento.value
-    });
-
-    try {
-      await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
-        method: "POST",
-        body: dados
-      });
-
-      alert("Perfil atualizado com sucesso 🚀");
-
-    } catch (erro) {
-      console.error("Erro ao salvar:", erro);
-      alert("Erro ao salvar perfil");
-    }
+  const dados = new URLSearchParams({
+    email: email.value,
+    nome: nome.value,
+    telefone: tel.value,
+    cep: cep.value,
+    rua: rua.value,
+    cidade: cidade.value,
+    estado: estado.value,
+    numero: num.value,
+    complemento: complemento.value
   });
 
+  try {
+    const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: dados.toString()
+    });
+
+    const resposta = await res.json();
+
+    if (resposta.ok) {
+      mensagemSucesso();
+    } else {
+      console.log(resposta);
+      alert("Erro ao salvar no banco");
+    }
+
+  } catch (erro) {
+    console.error("Erro fetch:", erro);
+    alert("Erro no servidor");
+  }
 });
 
-const mensagem = document.getElementById("mensagem-sucesso");
-
-btnAlterarSenha.addEventListener("click", () => {
-  mensagem.style.display = "block";
-
-  setTimeout(() => {
-    window.location.href = "/.vscode/src/homeLogado.html";
-  }, 5000);
 });
