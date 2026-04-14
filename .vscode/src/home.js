@@ -4,7 +4,8 @@ const email = localStorage.getItem('usuarioEmail');
 // 2. VERIFICAÇÃO: Se não houver email, ele te chuta para fora na hora
 if (!email || email === "undefined" || email === null) {
     console.log("Acesso negado! Redirecionando...");
-    window.location.href = "/.vscode/src/homeNaoLogado.html"; // Nome da sua home pública
+    // Redireciona para a rota pública; o vercel.json faz o rewrite internamente
+    window.location.href = "/homeNaoLogado.html";
 } else {
     // 3. SE ESTIVER LOGADO, busca os dados no Railway
     fetch("https://lixie-production.up.railway.app/dados-usuario", {
@@ -25,5 +26,5 @@ if (!email || email === "undefined" || email === null) {
 
 function logout() {
     localStorage.removeItem("usuarioEmail");
-    window.location.href = "/.vscode/src/homeNaoLogado.html";
+    window.location.href = "/homeNaoLogado.html";
 }
