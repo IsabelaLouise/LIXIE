@@ -561,6 +561,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 if conexao and conexao.is_connected():
                     cursor.close()
                     conexao.close()
+        # 📝 CAMPOS DE TEXTO (Ajustado com .strip())
+        # 📝 CAMPOS DE TEXTO
+        else:
+            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+            # ADICIONE O .strip() AQUI:
+            valor = conteudo.decode('utf-8').strip() 
+            dados[nome_campo] = valor
 
 
 # === INICIALIZAÇÃO ===
