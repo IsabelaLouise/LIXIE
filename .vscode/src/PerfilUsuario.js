@@ -230,3 +230,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 });
+
+const mensagem = document.getElementById("mensagem-sucesso");
+
+btnAlterarSenha.addEventListener("click", () => {
+  mensagem.style.display = "block";
+
+  setTimeout(() => {
+    window.location.href = "/.vscode/src/homeLogado.html";
+  }, 5000);
+});
