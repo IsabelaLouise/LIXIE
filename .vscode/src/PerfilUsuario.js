@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             email.disabled = true; // Mantém email travado
 
             if (usuario.foto) {
+              console.log("URL da foto vinda do banco:", usuario.foto); // Adicione isso para testar!
               // Se a foto começa com "http", ela já é a URL do Cloudinary
               if (usuario.foto.startsWith('http')) {
                   fotoPerfil.src = usuario.foto;
