@@ -4,24 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Reciclagem</title>
+    <link rel="stylesheet" href="/.vscode/src/home.css">
     <link rel="stylesheet" href="registrarReciclagem.css">
 </head>
+  <header>
+    <div class="header-container">
+      <a href="/.vscode/src/homeLogado.html" class="logo-link">
+        <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+      </a>
+
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <nav class="navbar" id="navbar">
+        <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
+        <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
+        <a href="/.vscode/src/registrarReciclagem.html" class="nav-link active">Registrar Reciclagem</a>
+        <a href="#" class="nav-link">Mapa de Coleta</a>
+        <a href="#" class="nav-link">Recompensas</a>
+      </nav>
+
+      <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
+        <div class="profile"></div>
+      </a>
+    </div>
+  </header>
 <body>
 
 <div class="container">
 
+  <!-- DIREITA -->
+  <div class="lado-direito">
     <div id="painelPontos">
-  <h3>Seu Progresso</h3>
+      <h3>Seu Progresso</h3>
 
-  <p id="nivel">Nível: Iniciante 🌱</p>
-  <p id="pontos">Pontos: 0</p>
+      <p id="nivel">Nível: Iniciante 🌱</p>
+      <p id="pontos">Pontos: 0</p>
 
-  <div id="barraContainer">
-    <div id="barraProgresso"></div>
+      <div id="barraContainer">
+        <div id="barraProgresso"></div>
+      </div>
+    </div>
+
+    <button type="submit" form="formReciclagem">
+      Registrar
+    </button>
   </div>
-</div>
 
-<form id="formReciclagem">
+  <!-- ESQUERDA -->
+  <form id="formReciclagem">
 
   <h2>Registrar Reciclagem</h2>
 
@@ -31,6 +63,13 @@
     <button type="button" data-tipo="vidro">🍾 Vidro</button>
     <button type="button" data-tipo="metal">🥫 Metal</button>
     <button type="button" data-tipo="organico">🌱 Orgânico</button>
+    <button type="button" data-tipo="pilhas">🔋 Pilhas</button>
+    <button type="button" data-tipo="eletronico">💻 Eletrônicos</button>
+    <button type="button" data-tipo="tampinha">🧴 Tampinha de garrafa</button>
+    <button type="button" data-tipo="cartela">💊 Cartela de remédio vazia</button>
+    <button type="button" data-tipo="capsula">☕ Cápsula de café</button>
+
+
   </div>
 
 <div class="linha">
@@ -45,12 +84,50 @@
 </div>
     <p id="resultado"></p>
 
-    <button type="submit">Registrar</button>
+<!--CEP-->
+    <label>Digite o CEP:</label>
+    <input type="text" id="cep" placeholder="Digite o CEP">
+
+<!--FOTO-->
+
+    <label>Comprove com uma foto:</label>
+    <input type="file" id="foto" accept="image/*">
 
     </form>
 </div>
 
 <script src="registrarReciclagem.js"></script>
+
+<script>
+    // MENU MOBILE TOGGLE
+    const menuToggle = document.getElementById('menuToggle');
+    const navbar = document.getElementById('navbar');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Toggle menu ao clicar no botão
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navbar.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
+    }
+
+    // Fechar menu ao clicar em um link
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        });
+    });
+
+    // Fechar menu ao redimensionar para desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            navbar.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
+</script>
 
 </body>
 

@@ -1,41 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIXIE</title>
     <link rel="stylesheet" href="/.vscode/src/home.css">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
-        <h2>Pontos de coleta</h2>
-        <button onclick="window.location.href='/.vscode/src/cadastrese.html'">
-            <h2>cadastre-se/Entrar</h2>
-        </button>
+        <div class="header-container">
+            <a href="#" class="logo-link">
+                <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="navbar" id="navbar">
+                <a href="/.vscode/src/cadastrese.html" class="nav-link active">Home</a>
+                <a href="/.vscode/src/cadastrese.html" class="nav-link">Ranking</a>
+                <a href="/.vscode/src/cadastrese.html" class="nav-link">Registrar Reciclagem</a>
+                <a href="/.vscode/src/cadastrese.html" class="nav-link">Mapa de Coleta</a>
+                <a href="/.vscode/src/cadastrese.html" class="nav-link">Recompensas</a>
+            </nav>
+
+            <button class="btn-auth" onclick="window.location.href='/.vscode/src/cadastrese.html'">
+                <i class="fas fa-user"></i> Cadastre-se
+            </button>
+        </div>
     </header>
+
     <main>
         <h1>Lixie -> titulo + subtitulo</h1>
         <h1>IMAGEM</h1>
     
-        <div class="Ranking">
+        <div class="ranking">
             <h4>Ranking Global</h4>
             <p>1. Usuário A - 1000 pontos</p>
             <p>2. Usuário B - 900 pontos</p>
             <p>3. Usuário C - 800 pontos</p>
         </div>
 
-        <div class="Como Funciona">
+        <div class="como-funciona">
             <h4>Como Funciona</h4>
             <p>Texto sobre como funciona o processo de reciclagem.</p>
         </div>
 
-        <div class="Impacto Ambiental">
+        <div class="impacto-ambiental">
             <h4>Impacto Ambiental</h4>
             <p>Texto sobre o impacto ambiental da escolha de engajar com o Lixie.</p>
         </div>
 
-        <div class ="Artigos">
+        <div class="artigos">
             <h4>Artigos</h4>
             <ul>
                 <li>Artigo 1</li>

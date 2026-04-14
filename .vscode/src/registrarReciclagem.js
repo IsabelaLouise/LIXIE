@@ -123,3 +123,46 @@ function atualizarPainel() {
 
   barra.style.width = porcentagem + "%";
 }
+
+
+document.getElementById("cep").addEventListener("input", async (e) => {
+
+    let valor = e.target.value;
+
+    // limpa
+    valor = valor.replace(/\D/g, "");
+
+    // limita
+    valor = valor.slice(0, 8);
+
+    // formata
+    if (valor.length > 5) {
+        valor = valor.slice(0, 5) + "-" + valor.slice(5);
+    }
+
+    e.target.value = valor;
+
+    // cria o cep limpo
+    const cepLimpo = valor.replace(/\D/g, "");
+
+    // SÓ entra quando tiver 8 dígitos
+    if (cepLimpo.length === 8) {
+
+        e.target.value = "Buscando...";
+
+        try {
+            const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+            const data = await res.json();
+
+            if (data.erro) {
+                e.target.value = "CEP não encontrado";
+                return;
+            }
+
+            e.target.value = `${data.logradouro} - ${data.localidade}`;
+
+        } catch (erro) {
+            e.target.value = "Erro ao buscar CEP";
+        }
+    }
+});
