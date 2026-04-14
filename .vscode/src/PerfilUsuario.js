@@ -62,16 +62,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             email.disabled = true; // Mantém email travado
 
-            if (usuario.foto) {
-              console.log("URL da foto vinda do banco:", usuario.foto); // Adicione isso para testar!
-              // Se a foto começa com "http", ela já é a URL do Cloudinary
-              if (usuario.foto.startsWith('http')) {
-                  fotoPerfil.src = usuario.foto;
-              } else {
-                  // Fallback caso ainda tenha fotos antigas no banco
-                  fotoPerfil.src = "https://lixie-production.up.railway.app/" + usuario.foto;
-              }
-          }
+                // ==========================================
+    // CORREÇÃO EXCLUSIVA PARA A FOTO (PerfilUsuario.js)
+    // ==========================================
+    if (usuario.foto) {
+        // 1. Limpa a URL que veio do banco (remove espaços e \r\n invisíveis)
+        const urlLimpa = usuario.foto.trim();
+
+        console.log("Tentando carregar foto com a URL limpa:", urlLimpa);
+
+        // 2. Verifica se é uma URL completa (Cloudinary, começa com http)
+        if (urlLimpa.startsWith('http')) {
+            fotoPerfil.src = urlLimpa;
+        } else {
+            // 3. Fallback para fotos antigas (caso ainda existam no servidor)
+            fotoPerfil.src = "https://lixie-production.up.railway.app/" + urlLimpa;
+        }
+    }
 
         } catch (erro) {
             console.error("Erro ao carregar perfil:", erro);
