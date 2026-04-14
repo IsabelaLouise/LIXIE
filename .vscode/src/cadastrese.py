@@ -3,12 +3,16 @@ import json
 import mysql.connector
 import bcrypt
 import secrets
-import resend
 import os
+import uuid
 from datetime import datetime
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-resend.api_key = "re_aZMQGcj6_JsaxakpwsJTMb2NcDq5VAhCX"
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
@@ -20,17 +24,38 @@ DB_CONFIG = {
 }
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
-    
-    # === CORS ===
+
+# === CORS ===
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        super().end_headers()
+        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Max-Age', '86400') 
+        super().end_headers() # APENAS UMA VEZ AQUI
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.end_headers()
+
+    def do_GET(self):
+        if self.path.startswith("/uploads/"):
+            caminho = self.path.lstrip("/")
+
+            try:
+                with open(caminho, "rb") as f:
+                    self.send_response(200)
+
+                    if caminho.endswith(".png"):
+                        self.send_header("Content-Type", "image/png")
+                    elif caminho.endswith(".jpg") or caminho.endswith(".jpeg"):
+                        self.send_header("Content-Type", "image/jpeg")
+
+                    self.end_headers()
+                    self.wfile.write(f.read())
+
+            except:
+                self.send_response(404)
+                self.end_headers()
 
     def do_POST(self):
 
@@ -256,67 +281,83 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
 
         elif self.path == '/esqueci-senha':
+
+            conexao = None
             try:
                 content_length = int(self.headers['Content-Length'])
-                corpo = self.rfile.read(content_length)
+                corpo = self.rfile.read(content_length).decode()
                 from urllib.parse import parse_qs
-
-                dados = parse_qs(corpo.decode())
-                email = dados.get("email", [""])[0].strip()
+                dados = parse_qs(corpo)
+                email_destino = dados.get("email", [""])[0].strip()
 
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
-                usuario = cursor.fetchone()
-
-                if usuario:
+                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email_destino,))
+                if cursor.fetchone():
                     token = secrets.token_urlsafe(32)
-
                     cursor.execute("""
                         UPDATE Usuario 
                         SET Token_Recuperacao = %s, Token_Expira = DATE_ADD(NOW(), INTERVAL 1 HOUR)
                         WHERE Email = %s
-                    """, (token, email))
+                    """, (token, email_destino))
                     conexao.commit()
 
-                    link = f"https://lixie.vercel.app/src/esquecesenha.html?token={token}"     
+                    # Verifique se o nome do arquivo dentro de /.vscode/src/ é exatamente este
+                    link = f"https://lixie-chi.vercel.app/esquecesenha.html?token={token}"
 
+                    # --- CONFIGURAÇÃO DO GMAIL ---
+                    meu_email = "isabelalouise.cs@gmail.com"
+                    minha_senha = "ljwspppjpixwheel"
 
-                    resend.Emails.send({
-                        "from": "Lixie <onboarding@resend.dev>",
-                        "to": [email],
-                        "subject": "Recuperação de senha - Lixie",
-                        "html": f"""
-                            <h2>Recuperação de senha</h2>
-                            <p>Clique no link abaixo para redefinir sua senha:</p>
-                            <a href="{link}">Redefinir senha</a>
-                        """
-                    })
+                    mensagem = MIMEMultipart()
+                    mensagem['From'] = f"Lixie <{meu_email}>"
+                    mensagem['To'] = email_destino
+                    mensagem['Subject'] = "Recuperação de Senha - Lixie"
 
-                    resposta = {"sucesso": True}
+                    corpo_html = f"""
+                    <html>
+                        <body style="font-family: Arial; color: #333;">
+                            <h2>Olá!</h2>
+                            <p>Recebemos um pedido para redefinir sua senha.</p>
+                            <p>Clique no link abaixo para prosseguir:</p>
+                            <a href="{link}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Redefinir Minha Senha</a>
+                            <p>Este link expira em 1 hora.</p>
+                        </body>
+                    </html>
+                    """
+                    mensagem.attach(MIMEText(corpo_html, 'html'))
 
-                else:
-                    resposta = {"sucesso": False, "mensagem": "Email não encontrado"}
+                    # Substitua o bloco de ENVIO REAL por este:
+                    # --- CONFIGURAÇÃO E ENVIO REAL ---
+                    try:
+                        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                            server.starttls() 
+                            server.login(meu_email, minha_senha)
+                            server.sendmail(meu_email, email_destino, mensagem.as_string())
+                        
+                        # Se chegou aqui, deu certo
+                        resposta = {"sucesso": True}
+                        
+                    except Exception as e:
+                        print(f"❌ Erro específico no SMTP: {e}")
+                        # Se deu erro no envio, repassa para o except geral
+                        raise e
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps(resposta).encode())
 
-                cursor.close()
-                conexao.close()
-
             except Exception as e:
-                print("❌ ERRO NO ESQUECI-SENHA:", e)
-
+                print(f"❌ Erro no Gmail: {e}")
                 self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({
-                    "sucesso": False,
-                    "mensagem": str(e)
-                }).encode())
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "Erro ao enviar e-mail"}).encode())
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
         elif self.path == '/redefinir-com-token':
             content_length = int(self.headers['Content-Length'])
@@ -359,6 +400,150 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(resposta).encode())
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/perfil':
+            content_length = int(self.headers['Content-Length'])
+            corpo = self.rfile.read(content_length)
+            from urllib.parse import parse_qs
+
+            dados = parse_qs(corpo.decode())
+            email = dados.get("email", [""])[0]
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento, Foto
+                FROM Usuario WHERE Email = %s
+            """, (email,))
+
+            usuario = cursor.fetchone()
+
+            resposta = {
+                "nome": usuario[0],
+                "email": usuario[1],
+                "telefone": usuario[2],
+                "dataNascimento": str(usuario[3]),
+                "cep": usuario[4],
+                "rua": usuario[5],
+                "cidade": usuario[6],
+                "estado": usuario[7],
+                "numero": usuario[8],
+                "complemento": usuario[9],
+                "foto": usuario[10]
+            }
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(resposta).encode())
+
+            cursor.close()
+            conexao.close()
+        
+        elif self.path == '/atualizar-perfil':
+
+            content_type = self.headers.get('Content-Type')
+
+            dados = {}
+            caminho_foto = None
+
+            # 🔥 SE FOR FORM COM IMAGEM
+            if "multipart/form-data" in content_type:
+                boundary = content_type.split("boundary=")[1].encode()
+                length = int(self.headers.get('Content-Length'))
+                body = self.rfile.read(length)
+
+                partes = body.split(b"--" + boundary)
+
+                for parte in partes:
+                    if b"Content-Disposition" in parte:
+                        headers, conteudo = parte.split(b"\r\n\r\n", 1)
+                        conteudo = conteudo.strip(b"\r\n")
+
+                        # 🔥 SE FOR ARQUIVO (FOTO)
+                        if b'filename="' in headers:
+                            nome_arquivo = headers.split(b'filename="')[1].split(b'"')[0].decode()
+
+                            nome_arquivo = nome_arquivo.replace(" ", "_")
+                            nome_arquivo = str(uuid.uuid4()) + "_" + nome_arquivo   
+
+                            pasta = "uploads"
+                            if not os.path.exists(pasta):
+                                os.makedirs(pasta)
+
+                            caminho_foto = os.path.join(pasta, nome_arquivo)
+
+                            with open(caminho_foto, "wb") as f:
+                                f.write(conteudo)
+
+                        # 🔥 CAMPOS NORMAIS
+                        else:
+                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+                            valor = conteudo.decode()
+                            dados[nome_campo] = valor
+
+            else:
+                # 🔥 CASO ANTIGO (SEM FOTO)
+                content_length = int(self.headers['Content-Length'])
+                corpo = self.rfile.read(content_length)
+                from urllib.parse import parse_qs
+
+                parsed = parse_qs(corpo.decode())
+
+                for chave in parsed:
+                    dados[chave] = parsed[chave][0]
+
+            email = dados.get("email", "")
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            # 🔥 COM FOTO
+            if caminho_foto:
+                cursor.execute("""
+                    UPDATE Usuario SET
+                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s, Foto=%s
+                    WHERE Email=%s
+                """, (
+                    dados.get("nome"),
+                    dados.get("telefone"),
+                    dados.get("cep"),
+                    dados.get("rua"),
+                    dados.get("cidade"),
+                    dados.get("estado"),
+                    dados.get("numero"),
+                    dados.get("complemento"),
+                    caminho_foto,
+                    email
+                ))
+            else:
+                # 🔥 SEM FOTO
+                cursor.execute("""
+                    UPDATE Usuario SET
+                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
+                    WHERE Email=%s
+                """, (
+                    dados.get("nome"),
+                    dados.get("telefone"),
+                    dados.get("cep"),
+                    dados.get("rua"),
+                    dados.get("cidade"),
+                    dados.get("estado"),
+                    dados.get("numero"),
+                    dados.get("complemento"),
+                    email
+                ))
+
+            conexao.commit()
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"ok": True}).encode())
 
             cursor.close()
             conexao.close()

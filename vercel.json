@@ -1,12 +1,16 @@
-{
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/.vscode/src/homeNaoLogado.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/.vscode/src/$1"
-    }
-  ]
+{ 
+    "rewrites": [ 
+        { 
+            "source": "/", 
+            "destination": "/.vscode/src/homeNaoLogado.html" 
+        }, 
+        { 
+            "source": "/esquecesenha.html", 
+            "destination": "/.vscode/src/esquecesenha.html" 
+        },
+        { 
+            "source": "/(.*)", 
+            "destination": "/.vscode/src/$1" 
+        } 
+    ] 
 }

@@ -134,10 +134,10 @@ document.addEventListener("DOMContentLoaded", function () {
           mostrarErro(email, "erro-email", data.mensagem || "Email não encontrado");
         }
       })
-    .catch((err) => {
-          console.error("❌ Erro na requisição:", err);
-          mostrarMensagem("Erro de conexão: O servidor não respondeu.", "erro");
-        });
+      .catch((err) => {
+                console.error("❌ Erro na requisição:", err);
+                mostrarMensagem("Erro de conexão: O servidor não respondeu.", "erro");
+              });
     });
   }
 
