@@ -1,11 +1,11 @@
-let fotoPerfil= document.getElementById('avatar');
+let fotoPerfil = document.getElementById('avatar');
 let inputFoto = document.getElementById('foto-perfil');
 
-inputFoto.onchange =  function(){
-    fotoPerfil.src = URL.createObjectURL(inputFoto.files[0]);
+inputFoto.onchange = function () {
+  fotoPerfil.src = URL.createObjectURL(inputFoto.files[0]);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   const form = document.getElementById("formPerfil");
 
@@ -20,12 +20,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const estado = document.getElementById("estado");
 
   const num = document.getElementById("num");
+  const complemento = document.getElementById("complemento");
 
-  const senha = document.getElementById("senha");
+  // 🔥 PEGA EMAIL SALVO NO LOGIN
+  const emailUsuario = localStorage.getItem("email");
 
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  // =========================
+  // 🔥 BUSCAR DADOS DO BANCO
+  // =========================
+  try {
+    const res = await fetch("https://lixie-production.up.railway.app", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `email=${emailUsuario}`
+    });
 
-  if (usuario) {
+    const usuario = await res.json();
+
     nome.value = usuario.nome || "";
     email.value = usuario.email || "";
     tel.value = usuario.telefone || "";
@@ -37,7 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
     estado.value = usuario.estado || "";
 
     num.value = usuario.numero || "";
-    document.getElementById("complemento").value = usuario.complemento || "";
+    complemento.value = usuario.complemento || "";
+
+    // 🔒 EMAIL BLOQUEADO
+    email.disabled = true;
+
+  } catch (erro) {
+    console.error("Erro ao carregar perfil:", erro);
   }
 
   // =========================
@@ -72,18 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     sucessoInput(nome, "erro-nome");
-    return true;
-  }
-
-  function validarEmail() {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!regex.test(email.value.trim())) {
-      mostrarErro(email, "erro-email", "Email inválido");
-      return false;
-    }
-
-    sucessoInput(email, "erro-email");
     return true;
   }
 
@@ -127,11 +134,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // EVENTOS (TEMPO REAL)
+  // EVENTOS
   // =========================
 
   nome.addEventListener("input", validarNome);
-  email.addEventListener("input", validarEmail);
   tel.addEventListener("input", validarTelefone);
 
   // Formatação telefone
@@ -180,39 +186,47 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =========================
-  // SUBMIT
+  // 🔥 SALVAR NO BANCO
   // =========================
 
-  form.addEventListener("submit", (e) => {
-  e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const valido =
-    validarNome() &&
-    validarEmail() &&
-    validarTelefone() &&
-    validarCep() &&
-    validarNumeroCasa();
+    const valido =
+      validarNome() &&
+      validarTelefone() &&
+      validarCep() &&
+      validarNumeroCasa();
 
-  if (!valido) {
-    alert("Preencha os campos corretamente");
-    return;
-  }
+    if (!valido) {
+      alert("Preencha os campos corretamente");
+      return;
+    }
 
-  const usuarioAtualizado = {
-    nome: nome.value,
-    email: email.value, // continua o mesmo
-    telefone: tel.value,
-    dataNascimento: data.value,
-    cep: cep.value,
-    rua: rua.value,
-    cidade: cidade.value,
-    estado: estado.value,
-    numero: num.value,
-    complemento: complemento.value
-  };
+    const dados = new URLSearchParams({
+      email: email.value,
+      nome: nome.value,
+      telefone: tel.value,
+      cep: cep.value,
+      rua: rua.value,
+      cidade: cidade.value,
+      estado: estado.value,
+      numero: num.value,
+      complemento: complemento.value
+    });
 
-  localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
+    try {
+      await fetch("https://SEU-BACKEND.up.railway.app/atualizar-perfil", {
+        method: "POST",
+        body: dados
+      });
 
-  alert("Perfil atualizado com sucesso 🚀");
-});
+      alert("Perfil atualizado com sucesso 🚀");
+
+    } catch (erro) {
+      console.error("Erro ao salvar:", erro);
+      alert("Erro ao salvar perfil");
+    }
+  });
+
 });
