@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 🔥 BUSCAR DADOS DO BANCO
   // =========================
   try {
-    const res = await fetch("https://lixie-production.up.railway.app", {
+    const res = await fetch("https://lixie-production.up.railway.app/perfil", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     try {
-      await fetch("https://SEU-BACKEND.up.railway.app/atualizar-perfil", {
+      await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
         method: "POST",
         body: dados
       });
