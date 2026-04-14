@@ -7,7 +7,7 @@
     <title>Cadastre-se</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/.vscode/src/PerfilUsuário.css">
+    <link rel="stylesheet" href="/.vscode/src/PerfilUsuario.css">
 
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +50,7 @@
                     <div class="campo" id="campo-3">
                         <label for="email">Email</label>
                         <div class="input-container">
-                            <input type="text" name="email" id="email" placeholder="Email da pessoa logada">
+                            <input type="text" name="email" id="email" disabled>
                             <span id="icon-email"></span>
                         </div>
                         <div class="erro-texto" id="erro-email"></div>
@@ -70,7 +70,7 @@
                     <div class="campo" id="campo-5">
                         <label for="dataNascimento">Data de Nascimento</label>
                         <div class="input-container">
-                            <input type="date" name="dataNascimento" id="dataNascimento" placeholder="Data de nascimento da pessoa logada"disabled>
+                            <input type="date" name="dataNascimento" id="dataNascimento">
                             <span id="icon-dataNascimento"></span>
                         </div>
                         <div class="erro-texto" id="erro-dataNascimento"></div>
@@ -151,8 +151,14 @@
                         <button type="submit" class="btn-salvar" id="Submit-Perfil">Salvar Alterações</button>
                     </div>
 
+                    <div id="mensagem-sucesso" class="mensagem-sucesso">
+                        Alterações salvas com sucesso ✅
+                    </div>
+
                 </div>
             </form>
+
+            
 
 
         </div>
@@ -160,5 +166,5 @@
 
 </body>
 
-<script src="PerfilUsuário.js"></script>
+<script src="PerfilUsuario.js"></script>
 </html>

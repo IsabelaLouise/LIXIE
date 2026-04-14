@@ -1,11 +1,12 @@
-let fotoPerfil= document.getElementById('avatar');
+let fotoPerfil = document.getElementById('avatar');
 let inputFoto = document.getElementById('foto-perfil');
 
-inputFoto.onchange =  function(){
-    fotoPerfil.src = URL.createObjectURL(inputFoto.files[0]);
+inputFoto.onchange = function () {
+  fotoPerfil.src = URL.createObjectURL(inputFoto.files[0]);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const mensagem = document.getElementById("mensagem-sucesso");
 
   const form = document.getElementById("formPerfil");
 
@@ -20,8 +21,52 @@ document.addEventListener("DOMContentLoaded", () => {
   const estado = document.getElementById("estado");
 
   const num = document.getElementById("num");
+  const complemento = document.getElementById("complemento");
 
-  const senha = document.getElementById("senha");
+  // 🔥 PEGA EMAIL SALVO NO LOGIN
+  const emailUsuario = localStorage.getItem("email");
+
+  const btnAlterarSenha = document.querySelector(".btn-alterar-senha");
+
+  if (btnAlterarSenha) {
+    btnAlterarSenha.addEventListener("click", () => {
+      window.location.href = "esquecesenha.html";
+    });
+  }
+
+  // =========================
+  // 🔥 BUSCAR DADOS DO BANCO
+  // =========================
+  try {
+    const res = await fetch("https://lixie-production.up.railway.app/perfil", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `email=${emailUsuario}`
+    });
+
+    const usuario = await res.json();
+
+    nome.value = usuario.nome || "";
+    email.value = usuario.email || "";
+    tel.value = usuario.telefone || "";
+    data.value = usuario.dataNascimento || "";
+
+    cep.value = usuario.cep || "";
+    rua.value = usuario.rua || "";
+    cidade.value = usuario.cidade || "";
+    estado.value = usuario.estado || "";
+
+    num.value = usuario.numero || "";
+    complemento.value = usuario.complemento || "";
+
+    // 🔒 EMAIL BLOQUEADO
+    email.disabled = true;
+
+  } catch (erro) {
+    console.error("Erro ao carregar perfil:", erro);
+  }
 
   // =========================
   // FUNÇÕES AUXILIARES
@@ -55,18 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     sucessoInput(nome, "erro-nome");
-    return true;
-  }
-
-  function validarEmail() {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!regex.test(email.value.trim())) {
-      mostrarErro(email, "erro-email", "Email inválido");
-      return false;
-    }
-
-    sucessoInput(email, "erro-email");
     return true;
   }
 
@@ -110,11 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // EVENTOS (TEMPO REAL)
+  // EVENTOS
   // =========================
 
   nome.addEventListener("input", validarNome);
-  email.addEventListener("input", validarEmail);
   tel.addEventListener("input", validarTelefone);
 
   // Formatação telefone
@@ -162,26 +194,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+// =========================
+// MENSAGEM SUCESSO
+// =========================
+  function mensagemSucesso() {
+  mensagem.style.display = "block";
+
+    setTimeout(() => {
+      window.location.href = "homeLogado.html";
+    }, 5000);
+  }
+
   // =========================
-  // SUBMIT
+  // 🔥 SALVAR NO BANCO
   // =========================
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const valido =
-      validarNome() &&
-      validarEmail() &&
-      validarTelefone() &&
-      validarCep() &&
-      validarNumeroCasa();
+  const valido =
+    validarNome() &&
+    validarTelefone() &&
+    validarCep() &&
+    validarNumeroCasa();
 
-    if (!valido) {
-      alert("Preencha os campos corretamente");
-      return;
+  if (!valido) {
+    alert("Preencha os campos corretamente");
+    return;
+  }
+
+  const dados = new URLSearchParams({
+    email: email.value,
+    nome: nome.value,
+    telefone: tel.value,
+    cep: cep.value,
+    rua: rua.value,
+    cidade: cidade.value,
+    estado: estado.value,
+    numero: num.value,
+    complemento: complemento.value
+  });
+
+  try {
+    const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: dados.toString()
+    });
+
+    const resposta = await res.json();
+
+    if (resposta.ok) {
+      mensagemSucesso();
+    } else {
+      console.log(resposta);
+      alert("Erro ao salvar no banco");
     }
 
-    alert("Perfil atualizado com sucesso 🚀");
-  });
+  } catch (erro) {
+    console.error("Erro fetch:", erro);
+    alert("Erro no servidor");
+  }
+});
 
 });

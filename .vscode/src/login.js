@@ -17,7 +17,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     const dados = await resposta.json();
 
     if (dados.sucesso) {
-      localStorage.setItem("usuarioEmail", email);
+      localStorage.setItem("email", email);
       window.location.href = "/.vscode/src/homeLogado.html";
     } else {
       mensagem.textContent = dados.mensagem;

@@ -380,6 +380,82 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor.close()
             conexao.close()
 
+        elif self.path == '/perfil':
+            content_length = int(self.headers['Content-Length'])
+            corpo = self.rfile.read(content_length)
+            from urllib.parse import parse_qs
+
+            dados = parse_qs(corpo.decode())
+            email = dados.get("email", [""])[0]
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento
+                FROM Usuario WHERE Email = %s
+            """, (email,))
+
+            usuario = cursor.fetchone()
+
+            resposta = {
+                "nome": usuario[0],
+                "email": usuario[1],
+                "telefone": usuario[2],
+                "dataNascimento": str(usuario[3]),
+                "cep": usuario[4],
+                "rua": usuario[5],
+                "cidade": usuario[6],
+                "estado": usuario[7],
+                "numero": usuario[8],
+                "complemento": usuario[9]
+            }
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(resposta).encode())
+
+            cursor.close()
+            conexao.close()
+        
+        elif self.path == '/atualizar-perfil':
+            content_length = int(self.headers['Content-Length'])
+            corpo = self.rfile.read(content_length)
+            from urllib.parse import parse_qs
+
+            dados = parse_qs(corpo.decode())
+
+            email = dados.get("email", [""])[0]
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                UPDATE Usuario SET
+                Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
+                WHERE Email=%s
+            """, (
+                dados.get("nome", [""])[0],
+                dados.get("telefone", [""])[0],
+                dados.get("cep", [""])[0],
+                dados.get("rua", [""])[0],
+                dados.get("cidade", [""])[0],
+                dados.get("estado", [""])[0],
+                dados.get("numero", [""])[0],
+                dados.get("complemento", [""])[0],
+                email
+            ))
+
+            conexao.commit()
+
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(json.dumps({"ok": True}).encode())
+
+            cursor.close()
+            conexao.close()
+
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":

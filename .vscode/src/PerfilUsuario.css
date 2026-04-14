@@ -434,3 +434,15 @@ label[for="foto-perfil"]:hover {
     75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
 }
+
+.mensagem-sucesso {
+    display: none;
+    color: #28a745;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    background-color: #eaffea;
+}
