@@ -23,6 +23,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const senha = document.getElementById("senha");
 
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (usuario) {
+    nome.value = usuario.nome || "";
+    email.value = usuario.email || "";
+    tel.value = usuario.telefone || "";
+    data.value = usuario.dataNascimento || "";
+
+    cep.value = usuario.cep || "";
+    rua.value = usuario.rua || "";
+    cidade.value = usuario.cidade || "";
+    estado.value = usuario.estado || "";
+
+    num.value = usuario.numero || "";
+    document.getElementById("complemento").value = usuario.complemento || "";
+  }
+
   // =========================
   // FUNÇÕES AUXILIARES
   // =========================
@@ -167,21 +184,35 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
 
   form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const valido =
-      validarNome() &&
-      validarEmail() &&
-      validarTelefone() &&
-      validarCep() &&
-      validarNumeroCasa();
+  const valido =
+    validarNome() &&
+    validarEmail() &&
+    validarTelefone() &&
+    validarCep() &&
+    validarNumeroCasa();
 
-    if (!valido) {
-      alert("Preencha os campos corretamente");
-      return;
-    }
+  if (!valido) {
+    alert("Preencha os campos corretamente");
+    return;
+  }
 
-    alert("Perfil atualizado com sucesso 🚀");
-  });
+  const usuarioAtualizado = {
+    nome: nome.value,
+    email: email.value, // continua o mesmo
+    telefone: tel.value,
+    dataNascimento: data.value,
+    cep: cep.value,
+    rua: rua.value,
+    cidade: cidade.value,
+    estado: estado.value,
+    numero: num.value,
+    complemento: complemento.value
+  };
 
+  localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
+
+  alert("Perfil atualizado com sucesso 🚀");
+});
 });
