@@ -6,22 +6,42 @@
     <title>Registro de Reciclagem</title>
     <link rel="stylesheet" href="registrarReciclagem.css">
 </head>
+<header class="header">
+    <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+
+    <nav>
+      <a href="#">Ranking</a>
+      <a href="#">Mapa de Coleta</a>
+      <a href="#">Recompensas</a>
+      <a href="#" class="active">Registrar reciclagem</a>
+    </nav>
+
+    <a class="profile"></a>
+  </header>
 <body>
 
 <div class="container">
 
+  <!-- DIREITA -->
+  <div class="lado-direito">
     <div id="painelPontos">
-  <h3>Seu Progresso</h3>
+      <h3>Seu Progresso</h3>
 
-  <p id="nivel">Nível: Iniciante 🌱</p>
-  <p id="pontos">Pontos: 0</p>
+      <p id="nivel">Nível: Iniciante 🌱</p>
+      <p id="pontos">Pontos: 0</p>
 
-  <div id="barraContainer">
-    <div id="barraProgresso"></div>
+      <div id="barraContainer">
+        <div id="barraProgresso"></div>
+      </div>
+    </div>
+
+    <button type="submit" form="formReciclagem">
+      Registrar
+    </button>
   </div>
-</div>
 
-<form id="formReciclagem">
+  <!-- ESQUERDA -->
+  <form id="formReciclagem">
 
   <h2>Registrar Reciclagem</h2>
 
@@ -31,6 +51,13 @@
     <button type="button" data-tipo="vidro">🍾 Vidro</button>
     <button type="button" data-tipo="metal">🥫 Metal</button>
     <button type="button" data-tipo="organico">🌱 Orgânico</button>
+    <button type="button" data-tipo="pilhas">🔋 Pilhas</button>
+    <button type="button" data-tipo="eletronico">💻 Eletrônicos</button>
+    <button type="button" data-tipo="tampinha">🧴 Tampinha de garrafa</button>
+    <button type="button" data-tipo="cartela">💊 Cartela de remédio vazia</button>
+    <button type="button" data-tipo="capsula">☕ Cápsula de café</button>
+
+
   </div>
 
 <div class="linha">
@@ -45,7 +72,14 @@
 </div>
     <p id="resultado"></p>
 
-    <button type="submit">Registrar</button>
+<!--CEP-->
+    <label>Digite o CEP:</label>
+    <input type="text" id="cep" placeholder="Digite o CEP">
+
+<!--FOTO-->
+
+    <label>Comprove com uma foto:</label>
+    <input type="file" id="foto" accept="image/*">
 
     </form>
 </div>

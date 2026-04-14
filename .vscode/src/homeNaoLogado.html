@@ -14,18 +14,27 @@
 </head>
 <body>
     <header>
-        <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
-        <ul>
-            <li>LOGO = HOME</li>
-            <li>Ranking</li>
-            <li>Registrar Reciclagem</li>
-            <li>Mapa de Coleta</li>
-            <li>Recompensas</li>
-            <li>Ranking</li>
-            <li><button onclick="window.location.href='/.vscode/src/cadastrese.html'">
-                    <h2>Cadastrar/Entrar</h2>
-                </button></li>
-        </ul>
+        <div class="header-container">
+            <a href="#" class="logo-link">
+                <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="navbar" id="navbar">
+                <a href="#" class="nav-link active">Home</a>
+                <a href="#ranking" class="nav-link">Ranking</a>
+                <a href="#" class="nav-link">Registrar Reciclagem</a>
+                <a href="#" class="nav-link">Mapa de Coleta</a>
+                <a href="#" class="nav-link">Recompensas</a>
+            </nav>
+
+            <button class="btn-auth" onclick="window.location.href='/.vscode/src/cadastrese.html'">
+                <i class="fas fa-user"></i> Entrar
+            </button>
+        </div>
     </header>
 
     <main>
