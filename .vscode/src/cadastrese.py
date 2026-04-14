@@ -5,14 +5,13 @@ import bcrypt
 import secrets
 import os
 import uuid
+import cloudinary
+import cloudinary.uploader
 from datetime import datetime
 
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
@@ -23,38 +22,30 @@ DB_CONFIG = {
     "port": 28939
 }
 
+cloudinary.config(
+    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.getenv('CLOUDINARY_API_KEY'),
+    api_secret = os.getenv('CLOUDINARY_API_SECRET')
+)
+
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
-# === CORS ===
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.send_header('Access-Control-Max-Age', '86400') 
-        super().end_headers() # APENAS UMA VEZ AQUI
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+            self.send_header('Access-Control-Max-Age', '86400') 
+            super().end_headers()
 
     def do_OPTIONS(self):
-        self.send_response(200)
-        self.end_headers()
+            self.send_response(200)
+            self.end_headers()
 
     def do_GET(self):
-        if self.path.startswith("/uploads/"):
-            caminho = self.path.lstrip("/")
-
-            try:
-                with open(caminho, "rb") as f:
-                    self.send_response(200)
-
-                    if caminho.endswith(".png"):
-                        self.send_header("Content-Type", "image/png")
-                    elif caminho.endswith(".jpg") or caminho.endswith(".jpeg"):
-                        self.send_header("Content-Type", "image/jpeg")
-
-                    self.end_headers()
-                    self.wfile.write(f.read())
-
-            except:
-                self.send_response(404)
+            # Como as fotos agora estão no Cloudinary, você não precisará mais 
+            # desse GET para buscar na pasta /uploads/, mas vou manter por segurança.
+            if self.path.startswith("/uploads/"):
+                self.send_response(404) # Fotos locais não existem mais
                 self.end_headers()
 
     def do_POST(self):
@@ -445,13 +436,10 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
         
         elif self.path == '/atualizar-perfil':
-
             content_type = self.headers.get('Content-Type')
-
             dados = {}
-            caminho_foto = None
+            url_foto_cloudinary = None
 
-            # 🔥 SE FOR FORM COM IMAGEM
             if "multipart/form-data" in content_type:
                 boundary = content_type.split("boundary=")[1].encode()
                 length = int(self.headers.get('Content-Length'))
@@ -464,89 +452,82 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         headers, conteudo = parte.split(b"\r\n\r\n", 1)
                         conteudo = conteudo.strip(b"\r\n")
 
-                        # 🔥 SE FOR ARQUIVO (FOTO)
+                        # 📸 PROCESSANDO A FOTO
                         if b'filename="' in headers:
-                            nome_arquivo = headers.split(b'filename="')[1].split(b'"')[0].decode()
+                            if conteudo: # Se houver imagem selecionada
+                                try:
+                                    # Faz o upload direto para o Cloudinary usando os bytes
+                                    upload_result = cloudinary.uploader.upload(
+                                        conteudo, 
+                                        folder="perfil_usuarios"
+                                    )
+                                    # Pegamos a URL final
+                                    url_foto_cloudinary = upload_result.get('secure_url')
+                                except Exception as e:
+                                    print(f"Erro no Cloudinary: {e}")
 
-                            nome_arquivo = nome_arquivo.replace(" ", "_")
-                            nome_arquivo = str(uuid.uuid4()) + "_" + nome_arquivo   
-
-                            pasta = "uploads"
-                            if not os.path.exists(pasta):
-                                os.makedirs(pasta)
-
-                            caminho_foto = os.path.join(pasta, nome_arquivo)
-
-                            with open(caminho_foto, "wb") as f:
-                                f.write(conteudo)
-
-                        # 🔥 CAMPOS NORMAIS
+                        # 📝 CAMPOS DE TEXTO
                         else:
                             nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-                            valor = conteudo.decode()
+                            valor = conteudo.decode('utf-8')
                             dados[nome_campo] = valor
-
             else:
-                # 🔥 CASO ANTIGO (SEM FOTO)
+                # Caso venha como form normal (sem foto)
                 content_length = int(self.headers['Content-Length'])
                 corpo = self.rfile.read(content_length)
-                from urllib.parse import parse_qs
-
                 parsed = parse_qs(corpo.decode())
-
                 for chave in parsed:
                     dados[chave] = parsed[chave][0]
 
-            email = dados.get("email", "")
+            email_usuario = dados.get("email", "")
 
-            conexao = mysql.connector.connect(**DB_CONFIG)
-            cursor = conexao.cursor()
+            conexao = None
+            try:
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
 
-            # 🔥 COM FOTO
-            if caminho_foto:
-                cursor.execute("""
-                    UPDATE Usuario SET
-                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s, Foto=%s
-                    WHERE Email=%s
-                """, (
-                    dados.get("nome"),
-                    dados.get("telefone"),
-                    dados.get("cep"),
-                    dados.get("rua"),
-                    dados.get("cidade"),
-                    dados.get("estado"),
-                    dados.get("numero"),
-                    dados.get("complemento"),
-                    caminho_foto,
-                    email
-                ))
-            else:
-                # 🔥 SEM FOTO
-                cursor.execute("""
-                    UPDATE Usuario SET
-                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
-                    WHERE Email=%s
-                """, (
-                    dados.get("nome"),
-                    dados.get("telefone"),
-                    dados.get("cep"),
-                    dados.get("rua"),
-                    dados.get("cidade"),
-                    dados.get("estado"),
-                    dados.get("numero"),
-                    dados.get("complemento"),
-                    email
-                ))
+                if url_foto_cloudinary:
+                    # Atualiza TUDO, inclusive a nova URL da foto
+                    sql = """
+                        UPDATE Usuario SET
+                        Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s, Foto=%s
+                        WHERE Email=%s
+                    """
+                    valores = (
+                        dados.get("nome"), dados.get("telefone"), dados.get("cep"),
+                        dados.get("rua"), dados.get("cidade"), dados.get("estado"),
+                        dados.get("numero"), dados.get("complemento"), url_foto_cloudinary,
+                        email_usuario
+                    )
+                else:
+                    # Atualiza só os textos (mantém a foto que já estava)
+                    sql = """
+                        UPDATE Usuario SET
+                        Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
+                        WHERE Email=%s
+                    """
+                    valores = (
+                        dados.get("nome"), dados.get("telefone"), dados.get("cep"),
+                        dados.get("rua"), dados.get("cidade"), dados.get("estado"),
+                        dados.get("numero"), dados.get("complemento"), email_usuario
+                    )
 
-            conexao.commit()
+                cursor.execute(sql, valores)
+                conexao.commit()
 
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"ok": True}).encode())
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
 
-            cursor.close()
-            conexao.close()
+            except Exception as e:
+                print(f"Erro ao salvar perfil: {e}")
+                self.send_response(500)
+                self.end_headers()
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
 
 # === INICIALIZAÇÃO ===
