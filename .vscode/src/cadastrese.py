@@ -4,11 +4,15 @@ import mysql.connector
 import bcrypt
 import secrets
 import os
+import uuid
 from datetime import datetime
 
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # === CONFIGURAÇÕES DO BANCO ===
 DB_CONFIG = {
@@ -32,6 +36,26 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.end_headers()
+
+    def do_GET(self):
+        if self.path.startswith("/uploads/"):
+            caminho = self.path.lstrip("/")
+
+            try:
+                with open(caminho, "rb") as f:
+                    self.send_response(200)
+
+                    if caminho.endswith(".png"):
+                        self.send_header("Content-Type", "image/png")
+                    elif caminho.endswith(".jpg") or caminho.endswith(".jpeg"):
+                        self.send_header("Content-Type", "image/jpeg")
+
+                    self.end_headers()
+                    self.wfile.write(f.read())
+
+            except:
+                self.send_response(404)
+                self.end_headers()
 
     def do_POST(self):
 
@@ -392,7 +416,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento
+                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento, Foto
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
@@ -408,7 +432,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 "cidade": usuario[6],
                 "estado": usuario[7],
                 "numero": usuario[8],
-                "complemento": usuario[9]
+                "complemento": usuario[9],
+                "foto": usuario[10]
             }
 
             self.send_response(200)
@@ -420,36 +445,102 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
         
         elif self.path == '/atualizar-perfil':
-            content_length = int(self.headers['Content-Length'])
-            corpo = self.rfile.read(content_length)
-            from urllib.parse import parse_qs
 
-            dados = parse_qs(corpo.decode())
+            content_type = self.headers.get('Content-Type')
 
-            email = dados.get("email", [""])[0]
+            dados = {}
+            caminho_foto = None
+
+            # 🔥 SE FOR FORM COM IMAGEM
+            if "multipart/form-data" in content_type:
+                boundary = content_type.split("boundary=")[1].encode()
+                length = int(self.headers.get('Content-Length'))
+                body = self.rfile.read(length)
+
+                partes = body.split(b"--" + boundary)
+
+                for parte in partes:
+                    if b"Content-Disposition" in parte:
+                        headers, conteudo = parte.split(b"\r\n\r\n", 1)
+                        conteudo = conteudo.strip(b"\r\n")
+
+                        # 🔥 SE FOR ARQUIVO (FOTO)
+                        if b'filename="' in headers:
+                            nome_arquivo = headers.split(b'filename="')[1].split(b'"')[0].decode()
+
+                            nome_arquivo = str(uuid.uuid4()) + "_" + nome_arquivo
+
+                            pasta = "uploads"
+                            if not os.path.exists(pasta):
+                                os.makedirs(pasta)
+
+                            caminho_foto = os.path.join(pasta, nome_arquivo)
+
+                            with open(caminho_foto, "wb") as f:
+                                f.write(conteudo)
+
+                        # 🔥 CAMPOS NORMAIS
+                        else:
+                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+                            valor = conteudo.decode()
+                            dados[nome_campo] = valor
+
+            else:
+                # 🔥 CASO ANTIGO (SEM FOTO)
+                content_length = int(self.headers['Content-Length'])
+                corpo = self.rfile.read(content_length)
+                from urllib.parse import parse_qs
+
+                parsed = parse_qs(corpo.decode())
+
+                for chave in parsed:
+                    dados[chave] = parsed[chave][0]
+
+            email = dados.get("email", "")
 
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
-            cursor.execute("""
-                UPDATE Usuario SET
-                Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
-                WHERE Email=%s
-            """, (
-                dados.get("nome", [""])[0],
-                dados.get("telefone", [""])[0],
-                dados.get("cep", [""])[0],
-                dados.get("rua", [""])[0],
-                dados.get("cidade", [""])[0],
-                dados.get("estado", [""])[0],
-                dados.get("numero", [""])[0],
-                dados.get("complemento", [""])[0],
-                email
-            ))
+            # 🔥 COM FOTO
+            if caminho_foto:
+                cursor.execute("""
+                    UPDATE Usuario SET
+                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s, Foto=%s
+                    WHERE Email=%s
+                """, (
+                    dados.get("nome"),
+                    dados.get("telefone"),
+                    dados.get("cep"),
+                    dados.get("rua"),
+                    dados.get("cidade"),
+                    dados.get("estado"),
+                    dados.get("numero"),
+                    dados.get("complemento"),
+                    caminho_foto,
+                    email
+                ))
+            else:
+                # 🔥 SEM FOTO
+                cursor.execute("""
+                    UPDATE Usuario SET
+                    Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
+                    WHERE Email=%s
+                """, (
+                    dados.get("nome"),
+                    dados.get("telefone"),
+                    dados.get("cep"),
+                    dados.get("rua"),
+                    dados.get("cidade"),
+                    dados.get("estado"),
+                    dados.get("numero"),
+                    dados.get("complemento"),
+                    email
+                ))
 
             conexao.commit()
 
             self.send_response(200)
+            self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps({"ok": True}).encode())
 

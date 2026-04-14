@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+
   // =========================
   // 🔥 BUSCAR DADOS DO BANCO
   // =========================
@@ -63,6 +64,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 🔒 EMAIL BLOQUEADO
     email.disabled = true;
+
+        if (usuario.foto) {
+    fotoPerfil.src = "https://lixie-production.up.railway.app/" + usuario.foto;
+  }
 
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
@@ -209,7 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 🔥 SALVAR NO BANCO
   // =========================
 
-  form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const valido =
@@ -223,25 +228,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  const dados = new URLSearchParams({
-    email: email.value,
-    nome: nome.value,
-    telefone: tel.value,
-    cep: cep.value,
-    rua: rua.value,
-    cidade: cidade.value,
-    estado: estado.value,
-    numero: num.value,
-    complemento: complemento.value
-  });
+  // 🔥 AGORA USA FORMDATA (OBRIGATÓRIO PRA IMAGEM)
+  const formData = new FormData();
+
+  formData.append("email", email.value);
+  formData.append("nome", nome.value);
+  formData.append("telefone", tel.value);
+  formData.append("cep", cep.value);
+  formData.append("rua", rua.value);
+  formData.append("cidade", cidade.value);
+  formData.append("estado", estado.value);
+  formData.append("numero", num.value);
+  formData.append("complemento", complemento.value);
+
+  // 🔥 FOTO (ESSA É A PARTE IMPORTANTE)
+  if (inputFoto.files[0]) {
+    formData.append("foto", inputFoto.files[0]);
+  }
 
   try {
     const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: dados.toString()
+      body: formData // ❌ NÃO colocar headers aqui!
     });
 
     const resposta = await res.json();
