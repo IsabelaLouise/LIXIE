@@ -3,28 +3,53 @@ document.addEventListener("DOMContentLoaded", carregarRanking);
 document.addEventListener("DOMContentLoaded", carregarRanking);
 
 async function carregarRanking() {
-  const response = await fetch('http://127.0.0.1:8000/ranking', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-
-  const dados = await response.json();
-
   const container = document.querySelector('#ranking-lista');
 
-  container.innerHTML = '<h2>Top Recicladores</h2>';
+  // Mostrar loading
+  container.innerHTML = `
+    <h2>Top Recicladores</h2>
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Carregando ranking...</p>
+    </div>
+  `;
 
-  dados.forEach(user => {
-    container.innerHTML += `
-      <div class="rank-item">
-        <div class="rank-left">
-          <div class="position">${user.posicao}</div>
-          <span>${user.nome}</span>
+  try {
+    const response = await fetch('https://lixie-production.up.railway.app/ranking', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const dados = await response.json();
+
+    container.innerHTML = '<h2>Top Recicladores</h2>';
+
+    if (dados.length === 0) {
+      container.innerHTML += '<p class="no-data">Nenhum reciclador cadastrado ainda.</p>';
+      return;
+    }
+
+    dados.forEach(user => {
+      container.innerHTML += `
+        <div class="rank-item">
+          <div class="rank-left">
+            <div class="position">${user.posicao}</div>
+            <span>${user.nome}</span>
+          </div>
+          <span>${user.pontos} pts</span>
         </div>
-        <span>${user.pontos} pts</span>
+       `;
+    });
+  } catch (error) {
+    console.error('Erro ao carregar ranking:', error);
+    container.innerHTML = `
+      <h2>Top Recicladores</h2>
+      <div class="error-message">
+        <p>❌ Erro ao carregar o ranking.</p>
+        <p>Tente novamente mais tarde.</p>
       </div>
     `;
-  });
+  }
 }
