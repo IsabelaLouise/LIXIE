@@ -85,16 +85,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const urlLimpa = usuario.foto.trim();
         console.log("URL da foto vinda do banco:", urlLimpa);
 
-        // Se a URL começar com http, ela veio do Cloudinary
         if (urlLimpa.startsWith('http')) {
             fotoPerfil.src = urlLimpa;
         } else {
-            // Se for só um nome de arquivo, tenta o caminho do servidor antigo
             fotoPerfil.src = "https://lixie-production.up.railway.app/" + urlLimpa;
         }
     } else {
-        // Se não tiver foto no banco, usa o avatar padrão
-        fotoPerfil.src = "img/avatar.png"; // Ajuste para o caminho real da sua pasta de imagens
+        fotoPerfil.src = "img/avatar.png"; 
     }
 
         } catch (erro) {
@@ -230,7 +227,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         formData.append("email", email.value);
         formData.append("nome", nome.value);
         formData.append("telefone", tel.value);
-        formData.append("dataNascimento", data.value); // Enviando data também
+        formData.append("dataNascimento", data.value); 
         formData.append("cep", cep.value);
         formData.append("rua", rua.value);
         formData.append("cidade", cidade.value);
@@ -246,7 +243,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
                 method: "POST",
                 body: formData 
-                // ⚠️ IMPORTANTE: Não coloque Headers de Content-Type aqui!
             });
 
             const resposta = await res.json();
