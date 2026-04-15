@@ -5,7 +5,12 @@ import bcrypt
 import secrets
 import os
 import io
-import cgi
+try:
+    import cgi
+    HAVE_CGI = True
+except Exception:
+    cgi = None
+    HAVE_CGI = False
 import uuid
 import cloudinary
 import cloudinary.uploader
@@ -476,43 +481,98 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             url_foto_cloudinary = None
 
             if "multipart/form-data" in content_type:
-                # Use cgi.FieldStorage para parsear corretamente multipart/form-data
-                try:
-                    fs = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'}, keep_blank_values=True)
-                except Exception as e:
-                    print(f"❌ Erro ao parsear multipart: {e}")
-                    fs = None
+                if HAVE_CGI:
+                    # Use cgi.FieldStorage quando disponível
+                    try:
+                        fs = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'}, keep_blank_values=True)
+                    except Exception as e:
+                        print(f"❌ Erro ao parsear multipart: {e}")
+                        fs = None
 
-                if fs:
-                    for key in fs.keys():
-                        if key == 'foto':
-                            fileitem = fs['foto']
-                            # fileitem.filename existe se um arquivo foi enviado
-                            if getattr(fileitem, 'filename', None):
-                                try:
-                                    file_bytes = fileitem.file.read()
-                                    print("--- Iniciando upload para Cloudinary ---")
-                                    # Enviar um file-like object para o uploader
-                                    upload_result = cloudinary.uploader.upload(file=io.BytesIO(file_bytes), folder="perfil_usuarios")
-                                    url_foto_cloudinary = upload_result.get('secure_url')
-                                    print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
-                                except Exception as e:
-                                    print(f"❌ Erro Cloudinary: {e}")
-                                    # Retorna erro JSON para o frontend
+                    if fs:
+                        for key in fs.keys():
+                            if key == 'foto':
+                                fileitem = fs['foto']
+                                # fileitem.filename existe se um arquivo foi enviado
+                                if getattr(fileitem, 'filename', None):
                                     try:
-                                        self.send_response(500)
-                                        self.send_header('Content-Type', 'application/json')
-                                        self.end_headers()
-                                        self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
-                                    except Exception:
-                                        pass
-                                    return
-                        else:
-                            try:
-                                valor = fs.getvalue(key)
-                                dados[key] = valor
-                            except Exception:
-                                pass
+                                        file_bytes = fileitem.file.read()
+                                        print("--- Iniciando upload para Cloudinary ---")
+                                        # Enviar um file-like object para o uploader
+                                        upload_result = cloudinary.uploader.upload(file=io.BytesIO(file_bytes), folder="perfil_usuarios")
+                                        url_foto_cloudinary = upload_result.get('secure_url')
+                                        print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
+                                    except Exception as e:
+                                        print(f"❌ Erro Cloudinary: {e}")
+                                        # Retorna erro JSON para o frontend
+                                        try:
+                                            self.send_response(500)
+                                            self.send_header('Content-Type', 'application/json')
+                                            self.end_headers()
+                                            self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
+                                        except Exception:
+                                            pass
+                                        return
+                            else:
+                                try:
+                                    valor = fs.getvalue(key)
+                                    dados[key] = valor
+                                except Exception:
+                                    pass
+                else:
+                    # Fallback manual quando cgi não estiver presente
+                    try:
+                        boundary = content_type.split('boundary=')[1].encode()
+                    except Exception:
+                        boundary = None
+
+                    if not boundary:
+                        print('❌ Boundary não encontrado no Content-Type multipart')
+                    else:
+                        try:
+                            length = int(self.headers.get('Content-Length', 0))
+                            body = self.rfile.read(length)
+                            partes = body.split(b"--" + boundary)
+
+                            for parte in partes:
+                                parte = parte.strip()
+                                if not parte or parte == b'--':
+                                    continue
+                                if b"\r\n\r\n" not in parte:
+                                    continue
+                                headers, conteudo = parte.split(b"\r\n\r\n", 1)
+                                if conteudo.endswith(b"\r\n"):
+                                    conteudo = conteudo[:-2]
+
+                                # FILE
+                                if b'name="foto"' in headers and b'filename="' in headers:
+                                    if len(conteudo) > 0:
+                                        try:
+                                            print('--- Iniciando upload para Cloudinary (fallback) ---')
+                                            upload_result = cloudinary.uploader.upload(file=io.BytesIO(conteudo), folder='perfil_usuarios')
+                                            url_foto_cloudinary = upload_result.get('secure_url')
+                                            print(f'--- Sucesso! URL: {url_foto_cloudinary} ---')
+                                        except Exception as e:
+                                            print(f'❌ Erro Cloudinary (fallback): {e}')
+                                            try:
+                                                self.send_response(500)
+                                                self.send_header('Content-Type', 'application/json')
+                                                self.end_headers()
+                                                self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
+                                            except Exception:
+                                                pass
+                                            return
+                                else:
+                                    # TEXT FIELDS
+                                    if b'name="' in headers:
+                                        try:
+                                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+                                            valor = conteudo.decode('utf-8', errors='ignore').strip()
+                                            dados[nome_campo] = valor
+                                        except Exception:
+                                            pass
+                        except Exception as e:
+                            print(f'❌ Erro no parsing multipart (fallback): {e}')
 
             email_usuario = dados.get("email", "")
             if isinstance(email_usuario, list):
