@@ -28,6 +28,7 @@ DB_CONFIG = {
     "database": "Lixie",
     "port": 28939
 }
+
 print("ENV CLOUD NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
 print("ENV API KEY:", os.getenv('CLOUDINARY_API_KEY'))
 print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
@@ -35,7 +36,7 @@ print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
 cloudinary.config(
     cloud_name = "dkcyjejp6",
     api_key = "452934599459777",
-    api_secret = "6cc8gmW0ynE4YOYibmXt3gG2Ndk"
+    api_secret = "6cc8gmWOynE4YOYibmXt3gG2Ndk"
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
