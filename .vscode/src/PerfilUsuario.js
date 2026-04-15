@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             // No PerfilUsuario.js
             const usuario = await res.json();
 
+            console.log(usuario); // 👈 COLOCA ISSO AQUI
+
             nome.value = usuario.nome || "";
             email.value = usuario.email || "";
             tel.value = usuario.telefone || ""; // Certifique-se que é .telefone
