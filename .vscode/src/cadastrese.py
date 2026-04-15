@@ -97,7 +97,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 rua = dados.get("rua", [""])[0].strip() or None
                 cidade = dados.get("cidade", [""])[0].strip() or None
                 estado = dados.get("estado", [""])[0].strip() or None
-                numero = dados.get("numero", [""])[0].strip()      # ✅ CERTO
+                numero = dados.get("numeroCasa", [""])[0].strip()      # ✅ CERTO
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
