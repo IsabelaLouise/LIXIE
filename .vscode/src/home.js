@@ -1,13 +1,13 @@
 // 1. TENTA LER o email que deveria estar salvo
-const email = localStorage.getItem('usuarioEmail'); 
+// home.js - ALTERE A PRIMEIRA LINHA
+const email = localStorage.getItem('email');
 
-// 2. VERIFICAÇÃO: Se não houver email, ele te chuta para fora na hora
 if (!email || email === "undefined" || email === null) {
     console.log("Acesso negado! Redirecionando...");
-    // Redireciona para a rota pública; o vercel.json faz o rewrite internamente
-    window.location.href = "/homeNaoLogado.html";
+    window.location.href = "homeNaoLogado.html";
 } else {
-    // 3. SE ESTIVER LOGADO, busca os dados no Railway
+
+    // DADOS DO USUÁRIO
     fetch("https://lixie-production.up.railway.app/dados-usuario", {
         method: "POST",
         headers: {
@@ -22,7 +22,28 @@ if (!email || email === "undefined" || email === null) {
         document.getElementById("nivel").textContent = dados.nivel;
     })
     .catch(err => console.error("Erro ao conectar ao Railway:", err));
+
+    // ✅ FOTO DO USUÁRIO (AGORA NO LUGAR CERTO)
+    fetch("https://lixie-production.up.railway.app/perfil", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(usuario => {
+        const fotoHome = document.getElementById("fotoHome");
+
+        if (usuario.foto && usuario.foto.trim().startsWith("http")) {
+            fotoHome.src = usuario.foto.trim();
+        } else {
+            fotoHome.src = "img/avatar.png";
+        }
+    })
+    .catch(err => console.error("Erro ao carregar foto:", err));
 }
+
 
 function logout() {
     localStorage.removeItem("usuarioEmail");
