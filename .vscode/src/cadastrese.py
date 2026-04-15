@@ -477,73 +477,48 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 boundary = content_type.split("boundary=")[1].encode()
                 length = int(self.headers.get('Content-Length'))
                 body = self.rfile.read(length)
-
                 partes = body.split(b"--" + boundary)
 
                 for parte in partes:
                     if b"Content-Disposition" in parte:
-                        headers, conteudo = parte.split(b"\r\n\r\n", 1)
+                        parts = parte.split(b"\r\n\r\n", 1)
+                        if len(parts) < 2: continue
+                        headers, conteudo = parts
                         conteudo = conteudo.strip(b"\r\n")
 
                         # 📸 PROCESSANDO A FOTO
                         if b'filename="' in headers:
-                            if conteudo: # Se houver imagem selecionada
+                            if conteudo:
                                 try:
-                                    # Faz o upload direto para o Cloudinary usando os bytes
-                                    upload_result = cloudinary.uploader.upload(
-                                        conteudo, 
-                                        folder="perfil_usuarios"
-                                    )
-                                    # Pegamos a URL final
+                                    upload_result = cloudinary.uploader.upload(conteudo, folder="perfil_usuarios")
                                     url_foto_cloudinary = upload_result.get('secure_url')
                                 except Exception as e:
-                                    print(f"Erro no Cloudinary: {e}")
-
+                                    print(f"Erro Cloudinary: {e}")
                         # 📝 CAMPOS DE TEXTO
                         else:
                             nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-                            valor = conteudo.decode('utf-8')
+                            valor = conteudo.decode('utf-8').strip() # <--- O .strip() essencial aqui!
                             dados[nome_campo] = valor
-            else:
-                # Caso venha como form normal (sem foto)
-                content_length = int(self.headers['Content-Length'])
-                corpo = self.rfile.read(content_length)
-                parsed = parse_qs(corpo.decode())
-                for chave in parsed:
-                    dados[chave] = parsed[chave][0]
-
-            email_usuario = dados.get("email", "")
-
+            
+            # AGORA O SALVAMENTO (Dentro do escopo correto)
+            email_usuario = dados.get("email", "").strip()
             conexao = None
             try:
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
                 if url_foto_cloudinary:
-                    # Atualiza TUDO, inclusive a nova URL da foto
-                    sql = """
-                        UPDATE Usuario SET
-                        Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s, Foto=%s
-                        WHERE Email=%s
-                    """
-                    valores = (
-                        dados.get("nome"), dados.get("telefone"), dados.get("cep"),
-                        dados.get("rua"), dados.get("cidade"), dados.get("estado"),
-                        dados.get("numero"), dados.get("complemento"), url_foto_cloudinary,
-                        email_usuario
-                    )
+                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
+                             Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
+                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
+                               dados.get("complemento"), url_foto_cloudinary, email_usuario)
                 else:
-                    # Atualiza só os textos (mantém a foto que já estava)
-                    sql = """
-                        UPDATE Usuario SET
-                        Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
-                        WHERE Email=%s
-                    """
-                    valores = (
-                        dados.get("nome"), dados.get("telefone"), dados.get("cep"),
-                        dados.get("rua"), dados.get("cidade"), dados.get("estado"),
-                        dados.get("numero"), dados.get("complemento"), email_usuario
-                    )
+                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
+                             Numero_casa=%s, Complemento=%s WHERE Email=%s"""
+                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
+                               dados.get("complemento"), email_usuario)
 
                 cursor.execute(sql, valores)
                 conexao.commit()
@@ -554,29 +529,17 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
 
             except Exception as e:
-                print(f"Erro ao salvar perfil: {e}")
+                print(f"Erro ao salvar: {e}")
                 self.send_response(500)
                 self.end_headers()
             finally:
-                if conexao and conexao.is_connected():
-                    cursor.close()
-                    conexao.close()
-        # 📝 CAMPOS DE TEXTO (Ajustado com .strip())
-        # 📝 CAMPOS DE TEXTO
-        else:
-            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-            # ADICIONE O .strip() AQUI:
-            valor = conteudo.decode('utf-8').strip() 
-            dados[nome_campo] = valor
-
+                            if conexao and conexao.is_connected():
+                                cursor.close()
+                                conexao.close()
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
-    # O Railway injeta o número da porta nesta variável de ambiente. 
-    # Se não houver, ele usa a 8000 por padrão.
     port = int(os.environ.get("PORT", 8000)) 
-    
-    # '0.0.0.0' é OBRIGATÓRIO para o Railway conseguir te dar um domínio.
     server_address = ('0.0.0.0', port)
     httpd = http.server.HTTPServer(server_address, ServidorCadastro)
     print(f"Servidor rodando na porta {port}...")
