@@ -46,18 +46,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: `email=${encodeURIComponent(emailUsuario)}`
             });
 
+            // No PerfilUsuario.js
             const usuario = await res.json();
 
-            // Preenche os inputs com os dados que voltaram do banco
             nome.value = usuario.nome || "";
             email.value = usuario.email || "";
-            tel.value = usuario.telefone || "";
+            tel.value = usuario.telefone || ""; // Certifique-se que é .telefone
             data.value = usuario.dataNascimento || "";
             cep.value = usuario.cep || "";
             rua.value = usuario.rua || "";
             cidade.value = usuario.cidade || "";
             estado.value = usuario.estado || "";
-            num.value = usuario.numero || "";
+            num.value = usuario.numero || "";   // Certifique-se que é .numero
             complemento.value = usuario.complemento || "";
 
             email.disabled = true; // Mantém email travado
