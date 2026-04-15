@@ -487,21 +487,25 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         conteudo = conteudo.strip(b"\r\n")
 
                         # 📸 PROCESSANDO A FOTO
-                        if b'filename="' in headers:
-                            if conteudo:
+                        if b'name="foto"' in headers and b'filename="' in headers:
+                            if len(conteudo) > 0:
                                 try:
+                                    print("--- Iniciando upload para Cloudinary ---")
                                     upload_result = cloudinary.uploader.upload(conteudo, folder="perfil_usuarios")
                                     url_foto_cloudinary = upload_result.get('secure_url')
+                                    print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
                                 except Exception as e:
-                                    print(f"Erro Cloudinary: {e}")
+                                    print(f"❌ Erro Cloudinary: {e}")
+                        
                         # 📝 CAMPOS DE TEXTO
-                        else:
+                        elif b'name="' in headers:
                             nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-                            valor = conteudo.decode('utf-8').strip() # <--- O .strip() essencial aqui!
+                            valor = conteudo.decode('utf-8').strip()
                             dados[nome_campo] = valor
-            
-            # AGORA O SALVAMENTO (Dentro do escopo correto)
+
             email_usuario = dados.get("email", "").strip()
+            print(f"--- Tentando atualizar usuário: {email_usuario} ---")
+
             conexao = None
             try:
                 conexao = mysql.connector.connect(**DB_CONFIG)
@@ -510,18 +514,22 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 if url_foto_cloudinary:
                     sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
                              Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
+                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
                                dados.get("complemento"), url_foto_cloudinary, email_usuario)
                 else:
                     sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
                              Numero_casa=%s, Complemento=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
+                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
                                dados.get("complemento"), email_usuario)
 
                 cursor.execute(sql, valores)
                 conexao.commit()
+                
+                # Verifica se alguma linha foi realmente afetada
+                if cursor.rowcount == 0:
+                    print("⚠️ Nenhuma linha atualizada. O e-mail existe no banco?")
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -529,13 +537,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
 
             except Exception as e:
-                print(f"Erro ao salvar: {e}")
+                print(f"❌ Erro ao salvar no banco: {e}")
                 self.send_response(500)
                 self.end_headers()
             finally:
-                            if conexao and conexao.is_connected():
-                                cursor.close()
-                                conexao.close()
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
