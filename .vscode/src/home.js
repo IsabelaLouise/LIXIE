@@ -1,10 +1,11 @@
 // 1. TENTA LER o email que deveria estar salvo
-const email = localStorage.getItem('usuarioEmail'); 
+// home.js - ALTERE A PRIMEIRA LINHA
+const email = localStorage.getItem('email'); // ✅ Agora coincide com o login.js
 
-// 2. VERIFICAÇÃO: Se não houver email, ele te chuta para fora na hora
+// O resto do código permanece igual
 if (!email || email === "undefined" || email === null) {
     console.log("Acesso negado! Redirecionando...");
-    window.location.href = "/.vscode/src/homeNaoLogado.html"; // Nome da sua home pública
+    window.location.href = "homeNaoLogado.html"; // Remova a / se estiver na mesma pasta
 } else {
     // 3. SE ESTIVER LOGADO, busca os dados no Railway
     fetch("https://lixie-production.up.railway.app/dados-usuario", {
@@ -25,5 +26,5 @@ if (!email || email === "undefined" || email === null) {
 
 function logout() {
     localStorage.removeItem("usuarioEmail");
-    window.location.href = "/.vscode/src/homeNaoLogado.html";
+    window.location.href = "/homeNaoLogado.html";
 }

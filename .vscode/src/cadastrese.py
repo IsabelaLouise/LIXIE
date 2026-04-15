@@ -4,6 +4,9 @@ import mysql.connector
 import bcrypt
 import secrets
 import os
+import uuid
+import cloudinary
+import cloudinary.uploader
 from datetime import datetime
 
 import smtplib
@@ -19,19 +22,31 @@ DB_CONFIG = {
     "port": 28939
 }
 
+cloudinary.config(
+    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.getenv('CLOUDINARY_API_KEY'),
+    api_secret = os.getenv('CLOUDINARY_API_SECRET')
+)
+
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
-# === CORS ===
     def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.send_header('Access-Control-Max-Age', '86400') 
-        super().end_headers() # APENAS UMA VEZ AQUI
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+            self.send_header('Access-Control-Max-Age', '86400') 
+            super().end_headers()
 
     def do_OPTIONS(self):
-        self.send_response(200)
-        self.end_headers()
+            self.send_response(200)
+            self.end_headers()
+
+    def do_GET(self):
+            # Como as fotos agora estão no Cloudinary, você não precisará mais 
+            # desse GET para buscar na pasta /uploads/, mas vou manter por segurança.
+            if self.path.startswith("/uploads/"):
+                self.send_response(404) # Fotos locais não existem mais
+                self.end_headers()
 
     def do_POST(self):
 
@@ -379,6 +394,39 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             cursor.close()
             conexao.close()
+        
+
+
+# ===RANKING ===
+        elif self.path == '/ranking':
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                SELECT Nome, Pontuacao_Total_Acumulada_
+                FROM Usuario
+                ORDER BY Pontuacao_Total_Acumulada_ DESC
+                LIMIT 10
+            """)
+
+            resultados = cursor.fetchall()
+
+            ranking = []
+            for i, user in enumerate(resultados):
+                ranking.append({
+                "posicao": i + 1,
+                "nome": user[0],
+                "pontos": user[1]
+                })
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(ranking).encode())
+
+            cursor.close()
+            conexao.close()
+
 
         elif self.path == '/perfil':
             content_length = int(self.headers['Content-Length'])
@@ -392,7 +440,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento
+                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento, Foto
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
@@ -408,7 +456,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 "cidade": usuario[6],
                 "estado": usuario[7],
                 "numero": usuario[8],
-                "complemento": usuario[9]
+                "complemento": usuario[9],
+                "foto": usuario[10]
             }
 
             self.send_response(200)
@@ -420,50 +469,85 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao.close()
         
         elif self.path == '/atualizar-perfil':
-            content_length = int(self.headers['Content-Length'])
-            corpo = self.rfile.read(content_length)
-            from urllib.parse import parse_qs
+            content_type = self.headers.get('Content-Type')
+            dados = {}
+            url_foto_cloudinary = None
 
-            dados = parse_qs(corpo.decode())
+            if "multipart/form-data" in content_type:
+                boundary = content_type.split("boundary=")[1].encode()
+                length = int(self.headers.get('Content-Length'))
+                body = self.rfile.read(length)
+                partes = body.split(b"--" + boundary)
 
-            email = dados.get("email", [""])[0]
+                for parte in partes:
+                    if b"Content-Disposition" in parte:
+                        parts = parte.split(b"\r\n\r\n", 1)
+                        if len(parts) < 2: continue
+                        headers, conteudo = parts
+                        conteudo = conteudo.strip(b"\r\n")
 
-            conexao = mysql.connector.connect(**DB_CONFIG)
-            cursor = conexao.cursor()
+                        # 📸 PROCESSANDO A FOTO
+                        if b'name="foto"' in headers and b'filename="' in headers:
+                            if len(conteudo) > 0:
+                                try:
+                                    print("--- Iniciando upload para Cloudinary ---")
+                                    upload_result = cloudinary.uploader.upload(conteudo, folder="perfil_usuarios")
+                                    url_foto_cloudinary = upload_result.get('secure_url')
+                                    print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
+                                except Exception as e:
+                                    print(f"❌ Erro Cloudinary: {e}")
+                        
+                        # 📝 CAMPOS DE TEXTO
+                        elif b'name="' in headers:
+                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+                            valor = conteudo.decode('utf-8').strip()
+                            dados[nome_campo] = valor
 
-            cursor.execute("""
-                UPDATE Usuario SET
-                Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, Numero_casa=%s, Complemento=%s
-                WHERE Email=%s
-            """, (
-                dados.get("nome", [""])[0],
-                dados.get("telefone", [""])[0],
-                dados.get("cep", [""])[0],
-                dados.get("rua", [""])[0],
-                dados.get("cidade", [""])[0],
-                dados.get("estado", [""])[0],
-                dados.get("numero", [""])[0],
-                dados.get("complemento", [""])[0],
-                email
-            ))
+            email_usuario = dados.get("email", "").strip()
+            print(f"--- Tentando atualizar usuário: {email_usuario} ---")
 
-            conexao.commit()
+            conexao = None
+            try:
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
 
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(json.dumps({"ok": True}).encode())
+                if url_foto_cloudinary:
+                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
+                             Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
+                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
+                               dados.get("complemento"), url_foto_cloudinary, email_usuario)
+                else:
+                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
+                             Numero_casa=%s, Complemento=%s WHERE Email=%s"""
+                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
+                               dados.get("complemento"), email_usuario)
 
-            cursor.close()
-            conexao.close()
+                cursor.execute(sql, valores)
+                conexao.commit()
+                
+                # Verifica se alguma linha foi realmente afetada
+                if cursor.rowcount == 0:
+                    print("⚠️ Nenhuma linha atualizada. O e-mail existe no banco?")
 
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
+
+            except Exception as e:
+                print(f"❌ Erro ao salvar no banco: {e}")
+                self.send_response(500)
+                self.end_headers()
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
-    # O Railway injeta o número da porta nesta variável de ambiente. 
-    # Se não houver, ele usa a 8000 por padrão.
     port = int(os.environ.get("PORT", 8000)) 
-    
-    # '0.0.0.0' é OBRIGATÓRIO para o Railway conseguir te dar um domínio.
     server_address = ('0.0.0.0', port)
     httpd = http.server.HTTPServer(server_address, ServidorCadastro)
     print(f"Servidor rodando na porta {port}...")
