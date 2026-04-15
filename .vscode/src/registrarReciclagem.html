@@ -7,16 +7,28 @@
     <link rel="stylesheet" href="/.vscode/src/home.css">
     <link rel="stylesheet" href="registrarReciclagem.css">
 </head>
+<<<<<<< HEAD
+
+<body>
+
+<header class="header">
+    <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+=======
   <header>
     <div class="header-container">
       <a href="/.vscode/src/homeLogado.html" class="logo-link">
         <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
       </a>
+>>>>>>> c4f6d75dd4043ca3be8de725a24161f6d84e15df
 
       <button class="menu-toggle" id="menuToggle">
         <i class="fas fa-bars"></i>
       </button>
 
+<<<<<<< HEAD
+    <a class="profile"></a>
+</header>
+=======
       <nav class="navbar" id="navbar">
         <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
         <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
@@ -31,69 +43,72 @@
     </div>
   </header>
 <body>
+>>>>>>> c4f6d75dd4043ca3be8de725a24161f6d84e15df
 
 <div class="container">
 
-  <!-- DIREITA -->
-  <div class="lado-direito">
-    <div id="painelPontos">
-      <h3>Seu Progresso</h3>
+  <!-- 🔥 ESQUERDA: MATERIAIS -->
+  <div id="materiais-container">
+    <h2>Materiais</h2>
 
-      <p id="nivel">Nível: Iniciante 🌱</p>
-      <p id="pontos">Pontos: 0</p>
-
-      <div id="barraContainer">
-        <div id="barraProgresso"></div>
-      </div>
+    <div id="materiais">
+      <button type="button" data-tipo="plastico"><img src="/.vscode/src/img/plastico.png"> Plástico</button>
+      <button type="button" data-tipo="papel"><img src="/.vscode/src/img/papel.png"> Papel</button>
+      <button type="button" data-tipo="vidro"><img src="/.vscode/src/img/vidro.png"> Vidro</button>
+      <button type="button" data-tipo="metal"><img src="/.vscode/src/img/metal.png"> Metal</button>
+      <button type="button" data-tipo="organico"><img src="/.vscode/src/img/organico.png"> Orgânico</button>
+      <button type="button" data-tipo="pilhas"><img src="/.vscode/src/img/bateria.png"> Pilhas</button>
+      <button type="button" data-tipo="eletronico"><img src="/.vscode/src/img/eletronico.png"> Eletrônicos</button>
+      <button type="button" data-tipo="tampinha"><img src="/.vscode/src/img/tampinha.png"> Tampinha</button>
+      <button type="button" data-tipo="cartela"><img src="/.vscode/src/img/cartela.png"> Cartela</button>
+      <button type="button" data-tipo="capsula"><img src="/.vscode/src/img/cafe.png"> Cápsula</button>
     </div>
-
-    <button type="submit" form="formReciclagem">
-      Registrar
-    </button>
   </div>
 
-  <!-- ESQUERDA -->
+<div class="lado-direito">
+
+  <!-- FORM -->
   <form id="formReciclagem">
 
-  <h2>Registrar Reciclagem</h2>
+    <h2>Registrar Reciclagem</h2>
 
-  <div id="materiais">
-    <button type="button" data-tipo="plastico">♻️ Plástico</button>
-    <button type="button" data-tipo="papel">📄 Papel</button>
-    <button type="button" data-tipo="vidro">🍾 Vidro</button>
-    <button type="button" data-tipo="metal">🥫 Metal</button>
-    <button type="button" data-tipo="organico">🌱 Orgânico</button>
-    <button type="button" data-tipo="pilhas">🔋 Pilhas</button>
-    <button type="button" data-tipo="eletronico">💻 Eletrônicos</button>
-    <button type="button" data-tipo="tampinha">🧴 Tampinha de garrafa</button>
-    <button type="button" data-tipo="cartela">💊 Cartela de remédio vazia</button>
-    <button type="button" data-tipo="capsula">☕ Cápsula de café</button>
+    <div class="linha">
+      <input type="number" id="quantidade" placeholder="Quantidade" required>
 
+      <select id="unidade">
+        <option value="kg">kg (Kilogramas)</option>
+        <option value="g">g (Gramas)</option>
+        <option value="ton">ton (Toneladas)</option>
+        <option value="un">Unidades</option>
+      </select>
+    </div>
 
-  </div>
-
-<div class="linha">
-  <input type="number" id="quantidade" placeholder="Quantidade" required>
-
-  <select id="unidade">
-    <option value="kg">kg (Kilogramas)</option>
-    <option value="g">g (Gramas)</option>
-    <option value="ton">ton (Toneladas)</option>
-    <option value="un">Unidades</option>
-  </select>
-</div>
     <p id="resultado"></p>
 
-<!--CEP-->
     <label>Digite o CEP:</label>
     <input type="text" id="cep" placeholder="Digite o CEP">
-
-<!--FOTO-->
 
     <label>Comprove com uma foto:</label>
     <input type="file" id="foto" accept="image/*">
 
-    </form>
+  </form>
+
+  <!-- BOTÃO -->
+  <button type="submit" form="formReciclagem">
+    Registrar
+  </button>
+
+  <!-- 👇 PAINEL AGORA EMBAIXO -->
+  <div id="painelPontos">
+    <h3>Seu Progresso</h3>
+    <p id="nivel">Nível: Iniciante 🌱</p>
+    <p id="pontos">Pontos: 0</p>
+
+    <div id="barraContainer">
+      <div id="barraProgresso"></div>
+    </div>
+  </div>
+
 </div>
 
 <script src="registrarReciclagem.js"></script>
@@ -130,5 +145,4 @@
 </script>
 
 </body>
-
 </html>

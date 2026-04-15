@@ -4,6 +4,13 @@ import mysql.connector
 import bcrypt
 import secrets
 import os
+import io
+try:
+    import cgi
+    HAVE_CGI = True
+except Exception:
+    cgi = None
+    HAVE_CGI = False
 import uuid
 import cloudinary
 import cloudinary.uploader
@@ -22,10 +29,14 @@ DB_CONFIG = {
     "port": 28939
 }
 
+print("ENV CLOUD NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
+print("ENV API KEY:", os.getenv('CLOUDINARY_API_KEY'))
+print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
+
 cloudinary.config(
-    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
-    api_key = os.getenv('CLOUDINARY_API_KEY'),
-    api_secret = os.getenv('CLOUDINARY_API_SECRET')
+    cloud_name = "dkcyjejp6",
+    api_key = "452934599459777",
+    api_secret = "6cc8gmWOynE4YOYibmXt3gG2Ndk"
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
@@ -81,12 +92,12 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 # === CAMPOS ===
                 nome = dados.get("nome", [""])[0].strip() or None
                 email = dados.get("email", [""])[0].strip() or None
-                telefone = dados.get("numero", [""])[0].strip() or None
+                telefone = dados.get("telefone", [""])[0].strip()  # ✅ CERTO
                 cep = dados.get("cep", [""])[0].replace("-", "").strip() or None
                 rua = dados.get("rua", [""])[0].strip() or None
                 cidade = dados.get("cidade", [""])[0].strip() or None
                 estado = dados.get("estado", [""])[0].strip() or None
-                numero = dados.get("numeroCasa", [""])[0].strip() or None
+                numero = dados.get("numeroCasa", [""])[0].strip()      # ✅ CERTO
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
@@ -474,37 +485,106 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             url_foto_cloudinary = None
 
             if "multipart/form-data" in content_type:
-                boundary = content_type.split("boundary=")[1].encode()
-                length = int(self.headers.get('Content-Length'))
-                body = self.rfile.read(length)
-                partes = body.split(b"--" + boundary)
+                if HAVE_CGI:
+                    # Use cgi.FieldStorage quando disponível
+                    try:
+                        fs = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'}, keep_blank_values=True)
+                    except Exception as e:
+                        print(f"❌ Erro ao parsear multipart: {e}")
+                        fs = None
 
-                for parte in partes:
-                    if b"Content-Disposition" in parte:
-                        parts = parte.split(b"\r\n\r\n", 1)
-                        if len(parts) < 2: continue
-                        headers, conteudo = parts
-                        conteudo = conteudo.strip(b"\r\n")
-
-                        # 📸 PROCESSANDO A FOTO
-                        if b'name="foto"' in headers and b'filename="' in headers:
-                            if len(conteudo) > 0:
+                    if fs:
+                        for key in fs.keys():
+                            if key == 'foto':
+                                fileitem = fs['foto']
+                                # fileitem.filename existe se um arquivo foi enviado
+                                if getattr(fileitem, 'filename', None):
+                                    try:
+                                        file_bytes = fileitem.file.read()
+                                        print("--- Iniciando upload para Cloudinary ---")
+                                        # Enviar um file-like object para o uploader
+                                        upload_result = cloudinary.uploader.upload(file=io.BytesIO(file_bytes), folder="perfil_usuarios")
+                                        url_foto_cloudinary = upload_result.get('secure_url')
+                                        print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
+                                    except Exception as e:
+                                        print(f"❌ Erro Cloudinary: {e}")
+                                        # Retorna erro JSON para o frontend
+                                        try:
+                                            self.send_response(500)
+                                            self.send_header('Content-Type', 'application/json')
+                                            self.end_headers()
+                                            self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
+                                        except Exception:
+                                            pass
+                                        return
+                            else:
                                 try:
-                                    print("--- Iniciando upload para Cloudinary ---")
-                                    upload_result = cloudinary.uploader.upload(conteudo, folder="perfil_usuarios")
-                                    url_foto_cloudinary = upload_result.get('secure_url')
-                                    print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
-                                except Exception as e:
-                                    print(f"❌ Erro Cloudinary: {e}")
-                        
-                        # 📝 CAMPOS DE TEXTO
-                        elif b'name="' in headers:
-                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-                            valor = conteudo.decode('utf-8').strip()
-                            dados[nome_campo] = valor
+                                    valor = fs.getvalue(key)
+                                    dados[key] = valor
+                                except Exception:
+                                    pass
+                else:
+                    # Fallback manual quando cgi não estiver presente
+                    try:
+                        boundary = content_type.split('boundary=')[1].encode()
+                    except Exception:
+                        boundary = None
 
-            email_usuario = dados.get("email", "").strip()
+                    if not boundary:
+                        print('❌ Boundary não encontrado no Content-Type multipart')
+                    else:
+                        try:
+                            length = int(self.headers.get('Content-Length', 0))
+                            body = self.rfile.read(length)
+                            partes = body.split(b"--" + boundary)
+
+                            for parte in partes:
+                                parte = parte.strip()
+                                if not parte or parte == b'--':
+                                    continue
+                                if b"\r\n\r\n" not in parte:
+                                    continue
+                                headers, conteudo = parte.split(b"\r\n\r\n", 1)
+                                if conteudo.endswith(b"\r\n"):
+                                    conteudo = conteudo[:-2]
+
+                                # FILE
+                                if b'name="foto"' in headers and b'filename="' in headers:
+                                    if len(conteudo) > 0:
+                                        try:
+                                            print('--- Iniciando upload para Cloudinary (fallback) ---')
+                                            upload_result = cloudinary.uploader.upload(file=io.BytesIO(conteudo), folder='perfil_usuarios')
+                                            url_foto_cloudinary = upload_result.get('secure_url')
+                                            print(f'--- Sucesso! URL: {url_foto_cloudinary} ---')
+                                        except Exception as e:
+                                            print(f'❌ Erro Cloudinary (fallback): {e}')
+                                            try:
+                                                self.send_response(500)
+                                                self.send_header('Content-Type', 'application/json')
+                                                self.end_headers()
+                                                self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
+                                            except Exception:
+                                                pass
+                                            return
+                                else:
+                                    # TEXT FIELDS
+                                    if b'name="' in headers:
+                                        try:
+                                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
+                                            valor = conteudo.decode('utf-8', errors='ignore').strip()
+                                            dados[nome_campo] = valor
+                                        except Exception:
+                                            pass
+                        except Exception as e:
+                            print(f'❌ Erro no parsing multipart (fallback): {e}')
+
+            email_usuario = dados.get("email", "")
+            if isinstance(email_usuario, list):
+                email_usuario = email_usuario[0]
+
+            email_usuario = email_usuario.strip()
             print(f"--- Tentando atualizar usuário: {email_usuario} ---")
+            print("--- Dados brutos recebidos (campos):", dados)
 
             conexao = None
             try:
@@ -512,34 +592,88 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor = conexao.cursor()
 
                 if url_foto_cloudinary:
-                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
-                             Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
-                               dados.get("complemento"), url_foto_cloudinary, email_usuario)
-                else:
-                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
-                             Numero_casa=%s, Complemento=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
-                               dados.get("complemento"), email_usuario)
+                    sql = """UPDATE Usuario SET 
+                        Nome=%s, 
+                        Telefone=%s, 
+                        CEP=%s, 
+                        Rua=%s, 
+                        Cidade=%s, 
+                        Estado=%s, 
+                        Numero_casa=%s, 
+                        Complemento=%s,
+                        Data_Nasc=%s,
+                        Foto=%s
+                    WHERE Email=%s"""
 
+                    valores = (
+                        dados.get("nome"),
+                        dados.get("telefone"),
+                        dados.get("cep"),
+                        dados.get("rua"),
+                        dados.get("cidade"),
+                        dados.get("estado"),
+                        dados.get("numero"),
+                        dados.get("complemento"),
+                        dados.get("dataNascimento"),
+                        url_foto_cloudinary,
+                        email_usuario
+                    )
+
+                else:
+                    sql = """UPDATE Usuario SET 
+                        Nome=%s, 
+                        Telefone=%s, 
+                        CEP=%s, 
+                        Rua=%s, 
+                        Cidade=%s, 
+                        Estado=%s, 
+                        Numero_casa=%s, 
+                        Complemento=%s,
+                        Data_Nasc=%s
+                    WHERE Email=%s"""
+
+                    valores = (
+                        dados.get("nome"),
+                        dados.get("telefone"),
+                        dados.get("cep"),
+                        dados.get("rua"),
+                        dados.get("cidade"),
+                        dados.get("estado"),
+                        dados.get("numero"),
+                        dados.get("complemento"),
+                        dados.get("dataNascimento"),
+                        email_usuario
+                    )
                 cursor.execute(sql, valores)
                 conexao.commit()
-                
+
                 # Verifica se alguma linha foi realmente afetada
                 if cursor.rowcount == 0:
                     print("⚠️ Nenhuma linha atualizada. O e-mail existe no banco?")
-
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
+                    resposta = {"ok": False, "mensagem": "Nenhuma linha atualizada. Verifique o email."}
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                else:
+                    resposta = {"ok": True, "foto": url_foto_cloudinary}
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
                 print(f"❌ Erro ao salvar no banco: {e}")
-                self.send_response(500)
-                self.end_headers()
+                # Retorna JSON com a mensagem de erro para ajudar no debug do frontend
+                try:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"ok": False, "mensagem": str(e)}).encode())
+                except Exception:
+                    # Caso a resposta JSON falhe, apenas finalize com 500
+                    self.send_response(500)
+                    self.end_headers()
             finally:
                 if conexao and conexao.is_connected():
                     cursor.close()
