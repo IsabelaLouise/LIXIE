@@ -513,18 +513,58 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor = conexao.cursor()
 
                 if url_foto_cloudinary:
-                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
-                             Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
-                               dados.get("complemento"), url_foto_cloudinary, email_usuario)
-                else:
-                    sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
-                             Numero_casa=%s, Complemento=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
-                               dados.get("complemento"), email_usuario)
+                    sql = """UPDATE Usuario SET 
+                        Nome=%s, 
+                        Telefone=%s, 
+                        CEP=%s, 
+                        Rua=%s, 
+                        Cidade=%s, 
+                        Estado=%s, 
+                        Numero_casa=%s, 
+                        Complemento=%s,
+                        Data_Nasc=%s,
+                        Foto=%s
+                    WHERE Email=%s"""
 
+                    valores = (
+                        dados.get("nome"),
+                        dados.get("telefone"),
+                        dados.get("cep"),
+                        dados.get("rua"),
+                        dados.get("cidade"),
+                        dados.get("estado"),
+                        dados.get("numero"),
+                        dados.get("complemento"),
+                        dados.get("dataNascimento"),
+                        url_foto_cloudinary,
+                        email_usuario
+                    )
+
+                else:
+                    sql = """UPDATE Usuario SET 
+                        Nome=%s, 
+                        Telefone=%s, 
+                        CEP=%s, 
+                        Rua=%s, 
+                        Cidade=%s, 
+                        Estado=%s, 
+                        Numero_casa=%s, 
+                        Complemento=%s,
+                        Data_Nasc=%s
+                    WHERE Email=%s"""
+
+                    valores = (
+                        dados.get("nome"),
+                        dados.get("telefone"),
+                        dados.get("cep"),
+                        dados.get("rua"),
+                        dados.get("cidade"),
+                        dados.get("estado"),
+                        dados.get("numero"),
+                        dados.get("complemento"),
+                        dados.get("dataNascimento"),
+                        email_usuario
+                    )
                 cursor.execute(sql, valores)
                 conexao.commit()
                 
