@@ -536,3 +536,7 @@ label[for="foto-perfil"]:hover {
         opacity: 1;
     }
 }
+
+.overlay.ativo {
+    display: flex;
+}
