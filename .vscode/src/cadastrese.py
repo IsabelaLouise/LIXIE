@@ -481,11 +481,12 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                 for parte in partes:
                     if b"Content-Disposition" in parte:
-                        print(headers)
                         parts = parte.split(b"\r\n\r\n", 1)
                         if len(parts) < 2: continue
+
                         headers, conteudo = parts
-                        conteudo = conteudo.strip(b"\r\n")
+
+                        print(headers)  # ✅ agora sim depois de definir
 
                         # 📸 PROCESSANDO A FOTO
                         if b'name="foto"' in headers and b'filename="' in headers:
