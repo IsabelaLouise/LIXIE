@@ -505,8 +505,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                             valor = conteudo.decode('utf-8').strip()
                             dados[nome_campo] = valor
 
-            email_usuario = dados.get("email", "").strip()
+            email_usuario = dados.get("email", "")
+            if isinstance(email_usuario, list):
+                email_usuario = email_usuario[0]
+
+            email_usuario = email_usuario.strip()
             print(f"--- Tentando atualizar usuário: {email_usuario} ---")
+            print("--- Dados brutos recebidos (campos):", dados)
 
             conexao = None
             try:
@@ -568,20 +573,34 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     )
                 cursor.execute(sql, valores)
                 conexao.commit()
-                
+
                 # Verifica se alguma linha foi realmente afetada
                 if cursor.rowcount == 0:
                     print("⚠️ Nenhuma linha atualizada. O e-mail existe no banco?")
-
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"ok": True, "foto": url_foto_cloudinary}).encode())
+                    resposta = {"ok": False, "mensagem": "Nenhuma linha atualizada. Verifique o email."}
+                    self.send_response(400)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                else:
+                    resposta = {"ok": True, "foto": url_foto_cloudinary}
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
                 print(f"❌ Erro ao salvar no banco: {e}")
-                self.send_response(500)
-                self.end_headers()
+                # Retorna JSON com a mensagem de erro para ajudar no debug do frontend
+                try:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"ok": False, "mensagem": str(e)}).encode())
+                except Exception:
+                    # Caso a resposta JSON falhe, apenas finalize com 500
+                    self.send_response(500)
+                    self.end_headers()
             finally:
                 if conexao and conexao.is_connected():
                     cursor.close()

@@ -203,9 +203,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         formData.append("numero", num.value);
         formData.append("complemento", complemento.value);
 
-        // if (inputFoto.files[0]) {
-        //     formData.append("foto", inputFoto.files[0]);
-        // }
+        if (inputFoto.files[0]) {
+            formData.append("foto", inputFoto.files[0]);
+        }
 
         try {
             const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
