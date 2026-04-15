@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const resposta = await res.json();
 
             if (resposta.ok || resposta.sucesso) {
-                mensagem.style.display = "block";
+                mensagem.classList.add("ativo");
                 setTimeout(() => {
                     window.location.href = "homeLogado.html";
                 }, 3000);
