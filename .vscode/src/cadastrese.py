@@ -4,6 +4,8 @@ import mysql.connector
 import bcrypt
 import secrets
 import os
+import io
+import cgi
 import uuid
 import cloudinary
 import cloudinary.uploader
@@ -474,36 +476,43 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             url_foto_cloudinary = None
 
             if "multipart/form-data" in content_type:
-                boundary = content_type.split("boundary=")[1].encode()
-                length = int(self.headers.get('Content-Length'))
-                body = self.rfile.read(length)
-                partes = body.split(b"--" + boundary)
+                # Use cgi.FieldStorage para parsear corretamente multipart/form-data
+                try:
+                    fs = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'}, keep_blank_values=True)
+                except Exception as e:
+                    print(f"❌ Erro ao parsear multipart: {e}")
+                    fs = None
 
-                for parte in partes:
-                    if b"Content-Disposition" in parte:
-                        parts = parte.split(b"\r\n\r\n", 1)
-                        if len(parts) < 2: continue
-
-                        headers, conteudo = parts
-
-                        print(headers)  # ✅ agora sim depois de definir
-
-                        # 📸 PROCESSANDO A FOTO
-                        if b'name="foto"' in headers and b'filename="' in headers:
-                            if len(conteudo) > 0:
+                if fs:
+                    for key in fs.keys():
+                        if key == 'foto':
+                            fileitem = fs['foto']
+                            # fileitem.filename existe se um arquivo foi enviado
+                            if getattr(fileitem, 'filename', None):
                                 try:
+                                    file_bytes = fileitem.file.read()
                                     print("--- Iniciando upload para Cloudinary ---")
-                                    upload_result = cloudinary.uploader.upload(conteudo, folder="perfil_usuarios")
+                                    # Enviar um file-like object para o uploader
+                                    upload_result = cloudinary.uploader.upload(file=io.BytesIO(file_bytes), folder="perfil_usuarios")
                                     url_foto_cloudinary = upload_result.get('secure_url')
                                     print(f"--- Sucesso! URL: {url_foto_cloudinary} ---")
                                 except Exception as e:
                                     print(f"❌ Erro Cloudinary: {e}")
-                        
-                        # 📝 CAMPOS DE TEXTO
-                        elif b'name="' in headers:
-                            nome_campo = headers.split(b'name="')[1].split(b'"')[0].decode()
-                            valor = conteudo.decode('utf-8').strip()
-                            dados[nome_campo] = valor
+                                    # Retorna erro JSON para o frontend
+                                    try:
+                                        self.send_response(500)
+                                        self.send_header('Content-Type', 'application/json')
+                                        self.end_headers()
+                                        self.wfile.write(json.dumps({"ok": False, "mensagem": f"Erro no upload da foto: {str(e)}"}).encode())
+                                    except Exception:
+                                        pass
+                                    return
+                        else:
+                            try:
+                                valor = fs.getvalue(key)
+                                dados[key] = valor
+                            except Exception:
+                                pass
 
             email_usuario = dados.get("email", "")
             if isinstance(email_usuario, list):
