@@ -9,8 +9,10 @@ inputFoto.onchange = function () {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const mensagemNada = document.getElementById("mensagem-nada");
     const mensagem = document.getElementById("mensagem-sucesso");
     const form = document.getElementById("formPerfil");
+    
 
     const nome = document.getElementById("nome");
     const email = document.getElementById("email");
@@ -22,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const estado = document.getElementById("estado");
     const num = document.getElementById("num");
     const complemento = document.getElementById("complemento");
+    let dadosOriginais = {};
 
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
@@ -32,7 +35,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "esquecesenha.html";
         });
     }
-
     // =========================
     // 1. BUSCAR DADOS DO BANCO (Ao carregar a página)
     // =========================
@@ -63,6 +65,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             complemento.value = usuario.complemento || "";
 
             email.disabled = true; // Mantém email travado
+
+            dadosOriginais = {
+              nome: usuario.nome || "",
+              telefone: usuario.telefone || "",
+              cep: usuario.cep || "",
+              rua: usuario.rua || "",
+              cidade: usuario.cidade || "",
+              estado: usuario.estado || "",
+              numero: usuario.numero || "",
+              complemento: usuario.complemento || ""
+          };
 
                 // ==========================================
     // CORREÇÃO EXCLUSIVA PARA A FOTO (PerfilUsuario.js)
@@ -190,6 +203,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Preencha os campos corretamente antes de salvar.");
             return;
         }
+        const nadaMudou =
+          nome.value === dadosOriginais.nome &&
+          tel.value === dadosOriginais.telefone &&
+          cep.value === dadosOriginais.cep &&
+          rua.value === dadosOriginais.rua &&
+          cidade.value === dadosOriginais.cidade &&
+          estado.value === dadosOriginais.estado &&
+          num.value === dadosOriginais.numero &&
+          complemento.value === dadosOriginais.complemento &&
+          !inputFoto.files[0];
+
+      if (nadaMudou) {
+        if (mensagemNada) {
+            mensagemNada.classList.add("ativo");
+
+            setTimeout(() => {
+                mensagemNada.classList.remove("ativo");
+            }, 2000);
+        }
+
+        return;
+    }
 
         const formData = new FormData();
         formData.append("email", email.value);
