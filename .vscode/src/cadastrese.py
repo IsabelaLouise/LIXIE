@@ -81,12 +81,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 # === CAMPOS ===
                 nome = dados.get("nome", [""])[0].strip() or None
                 email = dados.get("email", [""])[0].strip() or None
-                telefone = dados.get("numero", [""])[0].strip() or None
+                telefone = dados.get("telefone", [""])[0].strip()  # ✅ CERTO
                 cep = dados.get("cep", [""])[0].replace("-", "").strip() or None
                 rua = dados.get("rua", [""])[0].strip() or None
                 cidade = dados.get("cidade", [""])[0].strip() or None
                 estado = dados.get("estado", [""])[0].strip() or None
-                numero = dados.get("numeroCasa", [""])[0].strip() or None
+                telefone = dados.get("telefone", [""])[0].strip()  # ✅ CERTO
+                numero = dados.get("numero", [""])[0].strip()      # ✅ CERTO
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
@@ -514,14 +515,14 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 if url_foto_cloudinary:
                     sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
                              Numero_casa=%s, Complemento=%s, Foto=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
+                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
                                dados.get("complemento"), url_foto_cloudinary, email_usuario)
                 else:
                     sql = """UPDATE Usuario SET Nome=%s, Telefone=%s, CEP=%s, Rua=%s, Cidade=%s, Estado=%s, 
                              Numero_casa=%s, Complemento=%s WHERE Email=%s"""
-                    valores = (dados.get("nome"), dados.get("tel"), dados.get("cep"), dados.get("rua"), 
-                               dados.get("cidade"), dados.get("estado"), dados.get("num"), 
+                    valores = (dados.get("nome"), dados.get("telefone"), dados.get("cep"), dados.get("rua"), 
+                               dados.get("cidade"), dados.get("estado"), dados.get("numero"), 
                                dados.get("complemento"), email_usuario)
 
                 cursor.execute(sql, valores)
