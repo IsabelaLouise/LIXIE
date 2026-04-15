@@ -65,19 +65,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // ==========================================
     // CORREÇÃO EXCLUSIVA PARA A FOTO (PerfilUsuario.js)
     // ==========================================
+    // Dentro do seu DOMContentLoaded, onde você recebe o "usuario" do banco:
     if (usuario.foto) {
-        // 1. Limpa a URL que veio do banco (remove espaços e \r\n invisíveis)
         const urlLimpa = usuario.foto.trim();
+        console.log("URL da foto vinda do banco:", urlLimpa);
 
-        console.log("Tentando carregar foto com a URL limpa:", urlLimpa);
-
-        // 2. Verifica se é uma URL completa (Cloudinary, começa com http)
+        // Se a URL começar com http, ela veio do Cloudinary
         if (urlLimpa.startsWith('http')) {
             fotoPerfil.src = urlLimpa;
         } else {
-            // 3. Fallback para fotos antigas (caso ainda existam no servidor)
+            // Se for só um nome de arquivo, tenta o caminho do servidor antigo
             fotoPerfil.src = "https://lixie-production.up.railway.app/" + urlLimpa;
         }
+    } else {
+        // Se não tiver foto no banco, usa o avatar padrão
+        fotoPerfil.src = "img/avatar.png"; // Ajuste para o caminho real da sua pasta de imagens
     }
 
         } catch (erro) {
