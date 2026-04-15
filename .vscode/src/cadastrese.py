@@ -481,6 +481,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                 for parte in partes:
                     if b"Content-Disposition" in parte:
+                        print(headers)
                         parts = parte.split(b"\r\n\r\n", 1)
                         if len(parts) < 2: continue
                         headers, conteudo = parts
