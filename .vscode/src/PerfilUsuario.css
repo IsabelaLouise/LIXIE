@@ -615,3 +615,34 @@ dialog::backdrop {
     background-color: #4CAF50;
     color: white;
 }
+
+#btn-fechar-senha {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: rgba(91, 158, 105, 0.15);
+    color: #5b9e69;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+#btn-fechar-senha:hover {
+    background: rgba(91, 158, 105, 0.3);
+    transform: scale(1.1);
+}
