@@ -221,6 +221,36 @@ main h1 {
     border-bottom: none;
 }
 
+.video-section {
+    width: 100%;
+    max-width: 800px;
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+    transition: 0.3s;
+}
+
+.video-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.video-section h4 {
+    color: #5b9e69;
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.home-video {
+    width: 100%;
+    border-radius: 20px;
+    background: #000;
+    max-height: 450px;
+}
+
 /* FOOTER */
 footer {
     width: 100%;
