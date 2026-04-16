@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           const dados = await resposta.json();
 
           if (resposta.ok) {
-              alert("Senha alterada com sucesso ✅");
+              alert("Senha alterada com sucesso ✓");
               modalSenha.close();
           } else {
               alert(dados.erro || "Erro ao alterar senha");
