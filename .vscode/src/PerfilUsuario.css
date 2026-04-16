@@ -540,3 +540,42 @@ label[for="foto-perfil"]:hover {
 .overlay.ativo {
     display: flex;
 }
+
+.popup-grande {
+    width: 400px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.popup-grande h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.popup-grande .campo {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-grande input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.botoes-popup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-cancelar {
+    background-color: #ccc;
+}
+
+.btn-salvar {
+    background-color: #4CAF50;
+    color: white;
+}
