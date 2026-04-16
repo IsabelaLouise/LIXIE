@@ -92,12 +92,12 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 # === CAMPOS ===
                 nome = dados.get("nome", [""])[0].strip() or None
                 email = dados.get("email", [""])[0].strip() or None
-                telefone = dados.get("telefone", [""])[0].strip()  # ✅ CERTO
+                telefone = dados.get("telefone", [""])[0].strip()  
                 cep = dados.get("cep", [""])[0].replace("-", "").strip() or None
                 rua = dados.get("rua", [""])[0].strip() or None
                 cidade = dados.get("cidade", [""])[0].strip() or None
                 estado = dados.get("estado", [""])[0].strip() or None
-                numero = dados.get("numeroCasa", [""])[0].strip()      # ✅ CERTO
+                numero = dados.get("numeroCasa", [""])[0].strip()      
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
@@ -167,10 +167,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
                 resultado = cursor.fetchone()
 
-                # ❌ EMAIL NÃO EXISTE
+                # ❌ Para segurança, não revelar se foi o email ou a senha: mensagem genérica
                 if resultado is None:
-                    resposta = {"sucesso": False, "mensagem": "Email incorreto"}
-
+                    resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
 
@@ -178,7 +177,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {"sucesso": True, "mensagem": "Login realizado"}
                     else:
-                        resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+                        resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -692,6 +691,56 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 if conexao and conexao.is_connected():
                     cursor.close()
                     conexao.close()
+        
+        elif self.path == '/deletar-conta':
+            content_length = int(self.headers['Content-Length'])
+            corpo = self.rfile.read(content_length)
+
+            dados = json.loads(corpo.decode())
+
+            email = dados.get("email")
+            senha = dados.get("senha").encode('utf-8')
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            try:
+                # 🔍 busca senha do usuário
+                cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    resposta = {"sucesso": False, "mensagem": "Usuário não encontrado"}
+
+                else:
+                    senha_hash = resultado[0].encode('utf-8')
+
+                    # 🔐 compara senha digitada com hash
+                    if bcrypt.checkpw(senha, senha_hash):
+
+                        # 🗑️ deleta usuário
+                        cursor.execute("DELETE FROM Usuario WHERE Email = %s", (email,))
+                        conexao.commit()
+
+                        resposta = {"sucesso": True}
+
+                    else:
+                        resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(resposta).encode())
+
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "erro": str(e)}).encode())
+
+            finally:
+                cursor.close()
+                conexao.close()
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":

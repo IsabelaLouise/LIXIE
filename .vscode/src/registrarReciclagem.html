@@ -32,7 +32,7 @@
       </a>
     </div>
   </header>
-  
+
 <body>
 
 <div class="container">
@@ -58,12 +58,13 @@
 <div class="lado-direito">
 
   <!-- FORM -->
-  <form id="formReciclagem">
+  <form id="formReciclagem" novalidate>
 
     <h2>Registrar Reciclagem</h2>
 
     <div class="linha">
       <input type="number" id="quantidade" placeholder="Quantidade" required>
+        <span class="erro" id="erroQuantidade"></span>
 
       <select id="unidade">
         <option value="kg">kg (Kilogramas)</option>
@@ -77,6 +78,7 @@
 
     <label>Digite o CEP:</label>
     <input type="text" id="cep" placeholder="Digite o CEP">
+      <span id="erroCep"></span>
 
     <label>Comprove com uma foto:</label>
     <input type="file" id="foto" accept="image/*">
@@ -87,17 +89,6 @@
   <button type="submit" form="formReciclagem">
     Registrar
   </button>
-
-  <!-- 👇 PAINEL AGORA EMBAIXO -->
-  <div id="painelPontos">
-    <h3>Seu Progresso</h3>
-    <p id="nivel">Nível: Iniciante 🌱</p>
-    <p id="pontos">Pontos: 0</p>
-
-    <div id="barraContainer">
-      <div id="barraProgresso"></div>
-    </div>
-  </div>
 
 </div>
 

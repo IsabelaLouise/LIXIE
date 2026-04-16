@@ -9,8 +9,49 @@ inputFoto.onchange = function () {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    const mensagemNada = document.getElementById("mensagem-nada");
     const mensagem = document.getElementById("mensagem-sucesso");
     const form = document.getElementById("formPerfil");
+
+    const mensagemErroSenha = document.getElementById("mensagem-erro-senha");
+    console.log("mensagemErroSenha:", mensagemErroSenha);
+    const mensagemErroConexao = document.getElementById("mensagem-erro-conexao");
+
+    // Helper para ativar mensagens de overlay com null-check
+    function showOverlay(el) {
+        if (!el) return;
+        // garante que o overlay esteja como último filho do body (ficar acima de dialogs)
+        try {
+            if (el.parentNode !== document.body) document.body.appendChild(el);
+            // reforça z-index em runtime para evitar estilos do UA/diálogo sobrepor
+            el.style.zIndex = '99999';
+        } catch (e) {
+            // se falhar, segue normalmente
+            console.warn('Não foi possível mover overlay para body:', e);
+        }
+
+        el.classList.add("ativo");
+        setTimeout(() => {
+            el.classList.remove("ativo");
+        }, 2000);
+    }
+
+    // Mostrar erro inline dentro do diálogo (mais confiável que overlay em cima de <dialog>)
+    const erroSenhaInline = document.getElementById('erro-senha');
+    function showInlineError(msg) {
+        if (erroSenhaInline) {
+            erroSenhaInline.textContent = msg;
+            erroSenhaInline.classList.add('ativo');
+            // Limpa após 2s
+            setTimeout(() => {
+                erroSenhaInline.classList.remove('ativo');
+                erroSenhaInline.textContent = '';
+            }, 2000);
+            return true;
+        }
+        return false;
+    }
+    
 
     const nome = document.getElementById("nome");
     const email = document.getElementById("email");
@@ -22,16 +63,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const estado = document.getElementById("estado");
     const num = document.getElementById("num");
     const complemento = document.getElementById("complemento");
+    let dadosOriginais = {};
+
+    const modal = document.getElementById("popUp-apagar");
+    const openBtn = document.getElementById("btn-apagar-conta");
+    const closeBtn = document.getElementById("btn-fechar-modal");
+
+    openBtn.addEventListener("click", () => modal.showModal()); 
+    closeBtn.addEventListener("click", () => modal.close()); 
 
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
-
-    const btnAlterarSenha = document.querySelector(".btn-alterar-senha");
-    if (btnAlterarSenha) {
-        btnAlterarSenha.addEventListener("click", () => {
-            window.location.href = "esquecesenha.html";
-        });
-    }
 
     // =========================
     // 1. BUSCAR DADOS DO BANCO (Ao carregar a página)
@@ -64,6 +106,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             email.disabled = true; // Mantém email travado
 
+            dadosOriginais = {
+              nome: usuario.nome || "",
+              telefone: usuario.telefone || "",
+              cep: usuario.cep || "",
+              rua: usuario.rua || "",
+              cidade: usuario.cidade || "",
+              estado: usuario.estado || "",
+              numero: usuario.numero || "",
+              complemento: usuario.complemento || ""
+          };
+
                 // ==========================================
     // CORREÇÃO EXCLUSIVA PARA A FOTO (PerfilUsuario.js)
     // ==========================================
@@ -76,12 +129,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (urlLimpa.startsWith('http')) {
             fotoPerfil.src = urlLimpa;
         } else {
-            // Se for só um nome de arquivo, tenta o caminho do servidor antigo
+
             fotoPerfil.src = "https://lixie-production.up.railway.app/" + urlLimpa;
         }
     } else {
-        // Se não tiver foto no banco, usa o avatar padrão
-        fotoPerfil.src = "img/avatar.png"; // Ajuste para o caminho real da sua pasta de imagens
+        fotoPerfil.src = "img/avatar.png"; 
     }
 
         } catch (erro) {
@@ -178,6 +230,118 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    const modalSenha = document.getElementById("popUp-trocar-senha");
+    const btnAbrirSenha = document.querySelector(".btn-alterar-senha");
+    const btnFecharSenha = document.getElementById("btn-fechar-senha");
+
+    btnAbrirSenha.addEventListener("click", () => {
+        modalSenha.showModal();
+    });
+
+    btnFecharSenha.addEventListener("click", () => {
+        modalSenha.close();
+    });
+
+    const senhaAtual = document.getElementById("senha-atual");
+    const novaSenha = document.getElementById("nova-senha");
+    const confirmarNova = document.getElementById("confirmar-nova-senha");
+
+    function validarNovaSenha() {
+        const valor = novaSenha.value;
+        const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+
+        if (!regex.test(valor)) {
+            mostrarErro(novaSenha, "erro-nova-senha", "Senha inválida");
+            return false;
+        }
+
+        sucessoInput(novaSenha, "erro-nova-senha");
+
+        if (valor !== confirmarNova.value) {
+            mostrarErro(confirmarNova, "erro-confirmar-nova", "As senhas não coincidem");
+            return false;
+        }
+
+        sucessoInput(confirmarNova, "erro-confirmar-nova");
+        return true;
+    }
+    novaSenha.addEventListener("input", () => {
+      const valor = novaSenha.value;
+      const requisitos = document.getElementById("requisitosNovaSenha");
+
+      requisitos.style.display = valor.length > 0 ? "block" : "none";
+
+      const maiuscula = /[A-Z]/.test(valor);
+      const minuscula = /[a-z]/.test(valor);
+      const numero = /[0-9]/.test(valor);
+      const especial = /[!@#$%^&*]/.test(valor);
+      const tamanho = valor.length >= 8;
+
+      function atualizarReq(id, valido) {
+        const el = document.getElementById(id);
+
+        if (!el) return;
+
+        if (valido) {
+            el.classList.add("ok");
+            el.textContent = "✔️ " + el.textContent.replace("❌ ", "").replace("✔️ ", "");
+        } else {
+            el.classList.remove("ok");
+            el.textContent = "❌ " + el.textContent.replace("✔️ ", "").replace("❌ ", "");
+        }
+    }
+      atualizarReq("req-maiuscula", maiuscula);
+      atualizarReq("req-minuscula", minuscula);
+      atualizarReq("req-numero", numero);
+      atualizarReq("req-especial", especial);
+      atualizarReq("req-tamanho", tamanho);
+  });
+  document.getElementById("confirmar-troca-senha").addEventListener("click", async () => {
+
+      if (!senhaAtual.value) {
+          mostrarErro(senhaAtual, "erro-senha-atual", "Digite sua senha atual");
+          return;
+      }
+
+      if (!validarNovaSenha()) return;
+
+      try {
+          const resposta = await fetch("https://lixie-production.up.railway.app/trocar-senha", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                  email: email.value,
+                  senhaAtual: senhaAtual.value,
+                  novaSenha: novaSenha.value
+              })
+          });
+
+          const dados = await resposta.json();
+
+          if (resposta.ok) {
+              alert("Senha alterada com sucesso ✓");
+              modalSenha.close();
+          } else {
+              alert(dados.erro || "Erro ao alterar senha");
+          }
+
+      } catch (erro) {
+          alert("Erro de conexão com o servidor");
+      }
+  });
+
+  btnFecharSenha.addEventListener("click", () => {
+      modalSenha.close();
+
+      senhaAtual.value = "";
+      novaSenha.value = "";
+      confirmarNova.value = "";
+
+      document.getElementById("requisitosNovaSenha").style.display = "none";
+  });
+
     // =========================
     // 2. SALVAR ALTERAÇÕES (Botão Salvar)
     // =========================
@@ -190,12 +354,34 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Preencha os campos corretamente antes de salvar.");
             return;
         }
+        const nadaMudou =
+          nome.value === dadosOriginais.nome &&
+          tel.value === dadosOriginais.telefone &&
+          cep.value === dadosOriginais.cep &&
+          rua.value === dadosOriginais.rua &&
+          cidade.value === dadosOriginais.cidade &&
+          estado.value === dadosOriginais.estado &&
+          num.value === dadosOriginais.numero &&
+          complemento.value === dadosOriginais.complemento &&
+          !inputFoto.files[0];
+
+      if (nadaMudou) {
+        if (mensagemNada) {
+            mensagemNada.classList.add("ativo");
+
+            setTimeout(() => {
+                mensagemNada.classList.remove("ativo");
+            }, 2000);
+        }
+
+        return;
+    }
 
         const formData = new FormData();
         formData.append("email", email.value);
         formData.append("nome", nome.value);
         formData.append("telefone", tel.value);
-        formData.append("dataNascimento", data.value); // Enviando data também
+        formData.append("dataNascimento", data.value); 
         formData.append("cep", cep.value);
         formData.append("rua", rua.value);
         formData.append("cidade", cidade.value);
@@ -211,7 +397,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
                 method: "POST",
                 body: formData 
-                // ⚠️ IMPORTANTE: Não coloque Headers de Content-Type aqui!
             });
 
             const resposta = await res.json();
@@ -229,4 +414,126 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Erro de conexão com o servidor.");
         }
     });
+
+    document.getElementById("confirmar-apagar").addEventListener("click", async () => {
+        const senha = document.getElementById("senha").value;
+        const mensagemApagado = document.getElementById("mensagem-apagado");
+
+        if (!senha) {
+            mostrarErro(document.getElementById("senha"), "erro-senha", "Digite sua senha");
+            return;
+        }
+
+        try {
+            const resposta = await fetch("https://lixie-production.up.railway.app/deletar-conta", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email.value,
+                    senha: senha
+                })
+            });
+
+            let dados = null;
+            try {
+                dados = await resposta.json();
+            } catch (e) {
+                console.error('Resposta não-JSON ao deletar conta:', e, await resposta.text());
+                showOverlay(mensagemErroConexao);
+                return;
+            }
+
+            if (dados && dados.sucesso) {
+                localStorage.removeItem("email");
+                localStorage.removeItem("usuarioEmail");
+
+                const pop = document.getElementById("popUp-apagar");
+                if (pop && typeof pop.close === 'function') pop.close();
+
+                showOverlay(mensagemApagado);
+
+                setTimeout(() => {
+                    window.location.href = "homeNaoLogado.html";
+                }, 2500);
+
+            } else {
+                // tenta mostrar erro inline dentro do diálogo; se não existir, usa overlay
+                const shownInline = showInlineError(dados && dados.mensagem ? dados.mensagem : 'Senha incorreta');
+                if (!shownInline) showOverlay(mensagemErroSenha);
+
+                const inputSenha = document.getElementById("senha");
+                if (inputSenha) {
+                    inputSenha.value = "";
+                    inputSenha.focus();
+                }
+            }
+
+        } catch (erro) {
+            console.error('Erro na requisição deletar-conta:', erro);
+            showOverlay(mensagemErroConexao);
+        }
+    });
+
 });
+
+function toggleSenhaNova(icon) {
+    const container = icon.closest("dialog"); // pega o popup inteiro
+
+    const nova = container.querySelector("#nova-senha");
+    const confirmar = container.querySelector("#confirmar-nova-senha");
+
+    const mostrando = nova.type === "text";
+
+    if (mostrando) {
+        nova.type = "password";
+        confirmar.type = "password";
+    } else {
+        nova.type = "text";
+        confirmar.type = "text";
+    }
+
+    // muda TODOS os ícones desse grupo
+    const icons = container.querySelectorAll(".toggle-senha");
+
+    icons.forEach(i => {
+        if (mostrando) {
+            i.classList.remove("fa-eye-slash");
+            i.classList.add("fa-eye");
+        } else {
+            i.classList.remove("fa-eye");
+            i.classList.add("fa-eye-slash");
+        }
+    });
+}
+
+  function toggleSenhaAtual(icon) {
+    const input = icon.parentElement.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
+function toggleSenhaLogin(icon) {
+    const container = icon.closest(".senha-container");
+    const input = container.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
