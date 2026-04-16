@@ -58,26 +58,42 @@ async function carregarRanking() {
 async function carregarProgresso() {
   const email = localStorage.getItem("email");
 
-  const response = await fetch('https://lixie-production.up.railway.app/ranking', {
-    method: 'POST'
-  });
+  const container = document.getElementById("progresso-usuario");
 
-  const ranking = await response.json();
+  if (!email) {
+    container.innerHTML = "<p>Usuário não logado</p>";
+    return;
+  }
 
-  const top1 = ranking[0];
-  const usuario = ranking.find(u => u.email === email);
+  try {
+    const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `email=${email}`
+    });
 
-  if (!usuario) return;
+    const dados = await response.json();
 
-  const porcentagem = top1.pontos > 0 
-  ? (usuario.pontos / top1.pontos) * 100 
-  : 0;
+    const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
 
-  // Atualiza UI
-  document.querySelector(".progress-text").innerHTML = `
-    Você está em: <strong>${usuario.posicao}º Lugar</strong><br>
-    <strong>${usuario.pontos} Pontos</strong>
-  `;
+    container.innerHTML = `
+      <h2>Seu Progresso</h2>
+      <p>Você está em: <strong>${dados.nivel}º Lugar</strong></p>
+      <p><strong>${dados.pontos} Pontos</strong></p>
 
-  document.querySelector(".progress").style.width = `${porcentagem}%`;
+      <div class="progress-bar">
+        <div class="progress" style="width: ${porcentagem}%"></div>
+      </div>
+    `;
+  } catch (erro) {
+    console.error(erro);
+    container.innerHTML = "<p>Erro ao carregar progresso</p>";
+  }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  carregarRanking();
+  carregarProgresso();
+});
