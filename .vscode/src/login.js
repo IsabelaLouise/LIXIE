@@ -27,11 +27,10 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
           // garante que o overlay fique como filho do body para sobrepor dialogs
           if (overlayErroLogin.parentNode !== document.body) document.body.appendChild(overlayErroLogin);
           overlayErroLogin.style.zIndex = '99999';
+          // apenas alterna a classe ativo; o CSS garante position:fixed e não empurra a página
           overlayErroLogin.classList.add('ativo');
-          overlayErroLogin.style.display = 'block';
           setTimeout(() => {
             overlayErroLogin.classList.remove('ativo');
-            overlayErroLogin.style.display = 'none';
           }, 2000);
         } else {
           // fallback simples para o box de mensagem padrão
