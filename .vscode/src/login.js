@@ -4,6 +4,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
   const mensagem = document.getElementById("mensagem");
+  const overlayErroLogin = document.getElementById("mensagem-erro-login");
 
   try {
     const resposta = await fetch("https://lixie-production.up.railway.app/login", {
@@ -20,8 +21,30 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
       localStorage.setItem("email", email);
       window.location.href = "/.vscode/src/homeLogado.html";
     } else {
-      mensagem.textContent = dados.mensagem;
-      mensagem.style.display = "block";
+      // Mostrar overlay bonitinho (como no PerfilUsuario)
+      try {
+        if (overlayErroLogin) {
+          // garante que o overlay fique como filho do body para sobrepor dialogs
+          if (overlayErroLogin.parentNode !== document.body) document.body.appendChild(overlayErroLogin);
+          overlayErroLogin.style.zIndex = '99999';
+          overlayErroLogin.classList.add('ativo');
+          overlayErroLogin.style.display = 'block';
+          setTimeout(() => {
+            overlayErroLogin.classList.remove('ativo');
+            overlayErroLogin.style.display = 'none';
+          }, 2000);
+        } else {
+          // fallback simples para o box de mensagem padrão
+          mensagem.textContent = dados.mensagem || 'Email e/ou senha incorreto(s)';
+          mensagem.className = 'mensagem erro';
+          mensagem.style.display = 'block';
+          setTimeout(() => { mensagem.style.display = 'none'; }, 2000);
+        }
+      } catch (e) {
+        mensagem.textContent = dados.mensagem || 'Email e/ou senha incorreto(s)';
+        mensagem.className = 'mensagem erro';
+        mensagem.style.display = 'block';
+      }
     }
 
   } catch (erro) {

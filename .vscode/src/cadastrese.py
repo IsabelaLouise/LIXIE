@@ -167,10 +167,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
                 resultado = cursor.fetchone()
 
-                # ❌ EMAIL NÃO EXISTE
+                # ❌ Para segurança, não revelar se foi o email ou a senha: mensagem genérica
                 if resultado is None:
-                    resposta = {"sucesso": False, "mensagem": "Email incorreto"}
-
+                    resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
 
@@ -178,7 +177,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {"sucesso": True, "mensagem": "Login realizado"}
                     else:
-                        resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+                        resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
