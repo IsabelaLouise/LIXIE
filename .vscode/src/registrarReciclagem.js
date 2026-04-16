@@ -1,6 +1,13 @@
 let tipoSelecionado = "";
 let pontosTotais = 0;
 
+document.getElementById("quantidade").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("cep").focus();
+  }
+});
+
 // pontos por material (base em KG)
 const pontosPorMaterial = {
   plastico: 10,
@@ -91,8 +98,6 @@ resultado.innerHTML = mensagem;
   document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
 });
 
-
-// 🔥 AGORA FORA DO SUBMIT (CORRETO)
 function atualizarPainel() {
   const nivelEl = document.getElementById("nivel");
   const pontosEl = document.getElementById("pontos");
@@ -124,17 +129,19 @@ function atualizarPainel() {
   barra.style.width = porcentagem + "%";
 }
 
+let cepValido = false;
 
-document.getElementById("cep").addEventListener("input", async (e) => {
+const cep = document.getElementById("cep");
+const erroCep = document.getElementById("erroCep");
+
+cep.addEventListener("input", async (e) => {
 
     let valor = e.target.value;
 
     // limpa
     valor = valor.replace(/\D/g, "");
-
-    // limita
+    //limita
     valor = valor.slice(0, 8);
-
     // formata
     if (valor.length > 5) {
         valor = valor.slice(0, 5) + "-" + valor.slice(5);
@@ -145,24 +152,40 @@ document.getElementById("cep").addEventListener("input", async (e) => {
     // cria o cep limpo
     const cepLimpo = valor.replace(/\D/g, "");
 
+    cepValido = false;
+
     // SÓ entra quando tiver 8 dígitos
     if (cepLimpo.length === 8) {
 
-        e.target.value = "Buscando...";
+    erroCep.className = "loading";
+    erroCep.innerText = "🔄 Buscando CEP...";
 
         try {
             const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
             const data = await res.json();
 
             if (data.erro) {
-                e.target.value = "CEP não encontrado";
+                erroCep.className = "erro";
+                erroCep.innerText = "❌ CEP não encontrado!";
+                cepValido = false;
                 return;
             }
 
-            e.target.value = `${data.logradouro} - ${data.localidade}`;
+        e.target.value = `${data.logradouro} - ${data.localidade}`;
 
-        } catch (erro) {
-            e.target.value = "Erro ao buscar CEP";
+            erroCep.className = "sucesso";
+            erroCep.innerText = "✅ CEP encontrado";
+
+            cepValido = true;
+
+        } catch {
+            erroCep.className = "erro";
+            erroCep.innerText = "❌ Erro ao buscar CEP";
+            cepValido = false;
         }
+
+    } else {
+    // limpa mensagem se não tiver completo
+         erroCep.innerText = "";
     }
 });
