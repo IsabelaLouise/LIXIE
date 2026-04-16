@@ -147,6 +147,32 @@
             <div id="mensagem-sucesso" class="mensagem-sucesso">
                 Alterações salvas com sucesso ✅
             </div>
+
+            <dialog id="popUp-apagar">
+                <button id="btn-fechar-modal">X</button>
+
+                <h3>Tem certeza que deseja apagar sua conta?</h3>
+                <br>
+                <p>Essa ação é irreversível e todos os seus dados serão perdidos.
+                    Se sim porfavor insira sua senha para confirmar sua identidade como dono da conta.</p>
+                <br>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <div class="senha-container input-container">
+                        <input type="password" id="senha" placeholder="Digite sua senha">
+                        <i class="fa fa-eye toggle-senha" onclick="toggleSenhaLogin(this)"></i>
+                        <span id="icon-senha"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-senha"></div>
+                </div>
+                <div class="botoes-dialog">
+                    <button id="confirmar-apagar" class="btn-confirmar">Apagar minha conta</button>
+                </div>
+            </dialog>
+
+            <dialog id="popUp-trocar-senha">
+                
+            </dialog>
         </div>
 
     </main>

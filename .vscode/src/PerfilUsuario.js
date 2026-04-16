@@ -23,6 +23,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const num = document.getElementById("num");
     const complemento = document.getElementById("complemento");
 
+    const modal = document.getElementById("popUp-apagar");
+    const openBtn = document.getElementById("btn-apagar-conta");
+    const closeBtn = document.getElementById("btn-fechar-modal");
+
+    openBtn.addEventListener("click", () => modal.showModal()); 
+    closeBtn.addEventListener("click", () => modal.close()); 
+
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
 
