@@ -501,6 +501,8 @@ dialog {
     width: 100%;
     max-width: 500px;
     margin: auto;
+    /* colocar diálogo abaixo das overlays de notificação */
+    z-index: 10000;
 }
 
 dialog::backdrop {
@@ -551,7 +553,8 @@ dialog::backdrop {
     align-items: center;
     justify-content: center;
 
-    z-index: 9999;
+    /* garantir que overlays (mensagens) fiquem acima de dialogs */
+    z-index: 20000 !important;
 }
 
 /* CAIXA CENTRAL */

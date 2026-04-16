@@ -16,6 +16,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mensagemErroSenha = document.getElementById("mensagem-erro-senha");
     console.log("mensagemErroSenha:", mensagemErroSenha);
     const mensagemErroConexao = document.getElementById("mensagem-erro-conexao");
+
+    // Helper para ativar mensagens de overlay com null-check
+    function showOverlay(el) {
+        if (!el) return;
+        // garante que o overlay esteja como último filho do body (ficar acima de dialogs)
+        try {
+            if (el.parentNode !== document.body) document.body.appendChild(el);
+            // reforça z-index em runtime para evitar estilos do UA/diálogo sobrepor
+            el.style.zIndex = '99999';
+        } catch (e) {
+            // se falhar, segue normalmente
+            console.warn('Não foi possível mover overlay para body:', e);
+        }
+
+        el.classList.add("ativo");
+        setTimeout(() => {
+            el.classList.remove("ativo");
+        }, 2000);
+    }
+
+    // Mostrar erro inline dentro do diálogo (mais confiável que overlay em cima de <dialog>)
+    const erroSenhaInline = document.getElementById('erro-senha');
+    function showInlineError(msg) {
+        if (erroSenhaInline) {
+            erroSenhaInline.textContent = msg;
+            erroSenhaInline.classList.add('ativo');
+            // Limpa após 2s
+            setTimeout(() => {
+                erroSenhaInline.classList.remove('ativo');
+                erroSenhaInline.textContent = '';
+            }, 2000);
+            return true;
+        }
+        return false;
+    }
     
 
     const nome = document.getElementById("nome");
@@ -401,38 +436,43 @@ document.addEventListener("DOMContentLoaded", async () => {
                 })
             });
 
-            const dados = await resposta.json();
+            let dados = null;
+            try {
+                dados = await resposta.json();
+            } catch (e) {
+                console.error('Resposta não-JSON ao deletar conta:', e, await resposta.text());
+                showOverlay(mensagemErroConexao);
+                return;
+            }
 
-            if (dados.sucesso) {
-              localStorage.removeItem("email");
-              localStorage.removeItem("usuarioEmail");
+            if (dados && dados.sucesso) {
+                localStorage.removeItem("email");
+                localStorage.removeItem("usuarioEmail");
 
-              document.getElementById("popUp-apagar").close();
+                const pop = document.getElementById("popUp-apagar");
+                if (pop && typeof pop.close === 'function') pop.close();
 
-              mensagemApagado.classList.add("ativo");
+                showOverlay(mensagemApagado);
 
-              setTimeout(() => {
-                  window.location.href = "homeNaoLogado.html";
-              }, 2500);
+                setTimeout(() => {
+                    window.location.href = "homeNaoLogado.html";
+                }, 2500);
 
-          } else {
-              mensagemErroSenha.classList.add("ativo");
+            } else {
+                // tenta mostrar erro inline dentro do diálogo; se não existir, usa overlay
+                const shownInline = showInlineError(dados && dados.mensagem ? dados.mensagem : 'Senha incorreta');
+                if (!shownInline) showOverlay(mensagemErroSenha);
 
-              setTimeout(() => {
-                  mensagemErroSenha.classList.remove("ativo");
-              }, 2000);
-
-              const inputSenha = document.getElementById("senha");
-              inputSenha.value = "";
-              inputSenha.focus();
-          }
+                const inputSenha = document.getElementById("senha");
+                if (inputSenha) {
+                    inputSenha.value = "";
+                    inputSenha.focus();
+                }
+            }
 
         } catch (erro) {
-            mensagemErroConexao.classList.add("ativo");
-
-            setTimeout(() => {
-                mensagemErroConexao.classList.remove("ativo");
-            }, 2000);
+            console.error('Erro na requisição deletar-conta:', erro);
+            showOverlay(mensagemErroConexao);
         }
     });
 

@@ -72,10 +72,11 @@
                 <div class="erro-texto" id="erro-data"></div>
             </div>
 
-            <div class="campo">
+                <div class="campo">
                 <label for="numero">Telefone</label>
                 <div class="input-container">
-                    <input type="tel" inputmode="numeric" maxlength="15" name="numero" id="numero" placeholder="(00) 00000-0000">
+                    <!-- name alterado para 'telefone' para casar com o backend; id permanece 'numero' para as máscaras/validações JS -->
+                    <input type="tel" inputmode="numeric" maxlength="15" name="telefone" id="numero" placeholder="(00) 00000-0000">
                     <span id="icon-numero"></span>
                 </div>
                 <div class="erro-texto" id="erro-numero"></div>
