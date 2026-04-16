@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mensagemNada = document.getElementById("mensagem-nada");
     const mensagem = document.getElementById("mensagem-sucesso");
     const form = document.getElementById("formPerfil");
+
+    const mensagemErroSenha = document.getElementById("mensagem-erro-senha");
+    const mensagemErroConexao = document.getElementById("mensagem-erro-conexao");
     
 
     const nome = document.getElementById("nome");
@@ -375,6 +378,64 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Erro de conexão com o servidor.");
         }
     });
+
+    document.getElementById("confirmar-apagar").addEventListener("click", async () => {
+        const senha = document.getElementById("senha").value;
+        const mensagemApagado = document.getElementById("mensagem-apagado");
+
+        if (!senha) {
+            mostrarErro(document.getElementById("senha"), "erro-senha", "Digite sua senha");
+            return;
+        }
+
+        try {
+            const resposta = await fetch("https://lixie-production.up.railway.app/deletar-conta", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email.value,
+                    senha: senha
+                })
+            });
+
+            const dados = await resposta.json();
+
+            if (dados.sucesso) {
+
+                localStorage.removeItem("email");
+                localStorage.removeItem("usuarioEmail");
+
+                document.getElementById("popUp-apagar").close();
+
+                mensagemApagado.classList.add("ativo");
+
+                setTimeout(() => {
+                    window.location.href = "homeNaoLogado.html";
+                }, 2500);
+
+            } else {
+                mensagemErroSenha.classList.add("ativo");
+
+                setTimeout(() => {
+                    mensagemErroSenha.classList.remove("ativo");
+                }, 2000);
+
+                // 🔥 EXTRA (melhora UX)
+                document.getElementById("senha").value = "";
+                document.getElementById("senha").focus();
+            }
+
+        } catch (erro) {
+            mensagemErroConexao.classList.add("ativo");
+
+            setTimeout(() => {
+                mensagemErroConexao.classList.remove("ativo");
+            }, 2000);
+        }
+    });
+
 });
 
 function toggleSenhaNova(icon) {
@@ -420,3 +481,18 @@ function toggleSenhaNova(icon) {
         icon.classList.add("fa-eye");
     }
 }
+
+function toggleSenhaLogin(icon) {
+    const input = icon.parentElement.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
