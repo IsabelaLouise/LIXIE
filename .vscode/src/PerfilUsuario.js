@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const form = document.getElementById("formPerfil");
 
     const mensagemErroSenha = document.getElementById("mensagem-erro-senha");
+    console.log("mensagemErroSenha:", mensagemErroSenha);
     const mensagemErroConexao = document.getElementById("mensagem-erro-conexao");
     
 

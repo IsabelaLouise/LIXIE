@@ -654,8 +654,3 @@ dialog::backdrop {
     background: rgba(91, 158, 105, 0.3);
     transform: scale(1.1);
 }
-
-.popup.erro {
-    border: 2px solid #ff4d4d;
-    color: #ff4d4d;
-}
