@@ -191,20 +191,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    function toggleSenhaNova(icon) {
-      const input = icon.parentElement.querySelector("input");
-
-      if (input.type === "password") {
-          input.type = "text";
-          icon.classList.remove("fa-eye");
-          icon.classList.add("fa-eye-slash");
-      } else {
-          input.type = "password";
-          icon.classList.remove("fa-eye-slash");
-          icon.classList.add("fa-eye");
-      }
-  }
-
     const modalSenha = document.getElementById("popUp-trocar-senha");
     const btnAbrirSenha = document.querySelector(".btn-alterar-senha");
     const btnFecharSenha = document.getElementById("btn-fechar-senha");
@@ -390,3 +376,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 });
+
+function toggleSenhaNova(icon) {
+    const container = icon.closest("dialog"); // pega o popup inteiro
+
+    const nova = container.querySelector("#nova-senha");
+    const confirmar = container.querySelector("#confirmar-nova-senha");
+
+    const mostrando = nova.type === "text";
+
+    if (mostrando) {
+        nova.type = "password";
+        confirmar.type = "password";
+    } else {
+        nova.type = "text";
+        confirmar.type = "text";
+    }
+
+    // muda TODOS os ícones desse grupo
+    const icons = container.querySelectorAll(".toggle-senha");
+
+    icons.forEach(i => {
+        if (mostrando) {
+            i.classList.remove("fa-eye-slash");
+            i.classList.add("fa-eye");
+        } else {
+            i.classList.remove("fa-eye");
+            i.classList.add("fa-eye-slash");
+        }
+    });
+}
+
+  function toggleSenhaAtual(icon) {
+    const input = icon.parentElement.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
