@@ -53,3 +53,31 @@ async function carregarRanking() {
     `;
   }
 }
+
+
+async function carregarProgresso() {
+  const email = localStorage.getItem("email");
+
+  const response = await fetch('https://lixie-production.up.railway.app/ranking', {
+    method: 'POST'
+  });
+
+  const ranking = await response.json();
+
+  const top1 = ranking[0];
+  const usuario = ranking.find(u => u.email === email);
+
+  if (!usuario) return;
+
+  const porcentagem = top1.pontos > 0 
+  ? (usuario.pontos / top1.pontos) * 100 
+  : 0;
+
+  // Atualiza UI
+  document.querySelector(".progress-text").innerHTML = `
+    Você está em: <strong>${usuario.posicao}º Lugar</strong><br>
+    <strong>${usuario.pontos} Pontos</strong>
+  `;
+
+  document.querySelector(".progress").style.width = `${porcentagem}%`;
+}

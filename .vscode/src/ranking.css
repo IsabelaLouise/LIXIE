@@ -18,34 +18,56 @@ body {
 
 /* HEADER */
 header {
-  width: 100%;
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 18px 30px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    gap: 20px;
 }
 
+/* LOGO */
 .logo-link {
-  display: inline-flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
 }
 
 .logo-img {
-  max-height: 50px;
-  width: auto;
-  transition: transform 0.2s ease;
+    max-height: 50px;
+    width: auto;
+    transition: transform 0.2s;
 }
 
 .logo-link:hover .logo-img {
-  transform: scale(1.05);
+    transform: scale(1.05);
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #085b1c;
+    cursor: pointer;
+    padding: 5px;
+    transition: 0.2s;
 }
 
 .navbar {
