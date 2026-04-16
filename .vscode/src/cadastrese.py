@@ -92,12 +92,12 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 # === CAMPOS ===
                 nome = dados.get("nome", [""])[0].strip() or None
                 email = dados.get("email", [""])[0].strip() or None
-                telefone = dados.get("telefone", [""])[0].strip()  # ✅ CERTO
+                telefone = dados.get("telefone", [""])[0].strip()  
                 cep = dados.get("cep", [""])[0].replace("-", "").strip() or None
                 rua = dados.get("rua", [""])[0].strip() or None
                 cidade = dados.get("cidade", [""])[0].strip() or None
                 estado = dados.get("estado", [""])[0].strip() or None
-                numero = dados.get("numeroCasa", [""])[0].strip()      # ✅ CERTO
+                numero = dados.get("numeroCasa", [""])[0].strip()      
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 

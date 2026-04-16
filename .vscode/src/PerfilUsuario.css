@@ -192,10 +192,6 @@ button.btn-primary:hover {
     background-color: #4a8c58;
 }
 
-button.btn-alterar-senha {
-    width: 70%;
-}
-
 /*UPLOAD*/
 input[type="file"] {
     display: none;
@@ -353,7 +349,6 @@ label[for="foto-perfil"]:hover {
         "campo-6 campo-7"
         "campo-8 campo-9"
         "campo-10 campo-11"
-        "campo-12 campo-12"
         "campo-13 campo-13";
 }
 
@@ -381,7 +376,6 @@ label[for="foto-perfil"]:hover {
             "campo-9"
             "campo-10"
             "campo-11"
-            "campo-12"
             "campo-13";
 
     } 
@@ -398,7 +392,6 @@ label[for="foto-perfil"]:hover {
 #campo-9 { grid-area: campo-9; }
 #campo-10 { grid-area: campo-10; }
 #campo-11 { grid-area: campo-11; }
-#campo-12 { grid-area: campo-12; }
 #campo-13 { grid-area: campo-13; }
 
 .perfil-container {
@@ -449,6 +442,29 @@ label[for="foto-perfil"]:hover {
     justify-content: center;
 }
 
+#btn-apagar-conta {
+    width: 100%;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 50px;
+    border: none;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #c74040;
+    color: white;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#btn-apagar-conta:hover {
+    background-color: #8b2d2d;
+    transform: scale(1.02);
+}
+
 /*CAMPOS AUTO*/
 #cidade,
 #estado,
@@ -475,4 +491,127 @@ label[for="foto-perfil"]:hover {
     border: 1px solid #28a745;
     border-radius: 8px;
     background-color: #eaffea;
+}
+
+dialog {
+    border: none;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#btn-fechar-modal {
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    width: 4%;
+    height: 31px; 
+    padding: 0 16px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: bold;
+    background: rgba(72, 159, 88, 0.08);
+    color: #5b9e69;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* OVERLAY ESCURO FUNDO */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.4);
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+}
+
+/* CAIXA CENTRAL */
+.popup {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    animation: aparecer 0.3s ease;
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.overlay.ativo {
+    display: flex;
+}
+
+.popup-grande {
+    width: 400px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.popup-grande h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.popup-grande .campo {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-grande input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.botoes-popup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-cancelar {
+    background-color: #ccc;
+}
+
+.btn-salvar {
+    background-color: #4CAF50;
+    color: white;
 }

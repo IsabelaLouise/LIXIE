@@ -25,9 +25,7 @@
         <div class="perfil-container">  
             <a href="homeLogado.html" id="bnt-fechar">X</a>
             <form id="formPerfil" novalidate>
-                
                 <div class="grid-container">
-                    
 
                     <!-- FT PERFIL -->
                     <div class="campo" id="campo-1">
@@ -135,33 +133,58 @@
                         </div>
                         <div class="erro-texto" id="erro-complemento"></div>
                     </div>
-                    
-                    <!-- SENHA -->
-                    <div class="campo" id="campo-12">
-                        <label for="senha">Senha</label>
-                        <div class="input-container">
-                            <input type="password" name="senha" id="senha" placeholder="Sua senha" disabled>
-                            <span id="icon-senha"></span>
-                        </div>
-                        <div class="erro-texto" id="erro-senha"></div>
-                        <button type="button" class="btn-alterar-senha">Alterar Senha</button>
-                    </div>
 
+                    <!-- BTNS -->
                     <div class="campo" id="campo-13">
+                        <button type="button" class="btn-alterar-senha">Alterar Senha</button>
                         <button type="submit" class="btn-salvar" id="Submit-Perfil">Salvar Alterações</button>
+                        <button type="button" class="btn-apagar-conta" id="btn-apagar-conta">Apagar Conta</button>
                     </div>
-
-                    
 
                 </div>
             </form>
 
-            <div id="mensagem-sucesso" class="mensagem-sucesso">
-                Alterações salvas com sucesso ✅
+            <div id="mensagem-sucesso" class="overlay">
+                <div class="popup">
+                    <p>Alterações salvas com sucesso ✅</p>
+                </div>
             </div>
 
+            <div id="mensagem-nada" class="overlay">
+                <div class="popup">
+                    <p>Nenhuma alteração foi feita ⚠️</p>
+                </div>
+            </div>
 
+            <dialog id="popUp-apagar">
+                <button id="btn-fechar-modal">X</button>
+
+                <h3>Tem certeza que deseja apagar sua conta?</h3>
+                <br>
+                <p>Essa ação é irreversível e todos os seus dados serão perdidos.
+                    Se sim porfavor insira sua senha para confirmar sua identidade como dono da conta.</p>
+                <br>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <div class="senha-container input-container">
+                        <input type="password" id="senha" placeholder="Digite sua senha">
+                        <i class="fa fa-eye toggle-senha" onclick="toggleSenhaLogin(this)"></i>
+                        <span id="icon-senha"></span>
+                    </div>
+                    <div class="erro-texto" id="erro-senha"></div>
+                </div>
+                <div class="botoes-dialog">
+                    <button id="confirmar-apagar" class="btn-confirmar">Apagar minha conta</button>
+                </div>
+            </dialog>
+
+            <dialog id="popUp-trocar-senha">
+                
+            </dialog>
         </div>
+
+        
+
     </main>
 
 </body>
