@@ -5,7 +5,27 @@ let cepValido = false; // 👈 MOVIDO PRA CIMA
 document.getElementById("quantidade").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
+
+    const quantidade = parseFloat(document.getElementById("quantidade").value);
+    const resultado = document.getElementById("resultado");
+
+    if (!tipoSelecionado) {
+        resultado.className = "erro";
+        resultado.innerHTML =  "⚠️ Selecione um material primeiro!";
+        return;
+    }
+
+    if (!quantidade || quantidade <= 0) {
+        resultado.className = "erro";
+        resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
+        return;
+    }
+
+    resultado.innerHTML = "";
+    resultado.className = "";
+
     document.getElementById("cep").focus();
+    verificarPreenchimento();
   }
 });
 
@@ -34,6 +54,20 @@ function converterParaKg(valor, unidade) {
   }
 }
 
+
+    function verificarPreenchimento() {
+        const cepInput = document.getElementById("cep");
+        const quantidade = parseFloat(document.getElementById("quantidade").value);
+
+        if (tipoSelecionado !== "" && quantidade > 0) {
+            cepInput.disabled = false; //ativa
+        } else {
+            cepInput.disabled = true; // desativa
+            cepInput.value = "";
+        }
+    }
+
+
 // selecionar material
 document.querySelectorAll("#materiais button").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -41,6 +75,8 @@ document.querySelectorAll("#materiais button").forEach(btn => {
 
     document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
     btn.classList.add("ativo");
+
+    verificarPreenchimento();
   });
 });
 
@@ -188,7 +224,7 @@ cep.addEventListener("input", async (e) => {
         return;
       }
 
-      e.target.value = `${data.logradouro} - ${data.localidade}`;
+      e.target.value = `${data.logradouro} - ${data.localidade}, ${data.uf}`;
 
      // erroCep.className = "sucesso";
      // erroCep.innerText = "✔️ CEP encontrado";
@@ -202,5 +238,6 @@ cep.addEventListener("input", async (e) => {
 
   } else {
     erroCep.innerText = "";
+    erroCep.className = "";
   }
 });
