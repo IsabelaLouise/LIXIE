@@ -191,6 +191,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    function toggleSenhaNova(icon) {
+      const input = icon.parentElement.querySelector("input");
+
+      if (input.type === "password") {
+          input.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+      } else {
+          input.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+      }
+  }
+
     const modalSenha = document.getElementById("popUp-trocar-senha");
     const btnAbrirSenha = document.querySelector(".btn-alterar-senha");
     const btnFecharSenha = document.getElementById("btn-fechar-senha");
@@ -251,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             el.textContent = "❌ " + el.textContent.replace("✔️ ", "").replace("❌ ", "");
         }
     }
+      atualizarReq("req-maiuscula", maiuscula);
       atualizarReq("req-minuscula", minuscula);
       atualizarReq("req-numero", numero);
       atualizarReq("req-especial", especial);

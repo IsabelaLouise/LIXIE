@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <header>
@@ -198,7 +199,8 @@
                 <div class="campo">
                     <label for="nova-senha">Nova senha</label>
                     <div class="senha-container input-container">
-                        <input type="password" id="nova-senha" placeholder="Digite a nova senha">
+                            <input type="password" id="nova-senha" placeholder="Digite a nova senha">
+                            <i class="fa fa-eye toggle-senha" onclick="toggleSenhaNova(this)"></i>
                     </div>
                     <div class="erro-texto" id="erro-nova-senha"></div>
 
@@ -215,7 +217,8 @@
                 <div class="campo">
                     <label for="confirmar-nova-senha">Confirmar nova senha</label>
                     <div class="senha-container input-container">
-                        <input type="password" id="confirmar-nova-senha" placeholder="Repita a nova senha">
+                            <input type="password" id="confirmar-nova-senha" placeholder="Repita a nova senha">
+                            <i class="fa fa-eye toggle-senha" onclick="toggleSenhaNova(this)"></i>
                     </div>
                     <div class="erro-texto" id="erro-confirmar-nova"></div>
                 </div>
