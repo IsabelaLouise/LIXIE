@@ -255,6 +255,39 @@ label {
   display: block;
 }
 
+#erroCep {
+  margin-top: -2px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* carregando */
+#erroCep.loading {
+  display: flex;
+  background: #f4f4f4;
+  color: #555;
+}
+
+/* erro */
+#erroCep.erro {
+  display: flex;
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* sucesso */
+#erroCep.sucesso {
+  display: flex;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
 /* ================= RESPONSIVIDADE ================= */
 
 @media (max-width: 1200px) {
