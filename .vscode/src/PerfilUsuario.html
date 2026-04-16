@@ -178,12 +178,55 @@
                 </div>
             </dialog>
 
-            <dialog id="popUp-trocar-senha">
-                
+
+            <dialog id="popUp-trocar-senha" class="popup-grande">
+                <button id="btn-fechar-senha">X</button>
+
+                <h3>Alterar senha</h3>
+                <br>
+
+                <!-- SENHA ATUAL -->
+                <div class="campo">
+                    <label for="senha-atual">Senha atual</label>
+                    <div class="senha-container input-container">
+                        <input type="password" id="senha-atual" placeholder="Digite sua senha atual">
+                    </div>
+                    <div class="erro-texto" id="erro-senha-atual"></div>
+                </div>
+
+                <!-- NOVA SENHA -->
+                <div class="campo">
+                    <label for="nova-senha">Nova senha</label>
+                    <div class="senha-container input-container">
+                        <input type="password" id="nova-senha" placeholder="Digite a nova senha">
+                    </div>
+                    <div class="erro-texto" id="erro-nova-senha"></div>
+
+                    <div class="requisitos-senha" id="requisitosNovaSenha">
+                        <p id="req-maiuscula">❌ Letra maiúscula</p>
+                        <p id="req-minuscula">❌ Letra minúscula</p>
+                        <p id="req-numero">❌ Número</p>
+                        <p id="req-especial">❌ Caractere especial</p>
+                        <p id="req-tamanho">❌ Mínimo 8 caracteres</p>
+                    </div>
+                </div>
+
+                <!-- CONFIRMAR -->
+                <div class="campo">
+                    <label for="confirmar-nova-senha">Confirmar nova senha</label>
+                    <div class="senha-container input-container">
+                        <input type="password" id="confirmar-nova-senha" placeholder="Repita a nova senha">
+                    </div>
+                    <div class="erro-texto" id="erro-confirmar-nova"></div>
+                </div>
+
+                <div class="botoes-dialog">
+                    <button id="confirmar-troca-senha" class="btn-confirmar">Alterar senha</button>
+                </div>
             </dialog>
         </div>
 
-        
+
 
     </main>
 

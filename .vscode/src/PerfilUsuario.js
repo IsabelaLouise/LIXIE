@@ -36,12 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
 
-    const btnAlterarSenha = document.querySelector(".btn-alterar-senha");
-    if (btnAlterarSenha) {
-        btnAlterarSenha.addEventListener("click", () => {
-            window.location.href = "esquecesenha.html";
-        });
-    }
     // =========================
     // 1. BUSCAR DADOS DO BANCO (Ao carregar a página)
     // =========================
@@ -196,6 +190,117 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
+
+    const modalSenha = document.getElementById("popUp-trocar-senha");
+    const btnAbrirSenha = document.querySelector(".btn-alterar-senha");
+    const btnFecharSenha = document.getElementById("btn-fechar-senha");
+
+    btnAbrirSenha.addEventListener("click", () => {
+        modalSenha.showModal();
+    });
+
+    btnFecharSenha.addEventListener("click", () => {
+        modalSenha.close();
+    });
+
+    const senhaAtual = document.getElementById("senha-atual");
+    const novaSenha = document.getElementById("nova-senha");
+    const confirmarNova = document.getElementById("confirmar-nova-senha");
+
+    function validarNovaSenha() {
+        const valor = novaSenha.value;
+        const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+
+        if (!regex.test(valor)) {
+            mostrarErro(novaSenha, "erro-nova-senha", "Senha inválida");
+            return false;
+        }
+
+        sucessoInput(novaSenha, "erro-nova-senha");
+
+        if (valor !== confirmarNova.value) {
+            mostrarErro(confirmarNova, "erro-confirmar-nova", "As senhas não coincidem");
+            return false;
+        }
+
+        sucessoInput(confirmarNova, "erro-confirmar-nova");
+        return true;
+    }
+    novaSenha.addEventListener("input", () => {
+      const valor = novaSenha.value;
+      const requisitos = document.getElementById("requisitosNovaSenha");
+
+      requisitos.style.display = valor.length > 0 ? "block" : "none";
+
+      const maiuscula = /[A-Z]/.test(valor);
+      const minuscula = /[a-z]/.test(valor);
+      const numero = /[0-9]/.test(valor);
+      const especial = /[!@#$%^&*]/.test(valor);
+      const tamanho = valor.length >= 8;
+
+      function atualizarReq(id, valido) {
+        const el = document.getElementById(id);
+
+        if (!el) return;
+
+        if (valido) {
+            el.classList.add("ok");
+            el.textContent = "✔️ " + el.textContent.replace("❌ ", "").replace("✔️ ", "");
+        } else {
+            el.classList.remove("ok");
+            el.textContent = "❌ " + el.textContent.replace("✔️ ", "").replace("❌ ", "");
+        }
+    }
+      atualizarReq("req-minuscula", minuscula);
+      atualizarReq("req-numero", numero);
+      atualizarReq("req-especial", especial);
+      atualizarReq("req-tamanho", tamanho);
+  });
+  document.getElementById("confirmar-troca-senha").addEventListener("click", async () => {
+
+      if (!senhaAtual.value) {
+          mostrarErro(senhaAtual, "erro-senha-atual", "Digite sua senha atual");
+          return;
+      }
+
+      if (!validarNovaSenha()) return;
+
+      try {
+          const resposta = await fetch("https://lixie-production.up.railway.app/trocar-senha", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                  email: email.value,
+                  senhaAtual: senhaAtual.value,
+                  novaSenha: novaSenha.value
+              })
+          });
+
+          const dados = await resposta.json();
+
+          if (resposta.ok) {
+              alert("Senha alterada com sucesso ✅");
+              modalSenha.close();
+          } else {
+              alert(dados.erro || "Erro ao alterar senha");
+          }
+
+      } catch (erro) {
+          alert("Erro de conexão com o servidor");
+      }
+  });
+
+  btnFecharSenha.addEventListener("click", () => {
+      modalSenha.close();
+
+      senhaAtual.value = "";
+      novaSenha.value = "";
+      confirmarNova.value = "";
+
+      document.getElementById("requisitosNovaSenha").style.display = "none";
+  });
 
     // =========================
     // 2. SALVAR ALTERAÇÕES (Botão Salvar)
