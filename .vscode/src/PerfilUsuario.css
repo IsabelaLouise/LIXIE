@@ -528,6 +528,7 @@ dialog::backdrop {
     display: flex;
     align-items: center;
     justify-content: center;
+}
 /* OVERLAY ESCURO FUNDO */
 .overlay {
     display: none;
