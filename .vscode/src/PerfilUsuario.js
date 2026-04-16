@@ -403,29 +403,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             const dados = await resposta.json();
 
             if (dados.sucesso) {
+              localStorage.removeItem("email");
+              localStorage.removeItem("usuarioEmail");
 
-                localStorage.removeItem("email");
-                localStorage.removeItem("usuarioEmail");
+              document.getElementById("popUp-apagar").close();
 
-                document.getElementById("popUp-apagar").close();
+              mensagemApagado.classList.add("ativo");
 
-                mensagemApagado.classList.add("ativo");
+              setTimeout(() => {
+                  window.location.href = "homeNaoLogado.html";
+              }, 2500);
 
-                setTimeout(() => {
-                    window.location.href = "homeNaoLogado.html";
-                }, 2500);
+          } else {
+              mensagemErroSenha.classList.add("ativo");
 
-            } else {
-                mensagemErroSenha.classList.add("ativo");
+              setTimeout(() => {
+                  mensagemErroSenha.classList.remove("ativo");
+              }, 2000);
 
-                setTimeout(() => {
-                    mensagemErroSenha.classList.remove("ativo");
-                }, 2000);
-
-                // 🔥 EXTRA (melhora UX)
-                document.getElementById("senha").value = "";
-                document.getElementById("senha").focus();
-            }
+              const inputSenha = document.getElementById("senha");
+              inputSenha.value = "";
+              inputSenha.focus();
+          }
 
         } catch (erro) {
             mensagemErroConexao.classList.add("ativo");
@@ -483,7 +482,8 @@ function toggleSenhaNova(icon) {
 }
 
 function toggleSenhaLogin(icon) {
-    const input = icon.parentElement.querySelector("input");
+    const container = icon.closest(".senha-container");
+    const input = container.querySelector("input");
 
     if (input.type === "password") {
         input.type = "text";
