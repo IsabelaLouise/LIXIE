@@ -92,9 +92,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const urlLimpa = usuario.foto.trim();
         console.log("URL da foto vinda do banco:", urlLimpa);
 
+        // Se a URL começar com http, ela veio do Cloudinary
         if (urlLimpa.startsWith('http')) {
             fotoPerfil.src = urlLimpa;
         } else {
+
             fotoPerfil.src = "https://lixie-production.up.railway.app/" + urlLimpa;
         }
     } else {
