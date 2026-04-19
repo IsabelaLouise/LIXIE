@@ -101,6 +101,15 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
+                # 🔍 Verifica se email já existe
+                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
+                if cursor.fetchone():
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"erro": "Essa conta já existe"}).encode())
+                    return
+                
                 # 🔐 HASH
                 senha_hash = bcrypt.hashpw(senha, bcrypt.gensalt())
 
