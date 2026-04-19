@@ -17,6 +17,41 @@ document.addEventListener("DOMContentLoaded", function () {
   const steps = document.querySelectorAll(".stepper .step");
   let currentPage = 0;
 
+  
+  async function verificarEmailExistente() {
+  const emailValor = email.value.trim();
+  console.log("Verificando email:", emailValor);
+
+  
+  try {
+    const formData = new URLSearchParams();
+    formData.append("email", emailValor);
+
+    const resposta = await fetch("https://lixie-production.up.railway.app/verificar-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+      body: formData
+    });
+
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+    
+    if (dados.existe) {
+      mostrarErro(email, "erro-email", "Essa conta já existe!");
+      return true; // existe
+    }
+
+    return false; // não existe
+
+  } catch (e) {
+    console.log("Erro", e);
+    mostrarMensagem("❌ Erro ao verificar email!", "erro");
+    return true // bloqueia por segurança
+  }
+}
+
   function mostrarErro(input, idErro, mensagem) {
     input.classList.remove("sucesso");
     input.classList.add("erro");
@@ -199,7 +234,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  document.getElementById("page1Next").addEventListener("click", irParaProximaPagina);
+  document.getElementById("page1Next").addEventListener("click", async () => {
+    
+    if (!validarEmail()) return; //valida
+    const existe = await verificarEmailExistente(); //verifica
+    if (existe) return; //bloqueia
+
+    irParaProximaPagina();
+});
+
   document.getElementById("page2Prev").addEventListener("click", irParaPaginaAnterior);
   document.getElementById("page2Next").addEventListener("click", irParaProximaPagina);
   document.getElementById("page3Prev").addEventListener("click", irParaPaginaAnterior);
@@ -228,9 +271,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+// limpa quando o usuario erra
   email.addEventListener("input", () => {
-    validarEmail();
+  validarEmail();
+
+  // limpa erro enquanto digita
+  email.classList.remove("erro");
+  const erro = document.getElementById("erro-email");
+  erro.textContent = "";
+  erro.classList.remove("ativo");
+});
+
+  email.addEventListener("blur", async () => {
+    if (!validarEmail()) return;
+
+    const existe = await verificarEmailExistente();
+
+    if(!existe) {
+      sucessoInput(email, "erro-email");
+    }
   });
+
 
   data.addEventListener("input", function (e) {
     let v = e.target.value.replace(/\D/g, "");
@@ -454,4 +515,3 @@ function limparFormulario() {
   const mensagem = document.getElementById("mensagem");
   mensagem.style.display = "none";
 }
-
