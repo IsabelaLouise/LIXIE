@@ -38,22 +38,34 @@
     </header>
 
     <main>
-        <h1>Lixie -> titulo + subtitulo</h1>
-        <h1>IMAGEM</h1>
-
         <div class="video-section">
-            <h4>Conheça o Lixie</h4>
-            <video class="home-video" controls preload="metadata" poster="/.vscode/src/img/logo.png">
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            <video class="home-video" autoplay loop muted preload="auto">
+                <source src="https://www.pexels.com/download/video/9808295/" type="video/mp4">
                 Seu navegador não suporta vídeo HTML5.
             </video>
+            <div class="video-overlay">
+                <h2>Bem-vindo ao Lixie</h2>
+                <p>Transforme sua reciclagem em recompensas</p>
+            </div>
         </div>
     
         <div class="ranking">
-            <h4>Ranking Global</h4>
-            <p>1. Usuário A - 1000 pontos</p>
-            <p>2. Usuário B - 900 pontos</p>
-            <p>3. Usuário C - 800 pontos</p>
+            <div class="ranking-grid">
+                <!-- LEFT - RANKING LIST -->
+                <div class="ranking-card">
+                    <h3>Top 5 Recicladores</h3>
+                    <div id="home-ranking-lista"></div>
+                    <button class="btn-ranking-complete btn-join">Ver Ranking Completo</button>
+                </div>
+
+                <!-- RIGHT - CTA IMAGE -->
+                <div class="ranking-side">
+                    <div class="cta-image-card">
+                        <img src="/.vscode/src/img/cool-people-recycle.jpg" alt="Cool people recycle" />
+                        <button class="btn-join" onclick="window.location.href='/.vscode/src/cadastrese.html'">Venha fazer parte!</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="como-funciona">
