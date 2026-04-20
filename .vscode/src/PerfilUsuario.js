@@ -337,15 +337,23 @@ document.addEventListener("DOMContentLoaded", async () => {
               confirmarNova.value = '';
               document.getElementById('requisitosNovaSenha').style.display = 'none';
           } else {
-              // Mostrar erro no mesmo estilo que o pop-up de senha incorreta
-              const mensagemErroSenha = document.getElementById('mensagem-erro-senha');
-              if (mensagemErroSenha) {
-                  if (mensagemErroSenha.parentNode !== document.body) document.body.appendChild(mensagemErroSenha);
-                  mensagemErroSenha.classList.add('ativo');
-                  setTimeout(() => mensagemErroSenha.classList.remove('ativo'), 2000);
-              } else {
-                  alert(dados.mensagem || 'Erro ao alterar senha');
+              // mostrar erro inline embaixo do campo de senha (como no fluxo de deletar conta)
+              const mostrado = showInlineError(dados.mensagem || 'Senha incorreta');
+              if (!mostrado) {
+                  // fallback para overlay caso o inline não exista
+                  const mensagemErroSenha = document.getElementById('mensagem-erro-senha');
+                  if (mensagemErroSenha) {
+                      if (mensagemErroSenha.parentNode !== document.body) document.body.appendChild(mensagemErroSenha);
+                      mensagemErroSenha.classList.add('ativo');
+                      setTimeout(() => mensagemErroSenha.classList.remove('ativo'), 2000);
+                  } else {
+                      alert(dados.mensagem || 'Erro ao alterar senha');
+                  }
               }
+
+              // Limpa e foca o campo de senha atual para facilitar correção
+              senhaAtual.value = '';
+              senhaAtual.focus();
           }
 
       } catch (erro) {
