@@ -418,7 +418,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_
+                SELECT Nome, Email, Pontuacao_Total_Acumulada_
                 FROM Usuario
                 ORDER BY Pontuacao_Total_Acumulada_ DESC
                 LIMIT 10
@@ -453,7 +453,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 "posicao": i + 1,
                 "nome": user[0],
                 "pontos": user[1],
-                "email": user[2]
+                "email": user[1]
 })
 
 
