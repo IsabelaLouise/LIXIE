@@ -320,11 +320,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           const dados = await resposta.json();
 
-          if (resposta.ok) {
-              alert("Senha alterada com sucesso ✓");
+          if (resposta.ok && dados.sucesso) {
+              // mostrar overlay bonitinho de sucesso
+              const mensagemSucesso = document.getElementById('mensagem-sucesso');
+              if (mensagemSucesso) {
+                  if (mensagemSucesso.parentNode !== document.body) document.body.appendChild(mensagemSucesso);
+                  mensagemSucesso.classList.add('ativo');
+                  setTimeout(() => mensagemSucesso.classList.remove('ativo'), 2000);
+              } else {
+                  alert('Senha alterada com sucesso ✓');
+              }
+
               modalSenha.close();
+              senhaAtual.value = '';
+              novaSenha.value = '';
+              confirmarNova.value = '';
+              document.getElementById('requisitosNovaSenha').style.display = 'none';
           } else {
-              alert(dados.erro || "Erro ao alterar senha");
+              // Mostrar erro no mesmo estilo que o pop-up de senha incorreta
+              const mensagemErroSenha = document.getElementById('mensagem-erro-senha');
+              if (mensagemErroSenha) {
+                  if (mensagemErroSenha.parentNode !== document.body) document.body.appendChild(mensagemErroSenha);
+                  mensagemErroSenha.classList.add('ativo');
+                  setTimeout(() => mensagemErroSenha.classList.remove('ativo'), 2000);
+              } else {
+                  alert(dados.mensagem || 'Erro ao alterar senha');
+              }
           }
 
       } catch (erro) {
