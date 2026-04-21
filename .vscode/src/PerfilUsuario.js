@@ -320,11 +320,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
           const dados = await resposta.json();
 
-          if (resposta.ok) {
-              alert("Senha alterada com sucesso ✓");
+          if (resposta.ok && dados.sucesso) {
+              // mostrar overlay bonitinho de sucesso
+              const mensagemSucesso = document.getElementById('mensagem-sucesso');
+              if (mensagemSucesso) {
+                  if (mensagemSucesso.parentNode !== document.body) document.body.appendChild(mensagemSucesso);
+                  mensagemSucesso.classList.add('ativo');
+                  setTimeout(() => mensagemSucesso.classList.remove('ativo'), 2000);
+              } else {
+                  alert('Senha alterada com sucesso ✓');
+              }
+
               modalSenha.close();
+              senhaAtual.value = '';
+              novaSenha.value = '';
+              confirmarNova.value = '';
+              document.getElementById('requisitosNovaSenha').style.display = 'none';
           } else {
-              alert(dados.erro || "Erro ao alterar senha");
+              // mostrar erro inline embaixo do campo de senha atual (usando o elemento erro-senha-atual)
+              const msg = dados.mensagem || 'Senha incorreta';
+              mostrarErro(senhaAtual, 'erro-senha-atual', msg);
+
+              // fallback: se o elemento não existir, usa o overlay global de erro
+              const erroElem = document.getElementById('erro-senha-atual');
+              if (!erroElem) {
+                  const mensagemErroSenha = document.getElementById('mensagem-erro-senha');
+                  if (mensagemErroSenha) {
+                      if (mensagemErroSenha.parentNode !== document.body) document.body.appendChild(mensagemErroSenha);
+                      mensagemErroSenha.classList.add('ativo');
+                      setTimeout(() => mensagemErroSenha.classList.remove('ativo'), 2000);
+                  } else {
+                      alert(msg);
+                  }
+              }
+
+              // Limpa e foca o campo de senha atual para facilitar correção
+              senhaAtual.value = '';
+              senhaAtual.focus();
           }
 
       } catch (erro) {

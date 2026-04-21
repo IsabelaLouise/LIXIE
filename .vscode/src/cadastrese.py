@@ -172,17 +172,14 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                # 🔍 BUSCA PELO EMAIL
                 cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
                 resultado = cursor.fetchone()
 
-                # ❌ Para segurança, não revelar se foi o email ou a senha: mensagem genérica
                 if resultado is None:
                     resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
 
-                    # 🔐 VERIFICA SENHA
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {"sucesso": True, "mensagem": "Login realizado"}
                     else:
@@ -194,7 +191,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
-                print(f"Erro no Esqueci Senha: {e}") # Isso vai aparecer nos logs do Railway
+                print(f"Erro no Esqueci Senha: {e}") 
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
@@ -345,8 +342,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                             server.starttls() 
                             server.login(meu_email, minha_senha)
                             server.sendmail(meu_email, email_destino, mensagem.as_string())
-                        
-                        # Se chegou aqui, deu certo
+
                         resposta = {"sucesso": True}
                         
                     except Exception as e:
@@ -422,7 +418,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_
+                SELECT Nome, Email, Pontuacao_Total_Acumulada_
                 FROM Usuario
                 ORDER BY Pontuacao_Total_Acumulada_ DESC
                 LIMIT 10
@@ -457,7 +453,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 "posicao": i + 1,
                 "nome": user[0],
                 "pontos": user[1],
-                "email": user[2]
+                "email": user[1]
 })
 
 
@@ -750,6 +746,84 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             finally:
                 cursor.close()
                 conexao.close()
+
+        elif self.path == '/trocar-senha':
+            # Endpoint para alterar senha a partir do perfil (requisição JSON)
+            content_length = int(self.headers.get('Content-Length', 0))
+            corpo = self.rfile.read(content_length)
+
+            try:
+                dados = json.loads(corpo.decode())
+            except Exception:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "JSON inválido"}).encode())
+                return
+
+            email = dados.get('email')
+            senha_atual = dados.get('senhaAtual', '').encode('utf-8')
+            nova_senha = dados.get('novaSenha', '').encode('utf-8')
+
+            if not email or not senha_atual or not nova_senha:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "Dados insuficientes"}).encode())
+                return
+
+            conexao = None
+            try:
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
+
+                # busca hash atual
+                cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    resposta = {"sucesso": False, "mensagem": "Usuário não encontrado"}
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                    return
+
+                senha_hash = resultado[0].encode('utf-8')
+
+                # valida senha atual
+                if not bcrypt.checkpw(senha_atual, senha_hash):
+                    resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                    return
+
+                # gera hash da nova senha e atualiza
+                nova_hash = bcrypt.hashpw(nova_senha, bcrypt.gensalt()).decode('utf-8')
+                cursor.execute("UPDATE Usuario SET Senha = %s WHERE Email = %s", (nova_hash, email))
+                conexao.commit()
+
+                resposta = {"sucesso": True, "mensagem": "Senha alterada com sucesso"}
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(resposta).encode())
+
+            except Exception as e:
+                print(f"❌ Erro ao trocar senha: {e}")
+                try:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"sucesso": False, "mensagem": str(e)}).encode())
+                except Exception:
+                    pass
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
