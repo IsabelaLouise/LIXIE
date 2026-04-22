@@ -27,6 +27,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   
   async function verificarEmailExistente() {
+    if (currentPage !== 0 || ignoreEmailChecks || (suppressEmailErrorUntil && Date.now() < suppressEmailErrorUntil)) {
+    return false;
+  }
   const emailValor = email.value.trim();
   console.log("Verificando email:", emailValor);
 
@@ -332,14 +335,16 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
   email.addEventListener("blur", async () => {
-    if (!validarEmail()) return;
+    if (ignoreEmailChecks || currentPage !== 0) return;
 
-    const existe = await verificarEmailExistente();
+      if (!validarEmail()) return;
 
-    if(!existe) {
-      sucessoInput(email, "erro-email");
-    }
-  });
+      const existe = await verificarEmailExistente();
+
+      if(!existe) {
+        sucessoInput(email, "erro-email");
+      }
+    });
 
 
   data.addEventListener("input", function (e) {
