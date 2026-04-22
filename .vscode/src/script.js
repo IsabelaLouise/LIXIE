@@ -477,7 +477,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mostrarPagina(currentPage);
         setTimeout(() => {
       window.location.href = "/login.html";
-      }, 1500);
+      }, 2000);
       } else {
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
       }
