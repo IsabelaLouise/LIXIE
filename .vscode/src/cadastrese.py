@@ -226,7 +226,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 pontos_usuario = usuario[1]
                 # calcular posição do usuário no ranking geral de forma robusta
                 try:
-                    cursor.execute("SELECT COUNT(*) FROM Usuario WHERE COALESCE(Pontuacao_Total_Acumulada_, 0) > %s", (pontos_usuario,))
+                    # Para evitar que muitos usuários com mesma pontuação fiquem com a mesma posição
+                    # vamos aplicar um critério de desempate determinístico (por email) ao contar
+                    # quantos usuários estão à frente: maior pontuação OR mesma pontuação e email < email_atual
+                    cursor.execute(
+                        "SELECT COUNT(*) FROM Usuario WHERE (COALESCE(Pontuacao_Total_Acumulada_, 0) > %s) OR (COALESCE(Pontuacao_Total_Acumulada_, 0) = %s AND Email < %s)",
+                        (pontos_usuario, pontos_usuario, email)
+                    )
                     maior_count = cursor.fetchone()[0]
                     posicao = maior_count + 1
                 except Exception:
