@@ -11,6 +11,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            /* Exibir botão Cadastrar/Entrar no desktop e apenas o ícone no mobile */
+            .profile-link.mobile-only { display: none; }
+            .btn-auth.desktop-only { display: inline-flex; }
+
+            @media (max-width: 900px) {
+                .btn-auth.desktop-only { display: none !important; }
+                .profile-link.mobile-only { display: flex !important; align-items: center; }
+                .profile-link.mobile-only img.profile { width: 42px; height: 42px; }
+            }
+        </style>
 </head>
 <body>
     <header>
@@ -31,9 +42,13 @@
                 <a href="/.vscode/src/cadastrese.html" class="nav-link">Recompensas</a>
             </nav>
 
-            <button class="btn-auth" onclick="window.location.href='/.vscode/src/cadastrese.html'">
+            <button class="btn-auth desktop-only" onclick="window.location.href='/.vscode/src/cadastrese.html'">
                 <i class="fas fa-user"></i> Cadastrar / Entrar
             </button>
+
+            <a href="/.vscode/src/cadastrese.html" class="profile-link mobile-only" aria-label="Entrar / Cadastrar">
+                <img id="fotoHome" class="profile" src="/.vscode/src/img/avatar.png" alt="Entrar">
+            </a>
         </div>
     </header>
 
@@ -190,10 +205,6 @@
     
     <footer>
         <span>Lixie ©</span>
-
-         <a href="#" id="logoutBtn" class="logout-footer">
-            <i class="fas fa-sign-out-alt"></i> Sair
-        </a>
     </footer>
 
     <script src="/.vscode/src/home.js"></script>
