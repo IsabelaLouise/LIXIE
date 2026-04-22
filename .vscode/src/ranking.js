@@ -85,10 +85,12 @@ async function carregarRanking() {
     }
 
     dados.forEach(user => {
+      // mostrar posição apenas se estiver no top-10; caso contrário mostrar '-º'
+      const displayPos = (typeof user.posicao === 'number' && user.posicao <= 10) ? `${user.posicao}º` : '-º';
       container.innerHTML += `
         <div class="rank-item">
           <div class="rank-left">
-            <div class="position">${user.posicao}</div>
+            <div class="position">${displayPos}</div>
             <span>${user.nome}</span>
           </div>
           <span>${user.pontos} pts</span>
@@ -135,11 +137,22 @@ async function carregarProgresso() {
     const ranking = await resRanking.json();
 
     //  acha posição real
-    const posicao = ranking.find(user => user.nome === usuario.nome)?.posicao || "-";
+    // Preferir a posição fornecida pelo endpoint /dados-usuario (inclui usuários fora do top-10)
+    let posicao = (typeof usuario.posicao !== 'undefined' && usuario.posicao !== null) ? usuario.posicao : null;
 
-    // 🔥calcula barra
+    if (!posicao) {
+      // se backend não forneceu, tenta achar pelo nome entre os top retornados
+      posicao = ranking.find(user => user.nome === usuario.nome)?.posicao || "-";
+    }
+
+    // 🔥calcula barra (quando não for possível determinar posição, evita NaN)
     const total = ranking.length;
-    const porcentagem = ((total - posicao + 1) / total) * 100;
+    let porcentagem = 0;
+    if (typeof posicao === 'number' || !isNaN(parseInt(posicao))) {
+      const posNum = parseInt(posicao);
+      porcentagem = ((total - posNum + 1) / Math.max(total, posNum)) * 100;
+      porcentagem = Math.max(0, Math.min(100, porcentagem));
+    }
 
     container.innerHTML = `
       <h2>Seu Progresso</h2>

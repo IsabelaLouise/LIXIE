@@ -344,19 +344,19 @@ main h1 {
     text-align: center;
 }
 
-.rank-item:nth-child(2) .position {
+.rank-item:nth-child(1) .position {
     background: linear-gradient(135deg, #c7ab0e 0%, #99840de3 100%);
     color: #fff;
     box-shadow: 0 4px 12px rgba(153, 131, 6, 0.459);
 }
 
-.rank-item:nth-child(3) .position {
+.rank-item:nth-child(2) .position {
     background: linear-gradient(135deg, #C0C0C0 0%, #E8E8E8 100%);
     color: #333;
     box-shadow: 0 4px 12px rgba(192, 192, 192, 0.5);
 }
 
-.rank-item:nth-child(4) .position {
+.rank-item:nth-child(3) .position {
     background: linear-gradient(135deg, #CD7F32 0%, #a75113d3 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(88, 53, 17, 0.5);

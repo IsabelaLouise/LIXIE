@@ -212,18 +212,35 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
+            # buscar dados do usuário (tratar NULLs na pontuação)
             cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_, Nivel 
+                SELECT Nome, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos, Nivel
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
             usuario = cursor.fetchone()
 
-            resposta = {
-                "nome": usuario[0],
-                "pontos": usuario[1],
-                "nivel": usuario[2]
-            }
+            if not usuario:
+                resposta = {"nome": "", "pontos": 0, "nivel": "", "posicao": None}
+            else:
+                pontos_usuario = usuario[1]
+                # calcular posição do usuário no ranking geral de forma robusta
+                try:
+                    cursor.execute(
+                        "SELECT COUNT(*) FROM Usuario WHERE (COALESCE(Pontuacao_Total_Acumulada_, 0) > %s) OR (COALESCE(Pontuacao_Total_Acumulada_, 0) = %s AND Email < %s)",
+                        (pontos_usuario, pontos_usuario, email)
+                    )
+                    maior_count = cursor.fetchone()[0]
+                    posicao = maior_count + 1
+                except Exception:
+                    posicao = None
+
+                resposta = {
+                    "nome": usuario[0],
+                    "pontos": pontos_usuario,
+                    "nivel": usuario[2],
+                    "posicao": posicao
+                }
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')

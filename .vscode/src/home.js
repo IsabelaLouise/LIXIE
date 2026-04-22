@@ -178,15 +178,19 @@ async function carregarProgressoHomeLogada() {
         });
 
         const dados = await response.json();
-        const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
+            const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
 
-        container.innerHTML = `
-            <p class="progress-text">Você está em: <strong>${dados.nivel}º Lugar</strong></p>
-            <p><strong>${dados.pontos} Pontos</strong></p>
-            <div class="progress-bar">
-                <div class="progress" style="width: ${porcentagem}%"></div>
-            </div>
-        `;
+            // se o backend já retornou a posição do usuário, use-a (inclui usuários fora do top-10)
+            const posicaoUsuario = (typeof dados.posicao !== 'undefined' && dados.posicao !== null) ? dados.posicao : null;
+            const posText = posicaoUsuario ? `${posicaoUsuario}º Lugar` : `${dados.nivel}`;
+
+            container.innerHTML = `
+                <p class="progress-text">Você está em: <strong>${posText}</strong></p>
+                <p><strong>${dados.pontos} Pontos</strong></p>
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${porcentagem}%"></div>
+                </div>
+            `;
     } catch (erro) {
         console.error(erro);
         container.innerHTML = "<p>Erro ao carregar progresso</p>";
