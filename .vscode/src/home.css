@@ -902,15 +902,31 @@ footer {
 }
 
 @media (max-width: 900px) {
+
     .header-container {
-        padding: 0 15px;
+        position: relative;
+        justify-content: center;
     }
 
+    /* MENU (ESQUERDA) */
     .menu-toggle {
+        position: absolute;
+        left: 15px;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        order: 2;
+    }
+
+    /* LOGO (CENTRO REAL) */
+    .logo-link {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* BOTÃO DIREITA */
+    .btn-auth,
+    .profile-link {
+        position: absolute;
+        right: 15px;
     }
 
     .navbar {
@@ -920,18 +936,20 @@ footer {
         right: 0;
         background: white;
         flex-direction: column;
-        gap: 0;
-        margin: 0;
-        padding: 20px 0;
+        
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        z-index: 999;
+
+        opacity: 0;
+        pointer-events: none;
+
+        transition: all 0.3s ease;
     }
 
     .navbar.active {
         max-height: 400px;
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .nav-link {
@@ -945,16 +963,6 @@ footer {
 
     .nav-link:hover {
         background-color: rgba(91, 158, 105, 0.1);
-    }
-
-    .btn-auth {
-        order: 3;
-        padding: 8px 15px;
-        font-size: 13px;
-    }
-
-    .logo-link {
-        order: 1;
     }
 
     .ranking, .como-funciona, .impacto-ambiental, .artigos {
