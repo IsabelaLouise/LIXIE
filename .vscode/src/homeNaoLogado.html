@@ -54,7 +54,7 @@
             <div class="ranking-grid">
                 <!-- LEFT - RANKING LIST -->
                 <div class="ranking-card">
-                    <h3>Top 5 Recicladores</h3>
+                    <h4>Top 5 Recicladores</h4>
                     <div id="home-ranking-lista"></div>
                     <button class="btn-ranking-complete btn-join">Ver Ranking Completo</button>
                 </div>
@@ -74,28 +74,40 @@
             <h4>Como funciona</h4>
 
             <div class="como-funciona-cards">
-                <div class="como-funciona-card">
-                    <div class="step-number">1</div>
+
+                <div class="cf-card">
+                    <span class="cf-step">1</span>
                     <h5>Crie sua conta</h5>
-                    <p>Comece em segundos e entre para uma comunidade que transforma pequenas ações em grandes impactos.</p>
+                    <p>Comece em segundos e desbloqueie todas as funcionalidades da plataforma.</p>
+                    <a class="cf-btn" data-destino="auth" href="/.vscode/src/cadastrese.html">Começar agora</a>
                 </div>
 
-                <div class="como-funciona-card">
-                    <div class="step-number">2</div>
-                    <h5>Registre suas reciclagens</h5>
-                    <p>Informe o que você reciclou de forma simples e rápida, direto pelo sistema.</p>
+                <div class="cf-card">
+                    <span class="cf-step">2</span>
+                    <h5>Encontre um ponto de coleta</h5>
+                    <p>Localize rapidamente o ponto mais próximo e comece a reciclar.</p>
+                    <a class="cf-btn" data-destino="mapa" href="/.vscode/src/cadastrese.html">Ver mapa</a>
                 </div>
 
-                <div class="como-funciona-card">
-                    <div class="step-number">3</div>
-                    <h5>Ganhe pontos</h5>
-                    <p>Cada ação conta. Acumule pontos e acompanhe seu progresso em tempo real.</p>
+                <div class="cf-card">
+                    <span class="cf-step">3</span>
+                    <h5>Registre sua reciclagem</h5>
+                    <p>Informe o que você reciclou, ganhe pontos e acompanhe seu impacto.</p>
+                    <a class="cf-btn" data-destino="reciclagem" href="/.vscode/src/cadastrese.html">Registrar</a>
                 </div>
 
-                <div class="como-funciona-card">
-                    <div class="step-number">4</div>
+                <div class="cf-card">
+                    <span class="cf-step">4</span>
                     <h5>Suba no ranking</h5>
-                    <p>Compita com amigos e outros usuários enquanto contribui para um planeta mais sustentável.</p>
+                    <p>Compita com outros usuários e veja seu progresso em tempo real.</p>
+                    <a class="cf-btn" data-destino="ranking" href="/.vscode/src/cadastrese.html">Ver ranking</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">5</span>
+                    <h5>Troque por recompensas</h5>
+                    <p>Use seus pontos para ganhar benefícios exclusivos.</p>
+                    <a class="cf-btn" data-destino="recompensas" href="/.vscode/src/cadastrese.html">Ver recompensas</a>
                 </div>
             </div>
         </div>
@@ -129,6 +141,14 @@
                             <span>pessoas impactadas</span>
                         </div>
                     </div>
+                    
+                    <p>
+                        O que você já vê aqui é só o começo. Cada nova ação amplia o impacto coletivo e mostra como pequenas escolhas, quando repetidas, geram resultados reais. 
+                        O Lixie transforma esse processo em algo visível, mensurável e motivador, permitindo que você acompanhe de perto a diferença que está fazendo.
+                    </p>
+                    <p> Participe, acompanhe seu progresso e veja seu impacto crescer junto com a comunidade. 
+                        Quanto mais pessoas entram nesse movimento, maiores são os resultados e mais perto chegamos de um futuro mais sustentável.
+                    </p>
                 </div>
 
                 <div class="impacto-visual">
@@ -143,23 +163,23 @@
         <div class="artigos">
             <div class="artigos-header">
                 <h4>Aprenda mais</h4>
-                <p>Conteúdos selecionados para você viver de forma mais sustentável</p>
+                <p>Conteúdos selecionados para você se manter informado sobre sustentabilidade</p>
             </div>
 
             <div class="artigos-lista">
 
-                <a href="https://www.wwf.org.br" target="_blank" class="artigo-item">
-                    <span>Como reduzir seu impacto ambiental no dia a dia</span>
+                <a href="https://www.wwf.org.br/nossosconteudos/notas_e_releases/?94380/Desperdicio-de-alimentos-por-que-as-empresas-precisam-sair-do-discurso-e-entrar-na-pratica" target="_blank" class="artigo-item">
+                    <span>Desperdício de alimentos: por que as empresas precisam sair do discurso e entrar na prática</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
 
-                <a href="https://www.nationalgeographic.com" target="_blank" class="artigo-item">
-                    <span>O problema global do plástico explicado</span>
+                <a href="https://www.nationalgeographicbrasil.com/meio-ambiente/2023/04/dia-da-terra-10-acoes-sustentaveis-para-colocar-em-pratica-e-ajudar-o-planeta" target="_blank" class="artigo-item">
+                    <span>10 ações sustentáveis para colocar em prática e ajudar o planeta</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
 
-                <a href="https://www.unep.org" target="_blank" class="artigo-item">
-                    <span>Por que reciclar é essencial para o planeta</span>
+                <a href="https://www.poder360.com.br/poder-economia/__trashed-555/" target="_blank" class="artigo-item">
+                    <span>Demanda por plástico reciclado despenca antes de regra ambiental</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
 
@@ -172,6 +192,6 @@
         Lixie ©
     </footer>
 
-    <script src="/.vscode/src/homeNaoLogado.js"></script>
+    <script src="/.vscode/src/home.js"></script>
 </body>
 </html>

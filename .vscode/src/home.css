@@ -1,4 +1,3 @@
-/* RESET */
 * {
     margin: 0;
     padding: 0;
@@ -38,6 +37,21 @@ header {
     justify-content: space-between;
     padding: 0 30px;
     gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .navbar {
+        gap: 15px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+    }
+
+    .btn-auth {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
 }
 
 /* LOGO */
@@ -190,6 +204,12 @@ main h1 {
     margin-bottom: 40px;
 }
 
+.ranking-card h4 {
+    font-size: 28px;
+    color: #085b1c;
+    margin-bottom: 40px;
+}
+
 .ranking-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -275,10 +295,17 @@ main h1 {
     display: block;
 }
 
-.btn-ranking-complete:hover,
-.btn-join:hover,
 .btn-register-recycling:hover {
-    background: white;
+    box-shadow: 0 4px 12px rgba(91, 158, 105, 0.3);
+    color: white;
+    background: #4a8456;
+    transform: scale(1.05);
+}
+
+.btn-join:hover {
+    color: #085b1c;
+    box-shadow: 0 4px 12px rgba(91, 158, 105, 0.3);
+    zoom: 1.05;
 }
 
 .btn-register-recycling {
@@ -397,11 +424,6 @@ main h1 {
     color: white;
 }
 
-.btn-ranking-complete:hover {
-    background: #4a8456;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(91, 158, 105, 0.3);
-}
 
 .btn-register-recycling {
     background: rgba(255,255,255,0.95);
@@ -416,6 +438,22 @@ main h1 {
     margin: 0 auto;
     display: block;
     margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .ranking-card {
+        padding: 15px;
+    }
+
+    .rank-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .rank-points {
+        align-self: flex-end;
+    }
 }
 
 /* INFO BOX */
@@ -565,6 +603,30 @@ main h1 {
     max-width: 400px;
 }
 
+@media (max-width: 768px) {
+    .home-video {
+        aspect-ratio: 16 / 9;
+    }
+
+    .video-overlay {
+        padding-left: 20px;
+        padding-right: 20px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .video-overlay h2 {
+        font-size: 26px;
+    }
+
+    .video-overlay p1,
+    .video-overlay p2,
+    .video-overlay p3 {
+        font-size: 14px;
+        max-width: 100%;
+    }
+}
+
 @keyframes flyIn {
     from {
         opacity: 0;
@@ -596,42 +658,107 @@ footer {
 }
 
 .como-funciona h4 {
-    font-size: 26px;
+    font-size: 28px;
     color: #085b1c;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
+/* grid */
 .como-funciona-cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
 }
 
-.como-funciona-card {
+/* card */
+.cf-card {
     position: relative;
-    padding: 25px;
-    border-radius: 20px;
-    background: linear-gradient(145deg, #f7f9f6, #e8f5e9);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.06);
-    transition: all 0.4s ease;
+    background: linear-gradient(145deg, #ffffff, #f3f7f2);
+    border-radius: 22px;
+    padding: 25px 20px 30px;
+    text-align: left;
+    transition: all 0.35s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.04);
+
+    display: flex;             
+    flex-direction: column;    
 }
 
-.como-funciona-card:hover {
-    transform: translateY(-10px);
+/* hover Apple-style */
+.cf-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
-.step-number {
+/* número */
+.cf-step {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: -12px;
+    left: 15px;
     background: #5b9e69;
     color: white;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* título */
+.cf-card h5 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #085b1c;
+    font-size: 16px;
+}
+
+/* texto */
+.cf-card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* botão */
+.cf-btn {
+    border: none;
+    background: #5b9e69;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: auto;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* hover botão */
+.cf-btn:hover {
+    background: #4a8456;
+    transform: scale(1.05);
+}
+
+/* RESPONSIVO */
+@media (max-width: 1024px) {
+    .como-funciona-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .como-funciona-cards {
+        grid-template-columns: 1fr;
+    }
 }
 
 
@@ -664,6 +791,7 @@ footer {
     color: #085b1c;
     margin-bottom: 15px;
     line-height: 1.2;
+    margin-top: 22px;
 }
 
 .impacto-texto p {
@@ -675,6 +803,7 @@ footer {
 .impacto-stats {
     display: flex;
     gap: 30px;
+    margin-bottom: 25px;
 }
 
 .impacto-stats div {
@@ -690,6 +819,7 @@ footer {
 
 .impacto-visual img {
     width: 100%;
+    max-width: 450px;
     border-radius: 25px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
@@ -755,8 +885,6 @@ footer {
     color: #5b9e69;
 }
 
-
-/* RESPONSIVO */
 @media (max-width: 1024px) {
     .como-funciona-cards,
     .impacto-grid,
@@ -773,8 +901,7 @@ footer {
     }
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .header-container {
         padding: 0 15px;
     }
@@ -878,18 +1005,6 @@ footer {
     .btn-register-recycling {
         font-size: 14px;
         padding: 10px 14px;
-    }
-
-    .video-overlay h2 {
-        font-size: 32px;
-    }
-
-    .video-overlay p1, .video-overlay p2, .video-overlay p3 {
-        font-size: 16px;
-    }
-
-    .video-overlay {
-        padding-left: 30px;
     }
 
     main h1 {
