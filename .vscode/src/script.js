@@ -469,70 +469,72 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
-    mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
-    return;
-  }
+    // 1. Bloqueia qualquer verificação de e-mail futura IMEDIATAMENTE
+    ignoreEmailChecks = true;
+    suppressEmailErrorUntil = Date.now() + 10000; 
 
-  ignoreEmailChecks = true;
-  if (lastEmailCheckController) {
-    try { lastEmailCheckController.abort(); } catch (err) {}
-    lastEmailCheckController = null;
-  }
+    // Limpa visualmente o erro de e-mail antes de validar
+    const erroEmail = document.getElementById("erro-email");
+    if (erroEmail) {
+      erroEmail.textContent = "";
+      erroEmail.classList.remove("ativo");
+    }
+    email.classList.remove("erro");
 
-  // suprimir mensagens de erro de email por alguns segundos (evita 'Essa conta já existe' vindo de requisições pendentes)
-  suppressEmailErrorUntil = Date.now() + 6000; // 6s, um pouco maior que o overlay
-
-  const overlay = document.getElementById('mensagem-cadastrado');
-
-  // limpar erro antigo de email
-  const erroEmail = document.getElementById("erro-email");
-  if (erroEmail) {
-    erroEmail.textContent = "";
-    erroEmail.classList.remove("ativo");
-  }
-  email.classList.remove("erro");
-  try {
-    // mostrar overlay imediato com mensagem de criação
-    if (overlay) {
-      const popup = overlay.querySelector('.popup p');
-      if (popup) popup.textContent = 'Conta criada com sucesso!';
-      overlay.classList.add('ativo');
+    // 2. Validações locais
+    if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
+      ignoreEmailChecks = false; 
+      suppressEmailErrorUntil = 0;
+      mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
+      return;
     }
 
-    const formData = new URLSearchParams(new FormData(form));
+    // 3. Cancela qualquer requisição de verificação que ainda esteja "voando"
+    if (lastEmailCheckController) {
+      try { lastEmailCheckController.abort(); } catch (err) {}
+      lastEmailCheckController = null;
+    }
 
-    const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
-      method: "POST",
-      body: formData
-    });
+    const overlay = document.getElementById('mensagem-cadastrado');
 
-    const dados = await resposta.json();
-
-    if (resposta.ok) {
-      // atualizar overlay para sucesso e aguardar 5s
+    try {
+      // Mostrar overlay imediato
       if (overlay) {
         const popup = overlay.querySelector('.popup p');
-        if (popup) popup.textContent = 'Conta criada com sucesso';
+        if (popup) popup.textContent = 'Conta criada com sucesso!';
+        overlay.classList.add('ativo');
       }
 
-      localStorage.setItem('cadastroEmail', email.value.trim());
+      const formData = new URLSearchParams(new FormData(form));
 
-      setTimeout(() => {
+      const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
+        method: "POST",
+        body: formData
+      });
+
+      const dados = await resposta.json();
+
+      if (resposta.ok) {
+        localStorage.setItem('cadastroEmail', email.value.trim());
+
+        setTimeout(() => {
+          if (overlay) overlay.classList.remove('ativo');
+          window.location.href = "/login.html";
+        }, 5000);
+
+      } else {
+        // Se o servidor retornar erro real, liberamos as checagens e fechamos o overlay
+        ignoreEmailChecks = false;
+        suppressEmailErrorUntil = 0;
         if (overlay) overlay.classList.remove('ativo');
-        window.location.href = "/login.html";
-      }, 5000);
+        mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
+      }
 
-    } else {
-      // em caso de erro, esconder overlay e mostrar mensagem
+    } catch (erro) {
+      ignoreEmailChecks = false;
       if (overlay) overlay.classList.remove('ativo');
-      mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
+      mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
     }
-
-  } catch (erro) {
-    if (overlay) overlay.classList.remove('ativo');
-    mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
-  }
   });
 
 const campos = document.querySelectorAll("#formCadastro input");
