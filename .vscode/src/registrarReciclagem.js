@@ -1,6 +1,6 @@
 let tipoSelecionado = "";
 let pontosTotais = 0;
-let cepValido = false; // 👈 MOVIDO PRA CIMA
+let cepValido = false; 
 
 document.getElementById("quantidade").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
