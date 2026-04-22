@@ -1,6 +1,5 @@
 // home.js - Arquivo único para homeNaoLogado.html e homeLogado.html
 
-console.log("Home carregada!");
 
 // MENU MOBILE TOGGLE (comum a ambas)
 const menuToggle = document.getElementById('menuToggle');
