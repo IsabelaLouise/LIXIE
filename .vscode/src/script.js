@@ -16,11 +16,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const pages = document.querySelectorAll(".form-page");
   const steps = document.querySelectorAll(".stepper .step");
   let currentPage = 0;
+  // flag para ignorar verificações de email quando estamos no fluxo de sucesso
+  let ignoreEmailChecks = false;
 
   
   async function verificarEmailExistente() {
   const emailValor = email.value.trim();
   console.log("Verificando email:", emailValor);
+
+  if (ignoreEmailChecks) {
+    // durante o fluxo de sucesso (após criar conta) não queremos mostrar "email já cadastrado" por chamadas pendentes
+    console.log("Verificação de email ignorada por flag (fluxo de sucesso).");
+    return false;
+  }
 
   
   try {
@@ -437,6 +445,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (resposta.ok) {
         localStorage.setItem('cadastroEmail', email.value.trim());
+        // bloquear checagens de email que possam aparecer após o cadastro (evita aviso falso antes do redirect)
+        ignoreEmailChecks = true;
         mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
         form.reset();
         limparFormulario();

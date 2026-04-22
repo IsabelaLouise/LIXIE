@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  /* não forçar fonte aqui — usar a fonte definida em home.css / importações globais */
 }
 
 /* FUNDO */
@@ -66,7 +66,12 @@ header {
 .nav-link.active {
     color: #5b9e69;
     border-bottom-color: #5b9e69;
-    font-weight: 600;
+  font-weight: 700; /* mais negrito para ficar consistente com outras páginas */
+}
+
+/* aumentar especificidade caso alguma outra folha sobrescreva a regra */
+header .navbar .nav-link.active {
+  font-weight: 700;
 }
 
 /* MENU TOGGLE (MOBILE) */
