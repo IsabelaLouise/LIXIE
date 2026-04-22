@@ -181,23 +181,8 @@ async function carregarProgressoHomeLogada() {
         const dados = await response.json();
             const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
 
-            // buscar ranking para descobrir a posição do usuário
-            let posicaoUsuario = null;
-            try {
-                const resRank = await fetch('https://lixie-production.up.railway.app/ranking', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
-                const rankingDados = await resRank.json();
-                // tentar encontrar pelo nome (fallback razoável)
-                const encontrado = rankingDados.find(r => r.nome === dados.nome);
-                if (encontrado && typeof encontrado.posicao !== 'undefined') {
-                    posicaoUsuario = encontrado.posicao;
-                } else if (encontrado) {
-                    // se o backend não retornou posicao, computar com base no índice
-                    posicaoUsuario = rankingDados.findIndex(r => r.nome === dados.nome) + 1;
-                }
-            } catch (err) {
-                console.error('Erro ao buscar ranking para posição do usuário:', err);
-            }
-
+            // se o backend já retornou a posição do usuário, use-a (inclui usuários fora do top-10)
+            const posicaoUsuario = (typeof dados.posicao !== 'undefined' && dados.posicao !== null) ? dados.posicao : null;
             const posText = posicaoUsuario ? `${posicaoUsuario}º Lugar` : `${dados.nivel}`;
 
             container.innerHTML = `

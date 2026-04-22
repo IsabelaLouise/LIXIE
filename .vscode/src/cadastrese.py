@@ -219,10 +219,19 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             usuario = cursor.fetchone()
 
+            # calcular posição do usuário no ranking geral
+            try:
+                cursor.execute("SELECT COUNT(*) FROM Usuario WHERE Pontuacao_Total_Acumulada_ > (SELECT Pontuacao_Total_Acumulada_ FROM Usuario WHERE Email = %s)", (email,))
+                maior_count = cursor.fetchone()[0]
+                posicao = maior_count + 1
+            except Exception:
+                posicao = None
+
             resposta = {
                 "nome": usuario[0],
                 "pontos": usuario[1],
-                "nivel": usuario[2]
+                "nivel": usuario[2],
+                "posicao": posicao
             }
 
             self.send_response(200)
