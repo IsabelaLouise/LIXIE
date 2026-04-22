@@ -179,15 +179,34 @@ async function carregarProgressoHomeLogada() {
         });
 
         const dados = await response.json();
-        const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
+            const porcentagem = Math.min((dados.pontos / 10000) * 100, 100);
 
-        container.innerHTML = `
-            <p class="progress-text">Você está em: <strong>${dados.nivel}º Lugar</strong></p>
-            <p><strong>${dados.pontos} Pontos</strong></p>
-            <div class="progress-bar">
-                <div class="progress" style="width: ${porcentagem}%"></div>
-            </div>
-        `;
+            // buscar ranking para descobrir a posição do usuário
+            let posicaoUsuario = null;
+            try {
+                const resRank = await fetch('https://lixie-production.up.railway.app/ranking', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const rankingDados = await resRank.json();
+                // tentar encontrar pelo nome (fallback razoável)
+                const encontrado = rankingDados.find(r => r.nome === dados.nome);
+                if (encontrado && typeof encontrado.posicao !== 'undefined') {
+                    posicaoUsuario = encontrado.posicao;
+                } else if (encontrado) {
+                    // se o backend não retornou posicao, computar com base no índice
+                    posicaoUsuario = rankingDados.findIndex(r => r.nome === dados.nome) + 1;
+                }
+            } catch (err) {
+                console.error('Erro ao buscar ranking para posição do usuário:', err);
+            }
+
+            const posText = posicaoUsuario ? `${posicaoUsuario}º Lugar` : `${dados.nivel}`;
+
+            container.innerHTML = `
+                <p class="progress-text">Você está em: <strong>${posText}</strong></p>
+                <p><strong>${dados.pontos} Pontos</strong></p>
+                <div class="progress-bar">
+                    <div class="progress" style="width: ${porcentagem}%"></div>
+                </div>
+            `;
     } catch (erro) {
         console.error(erro);
         container.innerHTML = "<p>Erro ao carregar progresso</p>";
