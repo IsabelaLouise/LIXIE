@@ -102,33 +102,6 @@ header {
     color: #5b9e69;
 }
 
-/* BUTTON AUTH */
-.btn-auth {
-    background-color: #5b9e69;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    transition: all 0.2s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.btn-auth:hover {
-    background-color: #20582d;
-    transform: scale(1.05);
-}
-
-.btn-auth i {
-    font-size: 16px;
-}
-
 /* PROFILE LINK */
 .profile-link {
     display: flex;
