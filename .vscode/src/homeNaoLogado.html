@@ -13,14 +13,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <style>
             /* Exibir botão Cadastrar/Entrar no desktop e apenas o ícone no mobile */
-            .profile-link.mobile-only { display: none; }
-            .btn-auth.desktop-only { display: inline-flex; }
+                        .profile-link.mobile-only { display: none; }
+                        .btn-auth.desktop-only { display: inline-flex; }
 
-            @media (max-width: 900px) {
-                .btn-auth.desktop-only { display: none !important; }
-                .profile-link.mobile-only { display: flex !important; align-items: center; }
-                .profile-link.mobile-only img.profile { width: 42px; height: 42px; }
-            }
+                        /* estilo do icone circular mobile */
+                        .avatar-icon {
+                            width: 42px;
+                            height: 42px;
+                            border-radius: 50%;
+                            background: #5b9e69; /* verde */
+                            color: white;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 18px;
+                            border: 2px solid rgba(0,0,0,0.06);
+                        }
+
+                        @media (max-width: 900px) {
+                                .btn-auth.desktop-only { display: none !important; }
+                                .profile-link.mobile-only { display: flex !important; align-items: center; }
+                                .avatar-icon { width: 42px; height: 42px; }
+                        }
         </style>
 </head>
 <body>
@@ -46,8 +60,8 @@
                 <i class="fas fa-user"></i> Cadastrar / Entrar
             </button>
 
-            <a href="/.vscode/src/cadastrese.html" class="profile-link mobile-only" aria-label="Entrar / Cadastrar">
-                <img id="fotoHome" class="profile" src="/.vscode/src/img/avatar.png" alt="Entrar">
+            <a href="/.vscode/src/cadastrese.html" class="profile-link mobile-only avatar-icon" aria-label="Entrar / Cadastrar">
+                <i class="fas fa-user" aria-hidden="true"></i>
             </a>
         </div>
     </header>
