@@ -431,7 +431,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 ranking.append({
                 "posicao": i + 1,
                 "nome": user[0],
-                "pontos": user[1]
+                "pontos": user[2]
                 })
 
             self.send_response(200)
@@ -442,19 +442,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor.close()
             conexao.close()
 
-            cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_, Email
-                FROM Usuario
-                ORDER BY Pontuacao_Total_Acumulada_ DESC
-                LIMIT 10
-            """)
+            
 
-            ranking.append({
-                "posicao": i + 1,
-                "nome": user[0],
-                "pontos": user[1],
-                "email": user[1]
-})
 
 
         elif self.path == '/perfil':
