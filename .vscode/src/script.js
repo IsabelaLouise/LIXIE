@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentPage = 0;
   // flag para ignorar verificações de email quando estamos no fluxo de sucesso
   let ignoreEmailChecks = false;
+  // controller para cancelar verificações de email pendentes
+  let lastEmailCheckController = null;
 
   
   async function verificarEmailExistente() {
@@ -30,6 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
     return false;
   }
 
+  // cancelar verificação anterior (se houver) para evitar respostas fora de ordem
+  if (lastEmailCheckController) {
+    try { lastEmailCheckController.abort(); } catch (e) { /* ignorar */ }
+  }
+  lastEmailCheckController = new AbortController();
+  const signal = lastEmailCheckController.signal;
+
   
   try {
     const formData = new URLSearchParams();
@@ -40,7 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
     },
-      body: formData
+      body: formData,
+      signal
     });
 
     const dados = await resposta.json();
@@ -48,13 +58,19 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if (dados.existe) {
       mostrarErro(email, "erro-email", "Essa conta já existe!");
+      lastEmailCheckController = null;
       return true; // existe
     }
 
+    lastEmailCheckController = null;
     return false; // não existe
 
   } catch (e) {
     console.log("Erro", e);
+    if (e.name === 'AbortError') {
+      // verificação abortada por nova requisição ou por submissão; tratar como 'não existe' silencioso
+      return false;
+    }
     mostrarMensagem("❌ Erro ao verificar email!", "erro");
     return true // bloqueia por segurança
   }
@@ -431,6 +447,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
       mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
       return;
+    }
+
+    // cancelar qualquer verificação de email pendente e evitar mensagens falsas durante o fluxo de cadastro
+    ignoreEmailChecks = true;
+    if (lastEmailCheckController) {
+      try { lastEmailCheckController.abort(); } catch (err) { /* ignore */ }
+      lastEmailCheckController = null;
     }
 
     try {
