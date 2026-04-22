@@ -341,12 +341,9 @@ if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
         e.preventDefault();
 
-        const confirmar = confirm("Deseja realmente sair?");
-        if (!confirmar) return;
-
         localStorage.clear();
         sessionStorage.clear();
 
-        window.location.href = "/.vscode/src/home.html";
+        window.location.href = "/.vscode/src/homeNaoLogado.html";
     });
 }
