@@ -102,6 +102,33 @@ header {
     color: #5b9e69;
 }
 
+/* BUTTON AUTH */
+.btn-auth {
+    background-color: #5b9e69;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-auth:hover {
+    background-color: #20582d;
+    transform: scale(1.05);
+}
+
+.btn-auth i {
+    font-size: 16px;
+}
+
 /* PROFILE LINK */
 .profile-link {
     display: flex;
@@ -125,6 +152,7 @@ header {
     background: #d6e7d3;
 }
 
+
 @media (max-width: 1024px) {
     .navbar {
         gap: 15px;
@@ -133,6 +161,13 @@ header {
     .nav-link {
         font-size: 13px;
     }
+
+    .btn-auth {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
 
 
 
@@ -346,7 +381,13 @@ header {
     font-size: 24px;
   }
 
-  
+  .navbar {
+    gap: 15px;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
 
   .card {
     padding: 15px;
@@ -364,6 +405,19 @@ header {
     padding: 15px;
   }
 
+  .header-container {
+    padding: 0 15px;
+    gap: 10px;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .navbar {
+    gap: 10px;
+    font-size: 12px;
+  }
 
   .title h1 {
     font-size: 24px;
@@ -407,6 +461,14 @@ header {
     font-size: 13px;
   }
 
+  .logo-img {
+    max-height: 40px;
+  }
+
+  .profile {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 @media (max-width: 900px) {
