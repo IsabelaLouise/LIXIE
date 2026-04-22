@@ -125,7 +125,6 @@ header {
     background: #d6e7d3;
 }
 
-
 @media (max-width: 1024px) {
     .navbar {
         gap: 15px;
@@ -134,13 +133,6 @@ header {
     .nav-link {
         font-size: 13px;
     }
-
-    .btn-auth {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-}
-
 
 
 
@@ -354,13 +346,7 @@ header {
     font-size: 24px;
   }
 
-  .navbar {
-    gap: 15px;
-  }
-
-  .nav-link {
-    font-size: 14px;
-  }
+  
 
   .card {
     padding: 15px;
@@ -378,19 +364,6 @@ header {
     padding: 15px;
   }
 
-  .header-container {
-    padding: 0 15px;
-    gap: 10px;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-
-  .navbar {
-    gap: 10px;
-    font-size: 12px;
-  }
 
   .title h1 {
     font-size: 24px;
@@ -434,12 +407,123 @@ header {
     font-size: 13px;
   }
 
-  .logo-img {
-    max-height: 40px;
-  }
+}
 
-  .profile {
-    width: 36px;
-    height: 36px;
-  }
+@media (max-width: 900px) {
+
+    .header-container {
+        position: relative;
+        justify-content: center;
+    }
+
+    /* MENU (ESQUERDA) */
+    .menu-toggle {
+        position: absolute;
+        left: 15px;
+        display: flex;
+    }
+
+    /* LOGO (CENTRO REAL) */
+    .logo-link {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    /* BOTÃO DIREITA */
+    .btn-auth,
+    .profile-link {
+        position: absolute;
+        right: 15px;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        
+        max-height: 0;
+        overflow: hidden;
+
+        opacity: 0;
+        pointer-events: none;
+
+        transition: all 0.3s ease;
+    }
+
+    .navbar.active {
+        max-height: 400px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        border-bottom-color: transparent;
+        width: 100%;
+        text-align: left;
+    }
+
+    .nav-link:hover {
+        background-color: rgba(91, 158, 105, 0.1);
+    }
+
+    .ranking, .como-funciona, .impacto-ambiental, .artigos {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .timeline {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .timeline-connector {
+        width: 2px;
+        height: 50px;
+        margin: 10px 0;
+        flex: none;
+    }
+
+    .timeline-step {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .step-label {
+        margin-top: 0;
+        margin-left: 15px;
+        text-align: left;
+        max-width: none;
+    }
+
+    .ranking-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .ranking-side {
+        gap: 15px;
+    }
+
+    .btn-ranking-complete,
+    .btn-register-recycling {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    main h1 {
+        font-size: 24px;
+    }
 }
