@@ -22,11 +22,19 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastEmailCheckController = null;
   // marca que o email já foi verificado e está ok na etapa 1
   let emailValidatedAtStep = false;
+  // timestamp (ms) até quando suprimimos mensagens de erro de email (usado durante submit)
+  let suppressEmailErrorUntil = 0;
 
   
   async function verificarEmailExistente() {
   const emailValor = email.value.trim();
   console.log("Verificando email:", emailValor);
+
+  // se estivermos suprimindo mensagens (ex: durante submit/finalização), não mostrar erro
+  if (suppressEmailErrorUntil && Date.now() < suppressEmailErrorUntil) {
+    console.log('Verificação de email suprimida temporariamente');
+    return false;
+  }
 
   if (ignoreEmailChecks) {
     // durante o fluxo de sucesso (após criar conta) não queremos mostrar "email já cadastrado" por chamadas pendentes
@@ -472,6 +480,9 @@ document.addEventListener("DOMContentLoaded", function () {
     lastEmailCheckController = null;
   }
 
+  // suprimir mensagens de erro de email por alguns segundos (evita 'Essa conta já existe' vindo de requisições pendentes)
+  suppressEmailErrorUntil = Date.now() + 6000; // 6s, um pouco maior que o overlay
+
   const overlay = document.getElementById('mensagem-cadastrado');
 
   // limpar erro antigo de email
@@ -485,7 +496,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // mostrar overlay imediato com mensagem de criação
     if (overlay) {
       const popup = overlay.querySelector('.popup p');
-      if (popup) popup.textContent = 'Criando sua conta...';
+      if (popup) popup.textContent = 'Conta criada com sucesso!';
       overlay.classList.add('ativo');
     }
 

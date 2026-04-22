@@ -119,16 +119,16 @@ function converterParaKg(valor, unidade) {
 
 
     function verificarPreenchimento() {
-        const cepInput = document.getElementById("cep");
-        const quantidade = parseFloat(document.getElementById("quantidade").value);
+    const quantidade = parseFloat(document.getElementById("quantidade").value);
 
-        if (tipoSelecionado !== "" && quantidade > 0) {
-            cepInput.disabled = false; //ativa
-        } else {
-            cepInput.disabled = true; // desativa
-            cepInput.value = "";
+    if (tipoSelecionado === "" || !quantidade || quantidade <= 0) {
+        const erroCep = document.getElementById("erroCep");
+        if (erroCep) {
+            erroCep.innerText = "";
+            erroCep.className = "";
         }
     }
+}
 
 
 // selecionar material
