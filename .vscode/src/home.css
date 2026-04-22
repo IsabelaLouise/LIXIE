@@ -643,16 +643,28 @@ footer {
     width: 100%;
     padding: 20px;
     background: #ede8d0;
+    position: relative;
 
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 
     color: #6b7b6b;
     font-size: 14px;
 }
 
+/* texto central */
+footer span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* botão sair fixo à direita */
 .logout-footer {
+    position: absolute;
+    right: 20px;
+
     text-decoration: none;
     color: #c0392b;
     font-weight: 600;
