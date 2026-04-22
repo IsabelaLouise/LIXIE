@@ -14,7 +14,7 @@
 </head>
 <body>
 
-  <header>
+ <header>
         <div class="header-container">
             <a href="/.vscode/src/homeLogado.html" class="logo-link">
                 <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
@@ -25,7 +25,7 @@
             </button>
 
             <nav class="navbar" id="navbar">
-                <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
+                <a href="/.vscode/src/homeLogado.html" class="nav-link ">Home</a>
                 <a href="/.vscode/src/ranking.html" class="nav-link active">Ranking</a>
                 <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
                 <a href="#" class="nav-link">Mapa de Coleta</a>
@@ -89,36 +89,6 @@
 
   <script src="ranking.js"></script>
 
-   <script>
-        // MENU MOBILE TOGGLE
-        const menuToggle = document.getElementById('menuToggle');
-        const navbar = document.getElementById('navbar');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        // Toggle menu ao clicar no botão
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                navbar.classList.toggle('active');
-                menuToggle.classList.toggle('active');
-            });
-        }
-
-        // Fechar menu ao clicar em um link
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navbar.classList.remove('active');
-                menuToggle.classList.remove('active');
-            });
-        });
-
-        // Fechar menu ao redimensionar para desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                navbar.classList.remove('active');
-                menuToggle.classList.remove('active');
-            }
-        });
-    </script>
 
 </body>
 </html>

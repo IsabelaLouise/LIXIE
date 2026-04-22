@@ -1,12 +1,48 @@
-// 1. TENTA LER o email que deveria estar salvo
-// home.js - ALTERE A PRIMEIRA LINHA
-const email = localStorage.getItem('email');
+// home.js - Arquivo único para homeNaoLogado.html e homeLogado.html
 
-if (!email || email === "undefined" || email === null) {
+console.log("Home carregada!");
+
+// MENU MOBILE TOGGLE (comum a ambas)
+const menuToggle = document.getElementById('menuToggle');
+const navbar = document.getElementById('navbar');
+const navLinks = document.querySelectorAll('.nav-link');
+
+// Toggle menu ao clicar no botão
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        navbar.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+}
+
+// Fechar menu ao clicar em um link
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
+    });
+});
+
+// Fechar menu ao redimensionar para desktop
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
+    }
+});
+
+// VERIFICAR SE USUÁRIO ESTÁ LOGADO
+const email = localStorage.getItem('email');
+const usuarioLogado = email && email !== "undefined" && email !== null;
+
+// REDIRECIONAMENTO SE NÃO LOGADO NA PÁGINA LOGADA
+if (window.location.pathname.includes('homeLogado.html') && !usuarioLogado) {
     console.log("Acesso negado! Redirecionando...");
     window.location.href = "homeNaoLogado.html";
-} else {
+}
 
+// FUNÇÕES PARA USUÁRIO LOGADO
+if (usuarioLogado) {
     // DADOS DO USUÁRIO
     fetch("https://lixie-production.up.railway.app/dados-usuario", {
         method: "POST",
@@ -23,7 +59,7 @@ if (!email || email === "undefined" || email === null) {
     })
     .catch(err => console.error("Erro ao conectar ao Railway:", err));
 
-    // ✅ FOTO DO USUÁRIO (AGORA NO LUGAR CERTO)
+    // FOTO DO USUÁRIO
     fetch("https://lixie-production.up.railway.app/perfil", {
         method: "POST",
         headers: {
@@ -34,7 +70,6 @@ if (!email || email === "undefined" || email === null) {
     .then(res => res.json())
     .then(usuario => {
         const fotoHome = document.getElementById("fotoHome");
-
         if (usuario.foto && usuario.foto.trim().startsWith("http")) {
             fotoHome.src = usuario.foto.trim();
         } else {
@@ -44,7 +79,7 @@ if (!email || email === "undefined" || email === null) {
     .catch(err => console.error("Erro ao carregar foto:", err));
 }
 
-
+// FUNÇÃO LOGOUT
 function logout() {
     // remove possíveis flags de sessão e evita prompt de unload
     try { window.onbeforeunload = null; } catch (e) { /* ignore */ }
@@ -52,13 +87,20 @@ function logout() {
     localStorage.removeItem("email");
     // use replace para não deixar histórico de página de sessão
     window.location.replace('/.vscode/src/homeNaoLogado.html');
+    window.location.href = "/homeNaoLogado.html";
 }
 
-// CARREGAR RANKING NA HOME LOGADA
-async function carregarRankingHomeLogada() {
+// CARREGAR RANKING 
+async function carregarRankingHome() {
     const container = document.querySelector('#home-ranking-lista');
     
     if (!container) return;
+
+    container.innerHTML = `
+        <div class="loading">
+            <p>Carregando ranking...</p>
+        </div>
+    `;
 
     try {
         const response = await fetch('https://lixie-production.up.railway.app/ranking', {
@@ -69,6 +111,7 @@ async function carregarRankingHomeLogada() {
         });
 
         const dados = await response.json();
+        console.log('Dados do ranking:', dados);  // Adicione esta linha para verificar
 
         container.innerHTML = '';
 
@@ -77,8 +120,8 @@ async function carregarRankingHomeLogada() {
             return;
         }
 
-        // Mostrar apenas top 5
         dados.slice(0, 5).forEach((user, index) => {
+            console.log('Usuário:', user);  // Adicione esta linha para verificar cada usuário
             container.innerHTML += `
                 <div class="rank-item">
                     <div class="rank-left">
@@ -94,17 +137,18 @@ async function carregarRankingHomeLogada() {
         container.innerHTML = `
             <div class="error-message">
                 <p>❌ Erro ao carregar o ranking.</p>
+                <p>Tente novamente mais tarde.</p>
             </div>
         `;
     }
 }
 
-// CARREGAR PROGRESSO DO USUÁRIO NA HOME LOGADA
+// FUNÇÕES ESPECÍFICAS PARA LOGADO
 async function carregarProgressoHomeLogada() {
-    const email = localStorage.getItem("email");
+    if (!usuarioLogado) return;
+    
     const container = document.getElementById("home-progresso-usuario");
-
-    if (!container || !email) return;
+    if (!container) return;
 
     try {
         const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
@@ -121,7 +165,6 @@ async function carregarProgressoHomeLogada() {
         container.innerHTML = `
             <p class="progress-text">Você está em: <strong>${dados.nivel}º Lugar</strong></p>
             <p><strong>${dados.pontos} Pontos</strong></p>
-
             <div class="progress-bar">
                 <div class="progress" style="width: ${porcentagem}%"></div>
             </div>
@@ -132,12 +175,11 @@ async function carregarProgressoHomeLogada() {
     }
 }
 
-// CARREGAR DADOS DE RECICLAGEM DESSA SEMANA
 async function carregarReciclagemsemana() {
-    const email = localStorage.getItem("email");
+    if (!usuarioLogado) return;
+    
     const container = document.getElementById("home-reciclagens-semana");
-
-    if (!container || !email) return;
+    if (!container) return;
 
     try {
         const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
@@ -160,12 +202,11 @@ async function carregarReciclagemsemana() {
     }
 }
 
-// CARREGAR RECOMPENSAS GANHAS
 async function carregarRecompensas() {
-    const email = localStorage.getItem("email");
+    if (!usuarioLogado) return;
+    
     const container = document.getElementById("home-recompensas-ganhas");
-
-    if (!container || !email) return;
+    if (!container) return;
 
     try {
         const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
@@ -188,14 +229,26 @@ async function carregarRecompensas() {
     }
 }
 
-// CARREGAR TUDO QUANDO O DOM ESTIVER PRONTO
+// EVENT LISTENERS PARA BOTÕES
 document.addEventListener("DOMContentLoaded", () => {
-    carregarRankingHomeLogada();
-    carregarProgressoHomeLogada();
-    carregarReciclagemsemana();
-    carregarRecompensas();
+    const btnRankingComplete = document.querySelector('.btn-ranking-complete');
+    const btnRegisterRecycling = document.querySelector('.btn-register-recycling');
 
-    // EFEITO FADE-IN NO SCROLL
+    if (btnRankingComplete) {
+        btnRankingComplete.addEventListener('click', () => {
+            window.location.href = usuarioLogado ? '/.vscode/src/ranking.html' : '/.vscode/src/cadastrese.html';
+        });
+    }
+
+    if (btnRegisterRecycling) {
+        btnRegisterRecycling.addEventListener('click', () => {
+            window.location.href = usuarioLogado ? '/.vscode/src/registrarReciclagem.html' : '/.vscode/src/cadastrese.html';
+        });
+    }
+});
+
+// EFEITO FADE-IN NO SCROLL (comum)
+document.addEventListener("DOMContentLoaded", () => {
     const sections = document.querySelectorAll('.ranking, .como-funciona, .impacto-ambiental, .artigos');
 
     const observer = new IntersectionObserver((entries) => {
@@ -212,3 +265,69 @@ document.addEventListener("DOMContentLoaded", () => {
         observer.observe(section);
     });
 });
+
+// ANIMAÇÃO DE NÚMEROS (IMPACTO)
+function animarNumeros() {
+    const numeros = document.querySelectorAll('.impacto-numero');
+
+    numeros.forEach(numero => {
+        const target = +numero.getAttribute('data-target');
+        let count = 0;
+
+        const update = () => {
+            const increment = target / 60;
+            if (count < target) {
+                count += increment;
+                numero.innerText = Math.ceil(count);
+                requestAnimationFrame(update);
+            } else {
+                numero.innerText = target + "+";
+            }
+        };
+
+        update();
+    });
+}
+
+// INTERSECTION OBSERVER PARA ANIMAÇÃO
+document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll('.impacto-ambiental');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animarNumeros();
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    sections.forEach(section => observer.observe(section));
+});
+
+// CARREGAR DADOS AO CARREGAR PÁGINA
+document.addEventListener("DOMContentLoaded", () => {
+    carregarRankingHome();
+    
+    if (usuarioLogado) {
+        carregarProgressoHomeLogada();
+        carregarReciclagemsemana();
+        carregarRecompensas();
+    }
+});
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const confirmar = confirm("Deseja realmente sair?");
+        if (!confirmar) return;
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.href = "/.vscode/src/home.html";
+    });
+}
