@@ -641,12 +641,30 @@ main h1 {
 /* FOOTER */
 footer {
     width: 100%;
-    text-align: center;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.9);
+    background: #ede8d0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
     color: #6b7b6b;
     font-size: 14px;
-    margin-top: auto;
+}
+
+.logout-footer {
+    text-decoration: none;
+    color: #c0392b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.logout-footer:hover {
+    color: #922b21;
+    transform: scale(1.05);
 }
 
 /* ===== COMO FUNCIONA ===== */
