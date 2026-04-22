@@ -1,30 +1,136 @@
-let tipoSelecionado = "";
-let pontosTotais = 0;
+document.addEventListener('DOMContentLoaded', () => {
+  // MENU MOBILE TOGGLE (comum a ambas) - protegido por DOMContentLoaded
+  const menuToggle = document.getElementById('menuToggle');
+  const navbar = document.getElementById('navbar');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-// pontos por material (base em KG)
+  // Toggle menu ao clicar no botão
+  if (menuToggle && navbar) {
+    menuToggle.addEventListener('click', () => {
+      navbar.classList.toggle('active');
+      menuToggle.classList.toggle('active');
+    });
+  }
+
+  // Fechar menu ao clicar em um link
+  if (navLinks && navLinks.length) {
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (navbar) navbar.classList.remove('active');
+        if (menuToggle) menuToggle.classList.remove('active');
+      });
+    });
+  }
+
+  // Fechar menu ao redimensionar para desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      if (navbar) navbar.classList.remove('active');
+      if (menuToggle) menuToggle.classList.remove('active');
+    }
+  });
+
+  // FOTO DO USUÁRIO (se estiver logado)
+  const email = localStorage.getItem('email');
+  if (email) {
+    fetch("https://lixie-production.up.railway.app/perfil", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(usuario => {
+      const fotoHome = document.getElementById("fotoHome");
+      if (!fotoHome) return;
+      if (usuario.foto && usuario.foto.trim().startsWith("http")) {
+        fotoHome.src = usuario.foto.trim();
+      } else {
+        fotoHome.src = "img/avatar.png";
+      }
+    })
+    .catch(err => console.error("Erro ao carregar foto:", err));
+  }
+
+  let tipoSelecionado = "";
+  let pontosTotais = 0;
+  let cepValido = false;
+
+  // material e quantidade
+  const quantidadeEl = document.getElementById("quantidade");
+  if (quantidadeEl) {
+    quantidadeEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+
+        const quantidade = parseFloat(document.getElementById("quantidade").value);
+        const resultado = document.getElementById("resultado");
+
+        if (!tipoSelecionado) {
+          if (resultado) {
+            resultado.className = "erro";
+            resultado.innerHTML =  "⚠️ Selecione um material primeiro!";
+          }
+          return;
+        }
+
+        if (!quantidade || quantidade <= 0) {
+          if (resultado) {
+            resultado.className = "erro";
+            resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
+          }
+          return;
+        }
+
+        if (resultado) {
+          resultado.innerHTML = "";
+          resultado.className = "";
+        }
+
+        const cepInput = document.getElementById("cep");
+        if (cepInput) cepInput.focus();
+        verificarPreenchimento();
+      }
+    });
+  }
+
+// pontos por material
 const pontosPorMaterial = {
-  plastico: 10,
-  papel: 4,
-  vidro: 8,
+  plastico: 8,
+  papel: 3,
+  vidro: 6,
   metal: 15,
-  organico: 6
+  organico: 7,
+  pilhas: 10,
+  eletronicos: 20,
+  tampinha: 2,
+  cartela: 5,
+  capsula: 4,
 };
 
-// converter para KG
+// converter
 function converterParaKg(valor, unidade) {
   switch (unidade) {
-    case "g":
-      return valor / 1000;
-    case "kg":
-      return valor;
-    case "ton":
-      return valor * 1000;
-    case "un":
-      return valor; // pode ajustar depois
-    default:
-      return valor;
+    case "g": return valor / 1000;
+    case "kg": return valor;
+    case "ton": return valor * 1000;
+    case "un": return valor;
+    default: return valor;
   }
 }
+
+// verificação de preenchimento
+    function verificarPreenchimento() {
+    const quantidade = parseFloat(document.getElementById("quantidade").value);
+
+    if (tipoSelecionado === "" || !quantidade || quantidade <= 0) {
+        const erroCep = document.getElementById("erroCep");
+        if (erroCep) {
+            erroCep.innerText = "";
+            erroCep.className = "";
+        }
+    }
+}
+
 
 // selecionar material
 document.querySelectorAll("#materiais button").forEach(btn => {
@@ -33,34 +139,47 @@ document.querySelectorAll("#materiais button").forEach(btn => {
 
     document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
     btn.classList.add("ativo");
+
+    verificarPreenchimento();
   });
 });
 
-// enviar formulário
+// submit
 document.getElementById("formReciclagem").addEventListener("submit", (e) => {
   e.preventDefault();
 
   const quantidade = parseFloat(document.getElementById("quantidade").value);
   const unidade = document.getElementById("unidade").value;
   const resultado = document.getElementById("resultado");
+  const erroCep = document.getElementById("erroCep");
 
+  resultado.innerHTML = "";
+  resultado.className = "";
+  erroCep.innerHTML = "";
+  erroCep.className = "";
+  
   // validações
   if (!tipoSelecionado) {
     resultado.className = "erro";
-    resultado.innerText = "⚠️ Selecione um material!";
+    resultado.innerHTML = "⚠️ Selecione um material!";
     return;
   }
 
   if (!quantidade || quantidade <= 0) {
     resultado.className = "erro";
-    resultado.innerText = "⚠️ Digite uma quantidade válida!";
+    resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
     return;
   }
 
-  // CONVERSÃO CORRETA
+  if (!cepValido) {
+    erroCep.className = "erro";
+    erroCep.innerHTML = "⚠️ Finalize o CEP antes de registrar";
+    return;
+  }
+
+  // cálculo
   const quantidadeKg = converterParaKg(quantidade, unidade);
 
-  // CÁLCULO CORRETO
   const pontos = Math.round(
     quantidadeKg * (pontosPorMaterial[tipoSelecionado] || 0)
   );
@@ -69,36 +188,43 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
 
   atualizarPainel();
 
-  // mensagem final
+  // sucesso
   resultado.className = "sucesso";
   let mensagem = `
   ✅ Registrado com sucesso! <br>
   ♻️ Material: ${tipoSelecionado} <br>
   ⚖️ Quantidade: ${quantidade} ${unidade} <br>
-`;
+  `;
 
-if (unidade !== "un") {
-  mensagem += `📦 Equivalente: ${quantidadeKg.toFixed(2)} kg <br>`;
-}
+  if (unidade !== "un") {
+    mensagem += `📦 Equivalente: ${quantidadeKg.toFixed(2)} kg <br>`;
+  }
 
-mensagem += `⭐ Pontos ganhos: ${pontos}`;
+  mensagem += `⭐ Pontos ganhos: ${pontos}`;
 
-resultado.innerHTML = mensagem;
+  resultado.innerHTML = mensagem;
+  resultado.style.display = "block";
 
-  // limpar formulário
+  // limpar
   document.getElementById("quantidade").value = "";
+  document.getElementById("cep").value = "";
+  document.getElementById("foto").value = "";
+  erroCep.innerText = "";
+  erroCep.className = "";
+  cepValido = false;
   tipoSelecionado = "";
   document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
 });
 
-
-// 🔥 AGORA FORA DO SUBMIT (CORRETO)
+// painel
 function atualizarPainel() {
   const nivelEl = document.getElementById("nivel");
   const pontosEl = document.getElementById("pontos");
   const barra = document.getElementById("barraProgresso");
 
-  pontosEl.innerText = `Pontos: ${pontosTotais}`;
+  if (pontosEl) {
+    pontosEl.innerText = `Pontos: ${pontosTotais}`;
+  }
 
   let nivel = "Iniciante 🌱";
   let progresso = pontosTotais;
@@ -116,53 +242,69 @@ function atualizarPainel() {
     progresso = pontosTotais - 600;
   }
 
-  nivelEl.innerText = `Nível: ${nivel}`;
+  if (nivelEl) {
+    nivelEl.innerText = `Nível: ${nivel}`;
+  }
 
-  let porcentagem = (progresso / 100) * 100;
-  if (porcentagem > 100) porcentagem = 100;
-
-  barra.style.width = porcentagem + "%";
+  if (barra) {
+    let porcentagem = (progresso / 100) * 100;
+    if (porcentagem > 100) porcentagem = 100;
+    barra.style.width = porcentagem + "%";
+  }
 }
 
+// CEP
+const cep = document.getElementById("cep");
+const erroCep = document.getElementById("erroCep");
 
-document.getElementById("cep").addEventListener("input", async (e) => {
+cep.addEventListener("input", async (e) => {
 
-    let valor = e.target.value;
+  let valor = e.target.value;
 
-    // limpa
-    valor = valor.replace(/\D/g, "");
+  valor = valor.replace(/\D/g, "");
+  valor = valor.slice(0, 8);
 
-    // limita
-    valor = valor.slice(0, 8);
+  if (valor.length > 5) {
+    valor = valor.slice(0, 5) + "-" + valor.slice(5);
+  }
 
-    // formata
-    if (valor.length > 5) {
-        valor = valor.slice(0, 5) + "-" + valor.slice(5);
+  e.target.value = valor;
+
+  const cepLimpo = valor.replace(/\D/g, "");
+
+  cepValido = false;
+
+  if (cepLimpo.length === 8) {
+
+    // erroCep.className = "loading";
+    //erroCep.innerText = "🔄 Buscando CEP...";
+
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await res.json();
+
+      if (data.erro) {
+        erroCep.className = "erro";
+        erroCep.innerText = "❌ CEP não encontrado!";
+        return;
+      }
+
+      e.target.value = `${data.logradouro} - ${data.localidade}, ${data.uf}`;
+
+     // erroCep.className = "sucesso";
+     // erroCep.innerText = "✔️ CEP encontrado";
+
+      cepValido = true;
+
+    } catch {
+      erroCep.className = "erro";
+      erroCep.innerText = "❌ Erro ao buscar CEP";
     }
 
-    e.target.value = valor;
+  } else {
+    erroCep.innerText = "";
+    erroCep.className = "";
+  }
+});
 
-    // cria o cep limpo
-    const cepLimpo = valor.replace(/\D/g, "");
-
-    // SÓ entra quando tiver 8 dígitos
-    if (cepLimpo.length === 8) {
-
-        e.target.value = "Buscando...";
-
-        try {
-            const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-            const data = await res.json();
-
-            if (data.erro) {
-                e.target.value = "CEP não encontrado";
-                return;
-            }
-
-            e.target.value = `${data.logradouro} - ${data.localidade}`;
-
-        } catch (erro) {
-            e.target.value = "Erro ao buscar CEP";
-        }
-    }
 });

@@ -12,11 +12,9 @@ body {
     min-height: 100vh;
     color: #333;
     overflow-x: hidden;
-    background:
-        radial-gradient(circle at top left, rgba(91,158,105,0.16), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(14, 70, 30, 0.08), transparent 32%),
-        linear-gradient(135deg, #e8f5e9 0%, #f7f9f6 45%, #f0f0f0 100%);
+    background:#ede8d0;
 }
+        
 
 /*LAYOUT*/
 main {
@@ -501,6 +499,8 @@ dialog {
     width: 100%;
     max-width: 500px;
     margin: auto;
+    /* colocar diálogo abaixo das overlays de notificação */
+    z-index: 10000;
 }
 
 dialog::backdrop {
@@ -509,25 +509,34 @@ dialog::backdrop {
 
 #btn-fechar-modal {
     position: absolute;
-    top: 8px;
+    top: 10px;
     right: 15px;
-    cursor: pointer;
-    text-decoration: none;
-    width: 4%;
-    height: 31px; 
-    padding: 0 16px;
-    border-radius: 50px;
-    font-size: 15px;
-    font-weight: bold;
-    background: rgba(72, 159, 88, 0.08);
-    color: #5b9e69;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
     border: none;
+
+    background: rgba(91, 158, 105, 0.15);
+    color: #5b9e69;
+
+    font-size: 16px;
+    font-weight: bold;
+
     cursor: pointer;
-    margin-top: 8px;
-    transition: 0.2s;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    transition: 0.2s;
+}
+
+#btn-fechar-modal:hover {
+    background: rgba(91, 158, 105, 0.3);
+    transform: scale(1.1);
+}
 /* OVERLAY ESCURO FUNDO */
 .overlay {
     display: none;
@@ -542,7 +551,8 @@ dialog::backdrop {
     align-items: center;
     justify-content: center;
 
-    z-index: 9999;
+    /* garantir que overlays (mensagens) fiquem acima de dialogs */
+    z-index: 20000 !important;
 }
 
 /* CAIXA CENTRAL */
@@ -614,4 +624,34 @@ dialog::backdrop {
     background-color: #4CAF50;
     color: white;
 }
+
+#btn-fechar-senha {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+    border: none;
+
+    background: rgba(91, 158, 105, 0.15);
+    color: #5b9e69;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+#btn-fechar-senha:hover {
+    background: rgba(91, 158, 105, 0.3);
+    transform: scale(1.1);
 }

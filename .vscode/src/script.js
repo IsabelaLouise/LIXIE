@@ -16,8 +16,86 @@ document.addEventListener("DOMContentLoaded", function () {
   const pages = document.querySelectorAll(".form-page");
   const steps = document.querySelectorAll(".stepper .step");
   let currentPage = 0;
+  // flag para ignorar verificações de email quando estamos no fluxo de sucesso
+  let ignoreEmailChecks = false;
+  // controller para cancelar verificações de email pendentes
+  let lastEmailCheckController = null;
+  // marca que o email já foi verificado e está ok na etapa 1
+  let emailValidatedAtStep = false;
+  // timestamp (ms) até quando suprimimos mensagens de erro de email (usado durante submit)
+  let suppressEmailErrorUntil = 0;
+
+  
+  async function verificarEmailExistente() {
+    if (currentPage !== 0 || ignoreEmailChecks || (suppressEmailErrorUntil && Date.now() < suppressEmailErrorUntil)) {
+    return false;
+  }
+  const emailValor = email.value.trim();
+  console.log("Verificando email:", emailValor);
+
+  // se estivermos suprimindo mensagens (ex: durante submit/finalização), não mostrar erro
+  if (suppressEmailErrorUntil && Date.now() < suppressEmailErrorUntil) {
+    console.log('Verificação de email suprimida temporariamente');
+    return false;
+  }
+
+  if (ignoreEmailChecks) {
+    // durante o fluxo de sucesso (após criar conta) não queremos mostrar "email já cadastrado" por chamadas pendentes
+    console.log("Verificação de email ignorada por flag (fluxo de sucesso).");
+    return false;
+  }
+
+  // cancelar verificação anterior (se houver) para evitar respostas fora de ordem
+  if (lastEmailCheckController) {
+    try { lastEmailCheckController.abort(); } catch (e) { /* ignorar */ }
+  }
+  lastEmailCheckController = new AbortController();
+  const signal = lastEmailCheckController.signal;
+
+  
+  try {
+    const formData = new URLSearchParams();
+    formData.append("email", emailValor);
+
+    const resposta = await fetch("https://lixie-production.up.railway.app/verificar-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+      body: formData,
+      signal
+    });
+
+    const dados = await resposta.json();
+    console.log("Resposta do servidor:", dados);
+    
+    if (dados.existe) {
+      // só mostrar o erro de 'conta já existe' quando estivermos na etapa 1 (email) e não estivermos no fluxo de sucesso
+      if (!ignoreEmailChecks && currentPage === 0) {
+        mostrarErro(email, "erro-email", "Essa conta já existe!");
+      }
+      lastEmailCheckController = null;
+      return true;
+    }
+
+    lastEmailCheckController = null;
+    return false; // não existe
+
+  } catch (e) {
+    console.log("Erro", e);
+    if (e.name === 'AbortError') {
+      // verificação abortada por nova requisição ou por submissão; tratar como 'não existe' silencioso
+      return false;
+    }
+    mostrarMensagem("❌ Erro ao verificar email!", "erro");
+    return true // bloqueia por segurança
+  }
+}
 
   function mostrarErro(input, idErro, mensagem) {
+    // Se for o campo de email e não estivermos na primeira página, não faça nada
+    if (input.id === "email" && currentPage !== 0) return;
+
     input.classList.remove("sucesso");
     input.classList.add("erro");
 
@@ -183,14 +261,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function irParaProximaPagina() {
-    const validacoes = [validarEmail, validarDadosPessoais, validarCepPagina, validarSenhaPagina];
-    if (validacoes[currentPage] && validacoes[currentPage]()) {
-      if (currentPage < pages.length - 1) {
-        currentPage += 1;
-        mostrarPagina(currentPage);
+  const validacoes = [validarEmail, validarDadosPessoais, validarCepPagina, validarSenhaPagina];
+  if (validacoes[currentPage] && validacoes[currentPage]()) {
+    if (currentPage < pages.length - 1) {
+      
+      // LIMPEZA AGRESSIVA DO ERRO DE EMAIL
+      const erroEmail = document.getElementById('erro-email');
+      if (erroEmail) {
+        erroEmail.textContent = '';
+        erroEmail.classList.remove('ativo');
       }
+      email.classList.remove('erro');
+      email.classList.add('sucesso'); // Mantém verde se quiser, ou apenas remove erro
+
+      currentPage += 1;
+      mostrarPagina(currentPage);
     }
   }
+}
 
   function irParaPaginaAnterior() {
     if (currentPage > 0) {
@@ -199,7 +287,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  document.getElementById("page1Next").addEventListener("click", irParaProximaPagina);
+  document.getElementById("page1Next").addEventListener("click", async () => {
+    if (!validarEmail()) return; //valida
+    const existe = await verificarEmailExistente(); //verifica
+    if (existe) return; //bloqueia
+
+    // se chegou aqui, o email foi verificado e está ok
+    emailValidatedAtStep = true;
+
+    irParaProximaPagina();
+});
+
   document.getElementById("page2Prev").addEventListener("click", irParaPaginaAnterior);
   document.getElementById("page2Next").addEventListener("click", irParaProximaPagina);
   document.getElementById("page3Prev").addEventListener("click", irParaPaginaAnterior);
@@ -228,9 +326,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+// limpa quando o usuario erra
   email.addEventListener("input", () => {
-    validarEmail();
-  });
+  validarEmail();
+
+  // limpa erro enquanto digita
+  email.classList.remove("erro");
+  const erro = document.getElementById("erro-email");
+  erro.textContent = "";
+  erro.classList.remove("ativo");
+  // se o usuário editou o email, invalidar checagem anterior
+  emailValidatedAtStep = false;
+});
+
+  email.addEventListener("blur", async () => {
+    if (ignoreEmailChecks || currentPage !== 0) return;
+
+      if (!validarEmail()) return;
+
+      const existe = await verificarEmailExistente();
+
+      if(!existe) {
+        sucessoInput(email, "erro-email");
+      }
+    });
+
 
   data.addEventListener("input", function (e) {
     let v = e.target.value.replace(/\D/g, "");
@@ -357,14 +477,44 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
+    // 1. Bloqueia qualquer verificação de e-mail futura IMEDIATAMENTE
+    ignoreEmailChecks = true;
+    suppressEmailErrorUntil = Date.now() + 10000; 
+
+    // Limpa visualmente o erro de e-mail antes de validar
+    const erroEmail = document.getElementById("erro-email");
+    if (erroEmail) {
+      erroEmail.textContent = "";
+      erroEmail.classList.remove("ativo");
+    }
+    email.classList.remove("erro");
+
+    // 2. Validações locais
     if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
+      ignoreEmailChecks = false; 
+      suppressEmailErrorUntil = 0;
       mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
       return;
     }
 
+    // 3. Cancela qualquer requisição de verificação que ainda esteja "voando"
+    if (lastEmailCheckController) {
+      try { lastEmailCheckController.abort(); } catch (err) {}
+      lastEmailCheckController = null;
+    }
+
+    const overlay = document.getElementById('mensagem-cadastrado');
+
     try {
+      // Mostrar overlay imediato
+      if (overlay) {
+        const popup = overlay.querySelector('.popup p');
+        if (popup) popup.textContent = 'Conta criada com sucesso!';
+        overlay.classList.add('ativo');
+      }
+
       const formData = new URLSearchParams(new FormData(form));
 
       const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
@@ -376,37 +526,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (resposta.ok) {
         localStorage.setItem('cadastroEmail', email.value.trim());
-        mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
-        form.reset();
-        limparFormulario();
-        currentPage = 0;
-        mostrarPagina(currentPage);
+
         setTimeout(() => {
-      window.location.href = "/login.html";
-      }, 1500);
+          if (overlay) overlay.classList.remove('ativo');
+          window.location.href = "/.vscode/src/login.html";
+        }, 5000);
+
       } else {
+        // Se o servidor retornar erro real, liberamos as checagens e fechamos o overlay
+        ignoreEmailChecks = false;
+        suppressEmailErrorUntil = 0;
+        if (overlay) overlay.classList.remove('ativo');
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
       }
+
     } catch (erro) {
+      ignoreEmailChecks = false;
+      if (overlay) overlay.classList.remove('ativo');
       mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
     }
   });
 
-  const campos = document.querySelectorAll("#formCadastro input");
-  campos.forEach((campo, index) => {
-    campo.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const proximo = campos[index + 1];
-        if (proximo) {
-          proximo.focus();
-        }
+const campos = document.querySelectorAll("#formCadastro input");
+campos.forEach((campo, index) => {
+  campo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const proximo = campos[index + 1];
+      if (proximo) {
+        proximo.focus();
       }
-    });
+    }
   });
-
-  mostrarPagina(currentPage);
 });
+
+mostrarPagina(currentPage);
 
 function toggleSenha() {
   const senha = document.getElementById("senha");
@@ -436,22 +590,22 @@ function toggleSenha() {
   }
 }
 
-function limparFormulario() {
-  const inputs = document.querySelectorAll("#formCadastro input");
-  inputs.forEach(input => {
-    input.classList.remove("sucesso", "erro");
-  });
+  function limparFormulario() {
+    const inputs = document.querySelectorAll("#formCadastro input");
+    inputs.forEach(input => {
+      input.classList.remove("sucesso", "erro");
+    });
 
-  const erros = document.querySelectorAll(".erro-texto");
-  erros.forEach(e => {
-    e.textContent = "";
-    e.classList.remove("ativo");
-  });
+    const erros = document.querySelectorAll(".erro-texto");
+    erros.forEach(e => {
+      e.textContent = "";
+      e.classList.remove("ativo");
+    });
 
-  const requisitos = document.getElementById("requisitosSenha");
-  if (requisitos) requisitos.style.display = "none";
+    const requisitos = document.getElementById("requisitosSenha");
+    if (requisitos) requisitos.style.display = "none";
 
-  const mensagem = document.getElementById("mensagem");
-  mensagem.style.display = "none";
-}
-
+    const mensagem = document.getElementById("mensagem");
+    mensagem.style.display = "none";
+  }
+});

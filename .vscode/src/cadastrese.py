@@ -101,6 +101,15 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 complemento = dados.get("complemento", [""])[0].strip() or None
                 senha = dados.get("senha", [""])[0].encode('utf-8')
 
+                # 🔍 Verifica se email já existe
+                cursor.execute("SELECT Email FROM Usuario WHERE Email = %s", (email,))
+                if cursor.fetchone():
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"erro": "Essa conta já existe"}).encode())
+                    return
+                
                 # 🔐 HASH
                 senha_hash = bcrypt.hashpw(senha, bcrypt.gensalt())
 
@@ -163,22 +172,18 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                # 🔍 BUSCA PELO EMAIL
                 cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
                 resultado = cursor.fetchone()
 
-                # ❌ EMAIL NÃO EXISTE
                 if resultado is None:
-                    resposta = {"sucesso": False, "mensagem": "Email incorreto"}
-
+                    resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
 
-                    # 🔐 VERIFICA SENHA
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {"sucesso": True, "mensagem": "Login realizado"}
                     else:
-                        resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+                        resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
@@ -186,7 +191,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
-                print(f"Erro no Esqueci Senha: {e}") # Isso vai aparecer nos logs do Railway
+                print(f"Erro no Esqueci Senha: {e}") 
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
@@ -207,18 +212,35 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
+            # buscar dados do usuário (tratar NULLs na pontuação)
             cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_, Nivel 
+                SELECT Nome, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos, Nivel
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
             usuario = cursor.fetchone()
 
-            resposta = {
-                "nome": usuario[0],
-                "pontos": usuario[1],
-                "nivel": usuario[2]
-            }
+            if not usuario:
+                resposta = {"nome": "", "pontos": 0, "nivel": "", "posicao": None}
+            else:
+                pontos_usuario = usuario[1]
+                # calcular posição do usuário no ranking geral de forma robusta
+                try:
+                    cursor.execute(
+                        "SELECT COUNT(*) FROM Usuario WHERE (COALESCE(Pontuacao_Total_Acumulada_, 0) > %s) OR (COALESCE(Pontuacao_Total_Acumulada_, 0) = %s AND Email < %s)",
+                        (pontos_usuario, pontos_usuario, email)
+                    )
+                    maior_count = cursor.fetchone()[0]
+                    posicao = maior_count + 1
+                except Exception:
+                    posicao = None
+
+                resposta = {
+                    "nome": usuario[0],
+                    "pontos": pontos_usuario,
+                    "nivel": usuario[2],
+                    "posicao": posicao
+                }
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
@@ -337,8 +359,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                             server.starttls() 
                             server.login(meu_email, minha_senha)
                             server.sendmail(meu_email, email_destino, mensagem.as_string())
-                        
-                        # Se chegou aqui, deu certo
+
                         resposta = {"sucesso": True}
                         
                     except Exception as e:
@@ -414,7 +435,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Pontuacao_Total_Acumulada_
+                SELECT Nome, Email, Pontuacao_Total_Acumulada_
                 FROM Usuario
                 ORDER BY Pontuacao_Total_Acumulada_ DESC
                 LIMIT 10
@@ -427,7 +448,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 ranking.append({
                 "posicao": i + 1,
                 "nome": user[0],
-                "pontos": user[1]
+                "pontos": user[2]
                 })
 
             self.send_response(200)
@@ -437,6 +458,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             cursor.close()
             conexao.close()
+
+            
+
 
 
         elif self.path == '/perfil':
@@ -674,6 +698,134 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     # Caso a resposta JSON falhe, apenas finalize com 500
                     self.send_response(500)
                     self.end_headers()
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
+        
+        elif self.path == '/deletar-conta':
+            content_length = int(self.headers['Content-Length'])
+            corpo = self.rfile.read(content_length)
+
+            dados = json.loads(corpo.decode())
+
+            email = dados.get("email")
+            senha = dados.get("senha").encode('utf-8')
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            try:
+                # 🔍 busca senha do usuário
+                cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    resposta = {"sucesso": False, "mensagem": "Usuário não encontrado"}
+
+                else:
+                    senha_hash = resultado[0].encode('utf-8')
+
+                    # 🔐 compara senha digitada com hash
+                    if bcrypt.checkpw(senha, senha_hash):
+
+                        # 🗑️ deleta usuário
+                        cursor.execute("DELETE FROM Usuario WHERE Email = %s", (email,))
+                        conexao.commit()
+
+                        resposta = {"sucesso": True}
+
+                    else:
+                        resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(resposta).encode())
+
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "erro": str(e)}).encode())
+
+            finally:
+                cursor.close()
+                conexao.close()
+
+        elif self.path == '/trocar-senha':
+            # Endpoint para alterar senha a partir do perfil (requisição JSON)
+            content_length = int(self.headers.get('Content-Length', 0))
+            corpo = self.rfile.read(content_length)
+
+            try:
+                dados = json.loads(corpo.decode())
+            except Exception:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "JSON inválido"}).encode())
+                return
+
+            email = dados.get('email')
+            senha_atual = dados.get('senhaAtual', '').encode('utf-8')
+            nova_senha = dados.get('novaSenha', '').encode('utf-8')
+
+            if not email or not senha_atual or not nova_senha:
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"sucesso": False, "mensagem": "Dados insuficientes"}).encode())
+                return
+
+            conexao = None
+            try:
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
+
+                # busca hash atual
+                cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
+                resultado = cursor.fetchone()
+
+                if not resultado:
+                    resposta = {"sucesso": False, "mensagem": "Usuário não encontrado"}
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                    return
+
+                senha_hash = resultado[0].encode('utf-8')
+
+                # valida senha atual
+                if not bcrypt.checkpw(senha_atual, senha_hash):
+                    resposta = {"sucesso": False, "mensagem": "Senha incorreta"}
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(resposta).encode())
+                    return
+
+                # gera hash da nova senha e atualiza
+                nova_hash = bcrypt.hashpw(nova_senha, bcrypt.gensalt()).decode('utf-8')
+                cursor.execute("UPDATE Usuario SET Senha = %s WHERE Email = %s", (nova_hash, email))
+                conexao.commit()
+
+                resposta = {"sucesso": True, "mensagem": "Senha alterada com sucesso"}
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(resposta).encode())
+
+            except Exception as e:
+                print(f"❌ Erro ao trocar senha: {e}")
+                try:
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"sucesso": False, "mensagem": str(e)}).encode())
+                except Exception:
+                    pass
             finally:
                 if conexao and conexao.is_connected():
                     cursor.close()

@@ -11,6 +11,31 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            /* Exibir botão Cadastrar/Entrar no desktop e apenas o ícone no mobile */
+                        .profile-link.mobile-only { display: none; }
+                        .btn-auth.desktop-only { display: inline-flex; }
+
+                        /* estilo do icone circular mobile */
+                        .avatar-icon {
+                            width: 42px;
+                            height: 42px;
+                            border-radius: 50%;
+                            background: #5b9e69; /* verde */
+                            color: white;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 18px;
+                            border: 2px solid rgba(0,0,0,0.06);
+                        }
+
+                        @media (max-width: 900px) {
+                                .btn-auth.desktop-only { display: none !important; }
+                                .profile-link.mobile-only { display: flex !important; align-items: center; }
+                                .avatar-icon { width: 42px; height: 42px; }
+                        }
+        </style>
 </head>
 <body>
     <header>
@@ -31,56 +56,171 @@
                 <a href="/.vscode/src/cadastrese.html" class="nav-link">Recompensas</a>
             </nav>
 
-            <button class="btn-auth" onclick="window.location.href='/.vscode/src/cadastrese.html'">
-                <i class="fas fa-user"></i> Cadastre-se
+            <button class="btn-auth desktop-only" onclick="window.location.href='/.vscode/src/cadastrese.html'">
+                <i class="fas fa-user"></i> Cadastrar / Entrar
             </button>
+
+            <a href="/.vscode/src/cadastrese.html" class="profile-link mobile-only avatar-icon" aria-label="Entrar / Cadastrar">
+                <i class="fas fa-user" aria-hidden="true"></i>
+            </a>
         </div>
     </header>
 
     <main>
-        <h1>Lixie -> titulo + subtitulo</h1>
-        <h1>IMAGEM</h1>
-
         <div class="video-section">
-            <h4>Conheça o Lixie</h4>
-            <video class="home-video" controls preload="metadata" poster="/.vscode/src/img/logo.png">
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                Seu navegador não suporta vídeo HTML5.
+            <video class="home-video" autoplay loop muted preload="auto">
+                <source src="https://www.pexels.com/download/video/9808295/" type="video/mp4">
             </video>
+            <div class="video-overlay">
+                <h2>Lixie</h2>
+                <p1>Onde você ajuda o planeta,</p1>
+                <p2>Compete com amigos e</p2>
+                <p3>Ganha recompensas!</p3>
+            </div>
         </div>
     
         <div class="ranking">
-            <h4>Ranking Global</h4>
-            <p>1. Usuário A - 1000 pontos</p>
-            <p>2. Usuário B - 900 pontos</p>
-            <p>3. Usuário C - 800 pontos</p>
+            <div class="ranking-grid">
+                <!-- LEFT - RANKING LIST -->
+                <div class="ranking-card">
+                    <h4>Top 5 Recicladores</h4>
+                    <div id="home-ranking-lista"></div>
+                    <button class="btn-ranking-complete btn-join">Ver Ranking Completo</button>
+                </div>
+
+                <!-- RIGHT - CTA IMAGE -->
+                <div class="ranking-side">
+                    <div class="cta-image-card">
+                        <img src="/.vscode/src/img/cool-people-recycle.jpg" alt="Cool people recycle" />
+                        <button class="btn-join" onclick="window.location.href='/.vscode/src/cadastrese.html'">Venha fazer parte!</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <!-- COMO FUNCIONA -->
         <div class="como-funciona">
-            <h4>Como Funciona</h4>
-            <p>Texto sobre como funciona o processo de reciclagem.</p>
+            <h4>Como funciona</h4>
+
+            <div class="como-funciona-cards">
+
+                <div class="cf-card">
+                    <span class="cf-step">1</span>
+                    <h5>Crie sua conta</h5>
+                    <p>Comece em segundos e desbloqueie todas as funcionalidades da plataforma.</p>
+                    <a class="cf-btn" data-destino="auth" href="/.vscode/src/cadastrese.html">Começar agora</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">2</span>
+                    <h5>Encontre um ponto de coleta</h5>
+                    <p>Localize rapidamente o ponto mais próximo e comece a reciclar.</p>
+                    <a class="cf-btn" data-destino="mapa" href="/.vscode/src/cadastrese.html">Ver mapa</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">3</span>
+                    <h5>Registre sua reciclagem</h5>
+                    <p>Informe o que você reciclou, ganhe pontos e acompanhe seu impacto.</p>
+                    <a class="cf-btn" data-destino="reciclagem" href="/.vscode/src/cadastrese.html">Registrar</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">4</span>
+                    <h5>Suba no ranking</h5>
+                    <p>Compita com outros usuários e veja seu progresso em tempo real.</p>
+                    <a class="cf-btn" data-destino="ranking" href="/.vscode/src/cadastrese.html">Ver ranking</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">5</span>
+                    <h5>Troque por recompensas</h5>
+                    <p>Use seus pontos para ganhar benefícios exclusivos.</p>
+                    <a class="cf-btn" data-destino="recompensas" href="/.vscode/src/cadastrese.html">Ver recompensas</a>
+                </div>
+            </div>
         </div>
 
+
+        <!-- IMPACTO -->
         <div class="impacto-ambiental">
-            <h4>Impacto Ambiental</h4>
-            <p>Texto sobre o impacto ambiental da escolha de engajar com o Lixie.</p>
+            <div class="impacto-container">
+
+                <div class="impacto-texto">
+                    <h4>Pequenas ações.<br>Grande impacto.</h4>
+
+                    <p>
+                        Cada reciclagem registrada no Lixie reduz resíduos,
+                        economiza recursos naturais e ajuda a construir um futuro mais sustentável.
+                    </p>
+
+                    <div class="impacto-stats">
+                        <div>
+                            <strong class="impacto-numero" data-target="120">0</strong>
+                            <span>kg de CO₂ evitados</span>
+                        </div>
+
+                        <div>
+                            <strong class="impacto-numero" data-target="350">0</strong>
+                            <span>itens reciclados</span>
+                        </div>
+
+                        <div>
+                            <strong class="impacto-numero" data-target="80">0</strong>
+                            <span>pessoas impactadas</span>
+                        </div>
+                    </div>
+                    
+                    <p>
+                        O que você já vê aqui é só o começo. Cada nova ação amplia o impacto coletivo e mostra como pequenas escolhas, quando repetidas, geram resultados reais. 
+                        O Lixie transforma esse processo em algo visível, mensurável e motivador, permitindo que você acompanhe de perto a diferença que está fazendo.
+                    </p>
+                    <p> Participe, acompanhe seu progresso e veja seu impacto crescer junto com a comunidade. 
+                        Quanto mais pessoas entram nesse movimento, maiores são os resultados e mais perto chegamos de um futuro mais sustentável.
+                    </p>
+                </div>
+
+                <div class="impacto-visual">
+                    <img src="/.vscode/src/img/Nao-ha-planeta-b.png" alt="Impacto ambiental">
+                </div>
+
+            </div>
         </div>
 
+
+        <!-- ARTIGOS -->
         <div class="artigos">
-            <h4>Artigos</h4>
-            <ul>
-                <li>Artigo 1</li>
-                <li>Artigo 2</li>
-                <li>Artigo 3</li>
-            </ul>
+            <div class="artigos-header">
+                <h4>Aprenda mais</h4>
+                <p>Conteúdos selecionados para você se manter informado sobre sustentabilidade</p>
+            </div>
+
+            <div class="artigos-lista">
+
+                <a href="https://www.wwf.org.br/nossosconteudos/notas_e_releases/?94380/Desperdicio-de-alimentos-por-que-as-empresas-precisam-sair-do-discurso-e-entrar-na-pratica" target="_blank" class="artigo-item">
+                    <span>Desperdício de alimentos: por que as empresas precisam sair do discurso e entrar na prática</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+                <a href="https://www.nationalgeographicbrasil.com/meio-ambiente/2023/04/dia-da-terra-10-acoes-sustentaveis-para-colocar-em-pratica-e-ajudar-o-planeta" target="_blank" class="artigo-item">
+                    <span>10 ações sustentáveis para colocar em prática e ajudar o planeta</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+                <a href="https://www.poder360.com.br/poder-economia/__trashed-555/" target="_blank" class="artigo-item">
+                    <span>Demanda por plástico reciclado despenca antes de regra ambiental</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+            </div>
         </div>
 
     </main>
     
     <footer>
-        Lixie ©
+        <span>Lixie ©</span>
     </footer>
 
-    <script src="/.vscode/src/homeNaoLogado.js"></script>
+    <script src="/.vscode/src/home.js"></script>
 </body>
 </html>

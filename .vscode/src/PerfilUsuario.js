@@ -12,6 +12,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     const mensagemNada = document.getElementById("mensagem-nada");
     const mensagem = document.getElementById("mensagem-sucesso");
     const form = document.getElementById("formPerfil");
+
+    const mensagemErroSenha = document.getElementById("mensagem-erro-senha");
+    console.log("mensagemErroSenha:", mensagemErroSenha);
+    const mensagemErroConexao = document.getElementById("mensagem-erro-conexao");
+
+    // Helper para ativar mensagens de overlay com null-check
+    function showOverlay(el) {
+        if (!el) return;
+        // garante que o overlay esteja como último filho do body (ficar acima de dialogs)
+        try {
+            if (el.parentNode !== document.body) document.body.appendChild(el);
+            // reforça z-index em runtime para evitar estilos do UA/diálogo sobrepor
+            el.style.zIndex = '99999';
+        } catch (e) {
+            // se falhar, segue normalmente
+            console.warn('Não foi possível mover overlay para body:', e);
+        }
+
+        el.classList.add("ativo");
+        setTimeout(() => {
+            el.classList.remove("ativo");
+        }, 2000);
+    }
+
+    // Mostrar erro inline dentro do diálogo (mais confiável que overlay em cima de <dialog>)
+    const erroSenhaInline = document.getElementById('erro-senha');
+    function showInlineError(msg) {
+        if (erroSenhaInline) {
+            erroSenhaInline.textContent = msg;
+            erroSenhaInline.classList.add('ativo');
+            // Limpa após 2s
+            setTimeout(() => {
+                erroSenhaInline.classList.remove('ativo');
+                erroSenhaInline.textContent = '';
+            }, 2000);
+            return true;
+        }
+        return false;
+    }
     
 
     const nome = document.getElementById("nome");
@@ -36,12 +75,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
 
-    const btnAlterarSenha = document.querySelector(".btn-alterar-senha");
-    if (btnAlterarSenha) {
-        btnAlterarSenha.addEventListener("click", () => {
-            window.location.href = "esquecesenha.html";
-        });
-    }
     // =========================
     // 1. BUSCAR DADOS DO BANCO (Ao carregar a página)
     // =========================
@@ -197,6 +230,150 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    const modalSenha = document.getElementById("popUp-trocar-senha");
+    const btnAbrirSenha = document.querySelector(".btn-alterar-senha");
+    const btnFecharSenha = document.getElementById("btn-fechar-senha");
+
+    btnAbrirSenha.addEventListener("click", () => {
+        modalSenha.showModal();
+    });
+
+    btnFecharSenha.addEventListener("click", () => {
+        modalSenha.close();
+    });
+
+    const senhaAtual = document.getElementById("senha-atual");
+    const novaSenha = document.getElementById("nova-senha");
+    const confirmarNova = document.getElementById("confirmar-nova-senha");
+
+    function validarNovaSenha() {
+        const valor = novaSenha.value;
+        const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+
+        if (!regex.test(valor)) {
+            mostrarErro(novaSenha, "erro-nova-senha", "Senha inválida");
+            return false;
+        }
+
+        sucessoInput(novaSenha, "erro-nova-senha");
+
+        if (valor !== confirmarNova.value) {
+            mostrarErro(confirmarNova, "erro-confirmar-nova", "As senhas não coincidem");
+            return false;
+        }
+
+        sucessoInput(confirmarNova, "erro-confirmar-nova");
+        return true;
+    }
+    novaSenha.addEventListener("input", () => {
+      const valor = novaSenha.value;
+      const requisitos = document.getElementById("requisitosNovaSenha");
+
+      requisitos.style.display = valor.length > 0 ? "block" : "none";
+
+      const maiuscula = /[A-Z]/.test(valor);
+      const minuscula = /[a-z]/.test(valor);
+      const numero = /[0-9]/.test(valor);
+      const especial = /[!@#$%^&*]/.test(valor);
+      const tamanho = valor.length >= 8;
+
+      function atualizarReq(id, valido) {
+        const el = document.getElementById(id);
+
+        if (!el) return;
+
+        if (valido) {
+            el.classList.add("ok");
+            el.textContent = "✔️ " + el.textContent.replace("❌ ", "").replace("✔️ ", "");
+        } else {
+            el.classList.remove("ok");
+            el.textContent = "❌ " + el.textContent.replace("✔️ ", "").replace("❌ ", "");
+        }
+    }
+      atualizarReq("req-maiuscula", maiuscula);
+      atualizarReq("req-minuscula", minuscula);
+      atualizarReq("req-numero", numero);
+      atualizarReq("req-especial", especial);
+      atualizarReq("req-tamanho", tamanho);
+  });
+  document.getElementById("confirmar-troca-senha").addEventListener("click", async () => {
+
+      if (!senhaAtual.value) {
+          mostrarErro(senhaAtual, "erro-senha-atual", "Digite sua senha atual");
+          return;
+      }
+
+      if (!validarNovaSenha()) return;
+
+      try {
+          const resposta = await fetch("https://lixie-production.up.railway.app/trocar-senha", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                  email: email.value,
+                  senhaAtual: senhaAtual.value,
+                  novaSenha: novaSenha.value
+              })
+          });
+
+          const dados = await resposta.json();
+
+          if (resposta.ok && dados.sucesso) {
+              // mostrar overlay bonitinho de sucesso
+              const mensagemSucesso = document.getElementById('mensagem-sucesso');
+              if (mensagemSucesso) {
+                  if (mensagemSucesso.parentNode !== document.body) document.body.appendChild(mensagemSucesso);
+                  mensagemSucesso.classList.add('ativo');
+                  setTimeout(() => mensagemSucesso.classList.remove('ativo'), 2000);
+              } else {
+                  alert('Senha alterada com sucesso ✓');
+              }
+
+              modalSenha.close();
+              senhaAtual.value = '';
+              novaSenha.value = '';
+              confirmarNova.value = '';
+              document.getElementById('requisitosNovaSenha').style.display = 'none';
+          } else {
+              // mostrar erro inline embaixo do campo de senha atual (usando o elemento erro-senha-atual)
+              const msg = dados.mensagem || 'Senha incorreta';
+              mostrarErro(senhaAtual, 'erro-senha-atual', msg);
+
+              // fallback: se o elemento não existir, usa o overlay global de erro
+              const erroElem = document.getElementById('erro-senha-atual');
+              if (!erroElem) {
+                  const mensagemErroSenha = document.getElementById('mensagem-erro-senha');
+                  if (mensagemErroSenha) {
+                      if (mensagemErroSenha.parentNode !== document.body) document.body.appendChild(mensagemErroSenha);
+                      mensagemErroSenha.classList.add('ativo');
+                      setTimeout(() => mensagemErroSenha.classList.remove('ativo'), 2000);
+                  } else {
+                      alert(msg);
+                  }
+              }
+
+              // Limpa e foca o campo de senha atual para facilitar correção
+              senhaAtual.value = '';
+              senhaAtual.focus();
+          }
+
+      } catch (erro) {
+          alert("Erro de conexão com o servidor");
+      }
+  });
+
+  btnFecharSenha.addEventListener("click", () => {
+      modalSenha.close();
+
+      senhaAtual.value = "";
+      novaSenha.value = "";
+      confirmarNova.value = "";
+
+      document.getElementById("requisitosNovaSenha").style.display = "none";
+  });
+
     // =========================
     // 2. SALVAR ALTERAÇÕES (Botão Salvar)
     // =========================
@@ -269,4 +446,126 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Erro de conexão com o servidor.");
         }
     });
+
+    document.getElementById("confirmar-apagar").addEventListener("click", async () => {
+        const senha = document.getElementById("senha").value;
+        const mensagemApagado = document.getElementById("mensagem-apagado");
+
+        if (!senha) {
+            mostrarErro(document.getElementById("senha"), "erro-senha", "Digite sua senha");
+            return;
+        }
+
+        try {
+            const resposta = await fetch("https://lixie-production.up.railway.app/deletar-conta", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email.value,
+                    senha: senha
+                })
+            });
+
+            let dados = null;
+            try {
+                dados = await resposta.json();
+            } catch (e) {
+                console.error('Resposta não-JSON ao deletar conta:', e, await resposta.text());
+                showOverlay(mensagemErroConexao);
+                return;
+            }
+
+            if (dados && dados.sucesso) {
+                localStorage.removeItem("email");
+                localStorage.removeItem("usuarioEmail");
+
+                const pop = document.getElementById("popUp-apagar");
+                if (pop && typeof pop.close === 'function') pop.close();
+
+                showOverlay(mensagemApagado);
+
+                setTimeout(() => {
+                    window.location.href = "homeNaoLogado.html";
+                }, 2500);
+
+            } else {
+                // tenta mostrar erro inline dentro do diálogo; se não existir, usa overlay
+                const shownInline = showInlineError(dados && dados.mensagem ? dados.mensagem : 'Senha incorreta');
+                if (!shownInline) showOverlay(mensagemErroSenha);
+
+                const inputSenha = document.getElementById("senha");
+                if (inputSenha) {
+                    inputSenha.value = "";
+                    inputSenha.focus();
+                }
+            }
+
+        } catch (erro) {
+            console.error('Erro na requisição deletar-conta:', erro);
+            showOverlay(mensagemErroConexao);
+        }
+    });
+
 });
+
+function toggleSenhaNova(icon) {
+    const container = icon.closest("dialog"); // pega o popup inteiro
+
+    const nova = container.querySelector("#nova-senha");
+    const confirmar = container.querySelector("#confirmar-nova-senha");
+
+    const mostrando = nova.type === "text";
+
+    if (mostrando) {
+        nova.type = "password";
+        confirmar.type = "password";
+    } else {
+        nova.type = "text";
+        confirmar.type = "text";
+    }
+
+    // muda TODOS os ícones desse grupo
+    const icons = container.querySelectorAll(".toggle-senha");
+
+    icons.forEach(i => {
+        if (mostrando) {
+            i.classList.remove("fa-eye-slash");
+            i.classList.add("fa-eye");
+        } else {
+            i.classList.remove("fa-eye");
+            i.classList.add("fa-eye-slash");
+        }
+    });
+}
+
+  function toggleSenhaAtual(icon) {
+    const input = icon.parentElement.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+
+function toggleSenhaLogin(icon) {
+    const container = icon.closest(".senha-container");
+    const input = container.querySelector("input");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+

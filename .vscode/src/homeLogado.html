@@ -8,12 +8,12 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="/.vscode/src/home.css">
-    <script src="/.vscode/src/home.js"></script>
 
     <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -28,9 +28,9 @@
             </button>
 
             <nav class="navbar" id="navbar">
-                <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
+                <a href="/.vscode/src/homeLogado.html" class="nav-link active">Home</a>
                 <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
-                <a href="/.vscode/src/registrarReciclagem.html" class="nav-link active">Registrar Reciclagem</a>
+                <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
                 <a href="#" class="nav-link">Mapa de Coleta</a>
                 <a href="#" class="nav-link">Recompensas</a>
             </nav>
@@ -42,78 +42,184 @@
     </header>
 
     <main>
-        <h1>Bem-vinda, <span id="nome"></span></h1>
-        <p>Pontos: <span id="pontos"></span></p>
-        <p>Nível: <span id="nivel"></span></p>
-
-        <a href="PerfilUsuario.html">Ir para Perfil do Usuário</a>
-
         <div class="video-section">
-            <h4>Conheça o Lixie</h4>
-            <video class="home-video" controls preload="metadata" poster="/.vscode/src/img/logo.png">
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            <video class="home-video" autoplay loop muted preload="auto">
+                <source src="https://www.pexels.com/download/video/9808295/" type="video/mp4">
                 Seu navegador não suporta vídeo HTML5.
             </video>
+            <div class="video-overlay">
+                <h2>Lixie</h2>
+                <p1>Onde você ajuda o planeta,</p1>
+                <p2>Compete com amigos e</p2>
+                <p3>Ganha recompensas!</p3>
+            </div>
+        </div>
+    
+        <div class="ranking">
+            <div class="ranking-grid">
+                <!-- LEFT - RANKING LIST -->
+                <div class="ranking-card">
+                    <h4>Top 5 Recicladores</h4>
+                    <div id="home-ranking-lista"></div>
+                    <button class="btn-ranking-complete btn-join" onclick="window.location.href='/.vscode/src/ranking.html'">Ver Ranking Completo</button>
+                </div>
+
+                <!-- RIGHT - USER PROGRESS AND BUTTONS -->
+                <div class="ranking-side">
+                    <div class="card">
+                        <h2>Seu Progresso</h2>
+                        <div id="home-progresso-usuario">
+                            <p>Carregando...</p>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div id="home-reciclagens-semana">
+                            <img src="/.vscode/src/img/sinal-de-reciclagem.png" alt="reciclagem" class="reciclagem-img">
+                            12 reciclagens essa semana
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div id="home-recompensas-ganhas">
+                            <img src="/.vscode/src/img/presente.png" alt="presente" class="presente-img">
+                            3 recompensas ganhas
+                        </div>
+                    </div>
+
+                    <button class="btn-register-recycling" onclick="window.location.href='/.vscode/src/registrarReciclagem.html'">+ Nova Reciclagem</button>
+                </div>
+            </div>
         </div>
 
-        <div class="Ranking">
-        <h1>Ranking Global</h1>
-        <p>1. Usuário A - 1000 pontos</p>
-        <p>2. Usuário B - 900 pontos</p>
-        <p>3. Usuário C - 800 pontos</p>
+        <!-- COMO FUNCIONA -->
+        <div class="como-funciona">
+            <h4>Como funciona</h4>
+
+            <div class="como-funciona-cards">
+
+                <div class="cf-card">
+                    <span class="cf-step">1</span>
+                    <h5>Crie sua conta</h5>
+                    <p>Comece em segundos e desbloqueie todas as funcionalidades da plataforma.</p>
+                    <a class="cf-btn" data-destino="auth" href="/.vscode/src/PerfilUsuario.html">Começar agora</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">2</span>
+                    <h5>Encontre um ponto de coleta</h5>
+                    <p>Localize rapidamente o ponto mais próximo e comece a reciclar.</p>
+                    <a class="cf-btn" data-destino="mapa" >Ver mapa</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">3</span>
+                    <h5>Registre sua reciclagem</h5>
+                    <p>Informe o que você reciclou, ganhe pontos e acompanhe seu impacto.</p>
+                    <a class="cf-btn" data-destino="reciclagem" href="/.vscode/src/registrarReciclagem.html">Registrar</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">4</span>
+                    <h5>Suba no ranking</h5>
+                    <p>Compita com outros usuários e veja seu progresso em tempo real.</p>
+                    <a class="cf-btn" data-destino="ranking" href="/.vscode/src/ranking.html" >Ver ranking</a>
+                </div>
+
+                <div class="cf-card">
+                    <span class="cf-step">5</span>
+                    <h5>Troque por recompensas</h5>
+                    <p>Use seus pontos para ganhar benefícios exclusivos.</p>
+                    <a class="cf-btn" data-destino="recompensas" >Ver recompensas</a>
+                </div>
+
+            </div>
         </div>
 
-        <div class="Como Funciona">
-            <h4>Como Funciona</h4>
-            <p>Texto sobre como funciona o processo de reciclagem.</p>
+
+        <!-- IMPACTO -->
+        <div class="impacto-ambiental">
+            <div class="impacto-container">
+
+                <div class="impacto-texto">
+                    <h4>Pequenas ações.<br>Grande impacto.</h4>
+
+                    <p>
+                        Cada reciclagem registrada no Lixie reduz resíduos,
+                        economiza recursos naturais e ajuda a construir um futuro mais sustentável.
+                    </p>
+
+                    <div class="impacto-stats">
+                        <div>
+                            <strong class="impacto-numero" data-target="120">0</strong>
+                            <span>kg de CO₂ evitados</span>
+                        </div>
+
+                        <div>
+                            <strong class="impacto-numero" data-target="350">0</strong>
+                            <span>itens reciclados</span>
+                        </div>
+
+                        <div>
+                            <strong class="impacto-numero" data-target="80">0</strong>
+                            <span>pessoas impactadas</span>
+                        </div>
+                    </div>
+                    
+                    <p>
+                        O que você já vê aqui é só o começo. Cada nova ação amplia o impacto coletivo e mostra como pequenas escolhas, quando repetidas, geram resultados reais. 
+                        O Lixie transforma esse processo em algo visível, mensurável e motivador, permitindo que você acompanhe de perto a diferença que está fazendo.
+                    </p>
+                    <p> Participe, acompanhe seu progresso e veja seu impacto crescer junto com a comunidade. 
+                        Quanto mais pessoas entram nesse movimento, maiores são os resultados e mais perto chegamos de um futuro mais sustentável.
+                    </p>
+                </div>
+
+                <div class="impacto-visual">
+                    <img src="/.vscode/src/img/Nao-ha-planeta-b.png" alt="Impacto ambiental">
+                </div>
+
+            </div>
         </div>
 
-        <div class="Impacto Ambiental">
-            <h4>Impacto Ambiental</h4>
-            <p>Texto sobre o impacto ambiental da escolha de engajar com o Lixie.</p>
-        </div>
 
-        <div class ="Artigos">
-            <h4>Artigos</h4>
-            <ul>
-                <li>Artigo 1</li>
-                <li>Artigo 2</li>
-                <li>Artigo 3</li>
-            </ul>
-        </div>
+        <!-- ARTIGOS -->
+        <div class="artigos">
+            <div class="artigos-header">
+                <h4>Aprenda mais</h4>
+                <p>Conteúdos selecionados para você se manter informado sobre sustentabilidade</p>
+            </div>
 
-    <button onclick="logout()">Sair</button>
+            <div class="artigos-lista">
+
+                <a href="https://www.wwf.org.br/nossosconteudos/notas_e_releases/?94380/Desperdicio-de-alimentos-por-que-as-empresas-precisam-sair-do-discurso-e-entrar-na-pratica" target="_blank" class="artigo-item">
+                    <span>Desperdício de alimentos: por que as empresas precisam sair do discurso e entrar na prática</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+                <a href="https://www.nationalgeographicbrasil.com/meio-ambiente/2023/04/dia-da-terra-10-acoes-sustentaveis-para-colocar-em-pratica-e-ajudar-o-planeta" target="_blank" class="artigo-item">
+                    <span>10 ações sustentáveis para colocar em prática e ajudar o planeta</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+                <a href="https://www.poder360.com.br/poder-economia/__trashed-555/" target="_blank" class="artigo-item">
+                    <span>Demanda por plástico reciclado despenca antes de regra ambiental</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+
+            </div>
+        </div>
 
     </main>
+    
+    <footer>
+        <span>Lixie ©</span>
+
+         <a href="#" id="logoutBtn" class="logout-footer">
+            <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+    </footer>
+
     <script src="/.vscode/src/home.js"></script>
-    <script>
-        // MENU MOBILE TOGGLE
-        const menuToggle = document.getElementById('menuToggle');
-        const navbar = document.getElementById('navbar');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        // Toggle menu ao clicar no botão
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                navbar.classList.toggle('active');
-                menuToggle.classList.toggle('active');
-            });
-        }
-
-        // Fechar menu ao clicar em um link
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navbar.classList.remove('active');
-                menuToggle.classList.remove('active');
-            });
-        });
-
-        // Fechar menu ao redimensionar para desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                navbar.classList.remove('active');
-                menuToggle.classList.remove('active');
-            }
-        });
-    </script>
 </body>
+</html>
