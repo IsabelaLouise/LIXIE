@@ -1,6 +1,58 @@
 document.addEventListener("DOMContentLoaded", () => {
   carregarRanking();
   carregarProgresso();
+
+  // MENU MOBILE TOGGLE (comum a ambas)
+const menuToggle = document.getElementById('menuToggle');
+const navbar = document.getElementById('navbar');
+const navLinks = document.querySelectorAll('.nav-link');
+
+// Toggle menu ao clicar no botão
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        navbar.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+}
+
+// Fechar menu ao clicar em um link
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
+    });
+});
+
+// Fechar menu ao redimensionar para desktop
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
+    }
+});
+
+  // Adicione aqui o código da foto
+  const email = localStorage.getItem('email');
+  if (email) {
+    // ✅ FOTO DO USUÁRIO
+    fetch("https://lixie-production.up.railway.app/perfil", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(usuario => {
+      const fotoHome = document.getElementById("fotoHome");
+      if (usuario.foto && usuario.foto.trim().startsWith("http")) {
+        fotoHome.src = usuario.foto.trim();
+      } else {
+        fotoHome.src = "img/avatar.png";
+      }
+    })
+    .catch(err => console.error("Erro ao carregar foto:", err));
+  }
 });
 
 async function carregarRanking() {
@@ -104,24 +156,3 @@ async function carregarProgresso() {
     container.innerHTML = "<p>Erro ao carregar progresso</p>";
   }
 }
-
- // ✅ FOTO DO USUÁRIO (AGORA NO LUGAR CERTO)
-    fetch("https://lixie-production.up.railway.app/perfil", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `email=${encodeURIComponent(email)}`
-    })
-    .then(res => res.json())
-    .then(usuario => {
-        const fotoHome = document.getElementById("fotoHome");
-
-        if (usuario.foto && usuario.foto.trim().startsWith("http")) {
-            fotoHome.src = usuario.foto.trim();
-        } else {
-            fotoHome.src = "img/avatar.png";
-        }
-    })
-    .catch(err => console.error("Erro ao carregar foto:", err));
-  
