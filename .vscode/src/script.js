@@ -442,80 +442,70 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
-      mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
-      return;
+  if (!validarEmail() || !validarDadosPessoais() || !validarCepPagina() || !validarSenhaPagina()) {
+    mostrarMensagem("Preencha os campos corretamente antes de enviar", "erro");
+    return;
+  }
+
+  ignoreEmailChecks = true;
+  if (lastEmailCheckController) {
+    try { lastEmailCheckController.abort(); } catch (err) {}
+    lastEmailCheckController = null;
+  }
+
+  const overlay = document.getElementById('mensagem-cadastrado');
+
+  try {
+    if (overlay) {
+      const popup = overlay.querySelector('.popup p');
+      if (popup) popup.textContent = 'Conta criada com sucesso!';
+      overlay.classList.add('ativo');
     }
 
-    // cancelar qualquer verificação de email pendente e evitar mensagens falsas durante o fluxo de cadastro
-    ignoreEmailChecks = true;
-    if (lastEmailCheckController) {
-      try { lastEmailCheckController.abort(); } catch (err) { /* ignore */ }
-      lastEmailCheckController = null;
-    }
+    const formData = new URLSearchParams(new FormData(form));
 
-    try {
-      const overlay = document.getElementById('mensagem-cadastrado');
-      // mostrar imediatamente overlay de criação
-      if (overlay) {
-        const popup = overlay.querySelector('.popup p');
-        if (popup) popup.textContent = 'Criando sua conta...';
-        overlay.classList.add('ativo');
-      }
-
-      const formData = new URLSearchParams(new FormData(form));
-
-      const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
-        method: "POST",
-        body: formData
-      });
-
-      const dados = await resposta.json();
-
-      if (resposta.ok) {
-        localStorage.setItem('cadastroEmail', email.value.trim());
-        // bloquear checagens de email que possam aparecer após o cadastro (evita aviso falso antes do redirect)
-        ignoreEmailChecks = true;
-        // atualizar overlay para sucesso e aguardar 5s antes do redirect
-        if (overlay) {
-          const popup = overlay.querySelector('.popup p');
-          if (popup) popup.textContent = 'Conta criada com sucesso';
-        }
-        form.reset();
-        limparFormulario();
-        currentPage = 0;
-        mostrarPagina(currentPage);
-        setTimeout(() => {
-          if (overlay) overlay.classList.remove('ativo');
-          window.location.href = "/login.html";
-        }, 5000);
-      } else {
-        // em caso de erro, esconder overlay e mostrar mensagem de erro
-        if (overlay) overlay.classList.remove('ativo');
-        mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
-      }
-    } catch (erro) {
-      mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
-    }
-  });
-
-  const campos = document.querySelectorAll("#formCadastro input");
-  campos.forEach((campo, index) => {
-    campo.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const proximo = campos[index + 1];
-        if (proximo) {
-          proximo.focus();
-        }
-      }
+    const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
+      method: "POST",
+      body: formData
     });
-  });
 
-  mostrarPagina(currentPage);
+    const dados = await resposta.json();
+
+    if (resposta.ok) {
+      localStorage.setItem('cadastroEmail', email.value.trim());
+
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('ativo');
+        window.location.href = "/login.html";
+      }, 3000);
+
+    } else {
+      if (overlay) overlay.classList.remove('ativo');
+      mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
+    }
+
+  } catch (erro) {
+    if (overlay) overlay.classList.remove('ativo');
+    mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
+  }
 });
+
+const campos = document.querySelectorAll("#formCadastro input");
+campos.forEach((campo, index) => {
+  campo.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const proximo = campos[index + 1];
+      if (proximo) {
+        proximo.focus();
+      }
+    }
+  });
+});
+
+mostrarPagina(currentPage);
 
 function toggleSenha() {
   const senha = document.getElementById("senha");
@@ -563,3 +553,4 @@ function limparFormulario() {
   const mensagem = document.getElementById("mensagem");
   mensagem.style.display = "none";
 }
+});
