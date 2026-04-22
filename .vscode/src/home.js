@@ -46,8 +46,12 @@ if (!email || email === "undefined" || email === null) {
 
 
 function logout() {
+    // remove possíveis flags de sessão e evita prompt de unload
+    try { window.onbeforeunload = null; } catch (e) { /* ignore */ }
     localStorage.removeItem("usuarioEmail");
-    window.location.href = "/homeNaoLogado.html";
+    localStorage.removeItem("email");
+    // use replace para não deixar histórico de página de sessão
+    window.location.replace('/.vscode/src/homeNaoLogado.html');
 }
 
 // CARREGAR RANKING NA HOME LOGADA
