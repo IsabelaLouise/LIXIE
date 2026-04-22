@@ -457,6 +457,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
+      const overlay = document.getElementById('mensagem-cadastrado');
+      // mostrar imediatamente overlay de criação
+      if (overlay) {
+        const popup = overlay.querySelector('.popup p');
+        if (popup) popup.textContent = 'Criando sua conta...';
+        overlay.classList.add('ativo');
+      }
+
       const formData = new URLSearchParams(new FormData(form));
 
       const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
@@ -470,10 +478,10 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem('cadastroEmail', email.value.trim());
         // bloquear checagens de email que possam aparecer após o cadastro (evita aviso falso antes do redirect)
         ignoreEmailChecks = true;
-        // mostrar popup modal de sucesso (overlay) — ficará visível alguns segundos antes do redirect
-        const overlay = document.getElementById('mensagem-cadastrado');
+        // atualizar overlay para sucesso e aguardar 5s antes do redirect
         if (overlay) {
-          overlay.classList.add('ativo');
+          const popup = overlay.querySelector('.popup p');
+          if (popup) popup.textContent = 'Conta criada com sucesso';
         }
         form.reset();
         limparFormulario();
@@ -482,8 +490,10 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
           if (overlay) overlay.classList.remove('ativo');
           window.location.href = "/login.html";
-        }, 2000);
+        }, 5000);
       } else {
+        // em caso de erro, esconder overlay e mostrar mensagem de erro
+        if (overlay) overlay.classList.remove('ativo');
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
       }
     } catch (erro) {
