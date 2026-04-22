@@ -470,14 +470,19 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem('cadastroEmail', email.value.trim());
         // bloquear checagens de email que possam aparecer após o cadastro (evita aviso falso antes do redirect)
         ignoreEmailChecks = true;
-        mostrarMensagem("Cadastrado com sucesso 🚀", "sucesso");
+        // mostrar popup modal de sucesso (overlay) — ficará visível alguns segundos antes do redirect
+        const overlay = document.getElementById('mensagem-cadastrado');
+        if (overlay) {
+          overlay.classList.add('ativo');
+        }
         form.reset();
         limparFormulario();
         currentPage = 0;
         mostrarPagina(currentPage);
         setTimeout(() => {
-      window.location.href = "/login.html";
-      }, 2000);
+          if (overlay) overlay.classList.remove('ativo');
+          window.location.href = "/login.html";
+        }, 2000);
       } else {
         mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
       }
