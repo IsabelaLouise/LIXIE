@@ -957,6 +957,8 @@ footer span {
     .profile-link {
         position: absolute;
         right: 15px;
+        padding: 6px 10px;
+        gap: 5px;
     }
 
     .navbar {
