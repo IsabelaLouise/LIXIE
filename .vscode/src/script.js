@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let ignoreEmailChecks = false;
   // controller para cancelar verificações de email pendentes
   let lastEmailCheckController = null;
+  // marca que o email já foi verificado e está ok na etapa 1
+  let emailValidatedAtStep = false;
 
   
   async function verificarEmailExistente() {
@@ -57,7 +59,8 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Resposta do servidor:", dados);
     
     if (dados.existe) {
-      if (!ignoreEmailChecks) {
+      // só mostrar o erro de 'conta já existe' quando estivermos na etapa 1 (email) e não estivermos no fluxo de sucesso
+      if (!ignoreEmailChecks && currentPage === 0) {
         mostrarErro(email, "erro-email", "Essa conta já existe!");
       }
       lastEmailCheckController = null;
@@ -247,8 +250,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const validacoes = [validarEmail, validarDadosPessoais, validarCepPagina, validarSenhaPagina];
     if (validacoes[currentPage] && validacoes[currentPage]()) {
       if (currentPage < pages.length - 1) {
+        const prev = currentPage;
         currentPage += 1;
         mostrarPagina(currentPage);
+
+        // se estamos saindo da etapa 0 (email), esconder qualquer mensagem de erro relacionada ao email
+        if (prev === 0) {
+          const erro = document.getElementById('erro-email');
+          if (erro) { erro.textContent = ''; erro.classList.remove('ativo'); }
+          email.classList.remove('erro');
+        }
       }
     }
   }
@@ -261,10 +272,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.getElementById("page1Next").addEventListener("click", async () => {
-    
     if (!validarEmail()) return; //valida
     const existe = await verificarEmailExistente(); //verifica
     if (existe) return; //bloqueia
+
+    // se chegou aqui, o email foi verificado e está ok
+    emailValidatedAtStep = true;
 
     irParaProximaPagina();
 });
@@ -306,6 +319,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const erro = document.getElementById("erro-email");
   erro.textContent = "";
   erro.classList.remove("ativo");
+  // se o usuário editou o email, invalidar checagem anterior
+  emailValidatedAtStep = false;
 });
 
   email.addEventListener("blur", async () => {
@@ -466,37 +481,45 @@ document.addEventListener("DOMContentLoaded", function () {
     erroEmail.classList.remove("ativo");
   }
   email.classList.remove("erro");
-
-try {
-  const formData = new URLSearchParams(new FormData(form));
-
-  const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
-    method: "POST",
-    body: formData
-  });
-
-  const dados = await resposta.json();
-
-  if (resposta.ok) {
-
+  try {
+    // mostrar overlay imediato com mensagem de criação
     if (overlay) {
       const popup = overlay.querySelector('.popup p');
-      if (popup) popup.textContent = 'Conta criada com sucesso!';
+      if (popup) popup.textContent = 'Criando sua conta...';
       overlay.classList.add('ativo');
     }
 
-    localStorage.setItem('cadastroEmail', email.value.trim());
+    const formData = new URLSearchParams(new FormData(form));
 
-    setTimeout(() => {
+    const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
+      method: "POST",
+      body: formData
+    });
+
+    const dados = await resposta.json();
+
+    if (resposta.ok) {
+      // atualizar overlay para sucesso e aguardar 5s
+      if (overlay) {
+        const popup = overlay.querySelector('.popup p');
+        if (popup) popup.textContent = 'Conta criada com sucesso';
+      }
+
+      localStorage.setItem('cadastroEmail', email.value.trim());
+
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('ativo');
+        window.location.href = "/login.html";
+      }, 5000);
+
+    } else {
+      // em caso de erro, esconder overlay e mostrar mensagem
       if (overlay) overlay.classList.remove('ativo');
-      window.location.href = "/login.html";
-    }, 3000);
-
-  } else {
-    mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
-  }
+      mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
+    }
 
   } catch (erro) {
+    if (overlay) overlay.classList.remove('ativo');
     mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
   }
   });
