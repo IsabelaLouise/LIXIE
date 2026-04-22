@@ -1,6 +1,7 @@
-document.addEventListener("DOMContentLoaded", carregarRanking);
-
-document.addEventListener("DOMContentLoaded", carregarRanking);
+document.addEventListener("DOMContentLoaded", () => {
+  carregarRanking();
+  carregarProgresso();
+});
 
 async function carregarRanking() {
   const container = document.querySelector('#ranking-lista');
@@ -81,11 +82,12 @@ async function carregarProgresso() {
 
     const ranking = await resRanking.json();
 
-    // 🔥 acha posição real
+    //  acha posição real
     const posicao = ranking.find(user => user.nome === usuario.nome)?.posicao || "-";
 
-    // 🔥 calcula barra
-    const porcentagem = Math.min((usuario.pontos / 10000) * 100, 100);
+    // 🔥calcula barra
+    const total = ranking.length;
+    const porcentagem = ((total - posicao + 1) / total) * 100;
 
     container.innerHTML = `
       <h2>Seu Progresso</h2>

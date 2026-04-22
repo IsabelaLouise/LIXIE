@@ -125,3 +125,44 @@ document.addEventListener("DOMContentLoaded", () => {
         observer.observe(section);
     });
 });
+
+// ANIMAÇÃO DE NÚMEROS (IMPACTO)
+function animarNumeros() {
+    const numeros = document.querySelectorAll('.impacto-numero');
+
+    numeros.forEach(numero => {
+        const target = +numero.getAttribute('data-target');
+        let count = 0;
+
+        const update = () => {
+            const increment = target / 60;
+
+            if (count < target) {
+                count += increment;
+                numero.innerText = Math.ceil(count);
+                requestAnimationFrame(update);
+            } else {
+                numero.innerText = target + "+";
+            }
+        };
+
+        update();
+    });
+}
+
+
+// INTERSECTION OBSERVER MELHORADO
+document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll('.impacto-ambiental');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animarNumeros();
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    sections.forEach(section => observer.observe(section));
+});
