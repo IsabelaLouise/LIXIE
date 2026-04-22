@@ -57,9 +57,11 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Resposta do servidor:", dados);
     
     if (dados.existe) {
-      mostrarErro(email, "erro-email", "Essa conta já existe!");
+      if (!ignoreEmailChecks) {
+        mostrarErro(email, "erro-email", "Essa conta já existe!");
+      }
       lastEmailCheckController = null;
-      return true; // existe
+      return true;
     }
 
     lastEmailCheckController = null;
@@ -457,40 +459,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const overlay = document.getElementById('mensagem-cadastrado');
 
-  try {
+  // limpar erro antigo de email
+  const erroEmail = document.getElementById("erro-email");
+  if (erroEmail) {
+    erroEmail.textContent = "";
+    erroEmail.classList.remove("ativo");
+  }
+  email.classList.remove("erro");
+
+try {
+  const formData = new URLSearchParams(new FormData(form));
+
+  const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
+    method: "POST",
+    body: formData
+  });
+
+  const dados = await resposta.json();
+
+  if (resposta.ok) {
+
     if (overlay) {
       const popup = overlay.querySelector('.popup p');
       if (popup) popup.textContent = 'Conta criada com sucesso!';
       overlay.classList.add('ativo');
     }
 
-    const formData = new URLSearchParams(new FormData(form));
+    localStorage.setItem('cadastroEmail', email.value.trim());
 
-    const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
-      method: "POST",
-      body: formData
-    });
-
-    const dados = await resposta.json();
-
-    if (resposta.ok) {
-      localStorage.setItem('cadastroEmail', email.value.trim());
-
-      setTimeout(() => {
-        if (overlay) overlay.classList.remove('ativo');
-        window.location.href = "/login.html";
-      }, 3000);
-
-    } else {
+    setTimeout(() => {
       if (overlay) overlay.classList.remove('ativo');
-      mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
-    }
+      window.location.href = "/login.html";
+    }, 3000);
+
+  } else {
+    mostrarMensagem(dados.erro || "Erro ao cadastrar", "erro");
+  }
 
   } catch (erro) {
-    if (overlay) overlay.classList.remove('ativo');
     mostrarMensagem("Erro de conexão com o servidor ❌", "erro");
   }
-});
+  });
 
 const campos = document.querySelectorAll("#formCadastro input");
 campos.forEach((campo, index) => {
@@ -535,22 +544,22 @@ function toggleSenha() {
   }
 }
 
-function limparFormulario() {
-  const inputs = document.querySelectorAll("#formCadastro input");
-  inputs.forEach(input => {
-    input.classList.remove("sucesso", "erro");
-  });
+  function limparFormulario() {
+    const inputs = document.querySelectorAll("#formCadastro input");
+    inputs.forEach(input => {
+      input.classList.remove("sucesso", "erro");
+    });
 
-  const erros = document.querySelectorAll(".erro-texto");
-  erros.forEach(e => {
-    e.textContent = "";
-    e.classList.remove("ativo");
-  });
+    const erros = document.querySelectorAll(".erro-texto");
+    erros.forEach(e => {
+      e.textContent = "";
+      e.classList.remove("ativo");
+    });
 
-  const requisitos = document.getElementById("requisitosSenha");
-  if (requisitos) requisitos.style.display = "none";
+    const requisitos = document.getElementById("requisitosSenha");
+    if (requisitos) requisitos.style.display = "none";
 
-  const mensagem = document.getElementById("mensagem");
-  mensagem.style.display = "none";
-}
+    const mensagem = document.getElementById("mensagem");
+    mensagem.style.display = "none";
+  }
 });
