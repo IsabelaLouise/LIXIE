@@ -85,10 +85,12 @@ async function carregarRanking() {
     }
 
     dados.forEach(user => {
+      // mostrar posição apenas se estiver no top-10; caso contrário mostrar '-º'
+      const displayPos = (typeof user.posicao === 'number' && user.posicao <= 10) ? `${user.posicao}º` : '-º';
       container.innerHTML += `
         <div class="rank-item">
           <div class="rank-left">
-            <div class="position">${user.posicao}</div>
+            <div class="position">${displayPos}</div>
             <span>${user.nome}</span>
           </div>
           <span>${user.pontos} pts</span>
