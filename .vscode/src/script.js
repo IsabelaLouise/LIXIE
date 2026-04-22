@@ -93,6 +93,9 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
   function mostrarErro(input, idErro, mensagem) {
+    // Se for o campo de email e não estivermos na primeira página, não faça nada
+    if (input.id === "email" && currentPage !== 0) return;
+
     input.classList.remove("sucesso");
     input.classList.add("erro");
 
@@ -258,22 +261,24 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function irParaProximaPagina() {
-    const validacoes = [validarEmail, validarDadosPessoais, validarCepPagina, validarSenhaPagina];
-    if (validacoes[currentPage] && validacoes[currentPage]()) {
-      if (currentPage < pages.length - 1) {
-        const prev = currentPage;
-        currentPage += 1;
-        mostrarPagina(currentPage);
-
-        // se estamos saindo da etapa 0 (email), esconder qualquer mensagem de erro relacionada ao email
-        if (prev === 0) {
-          const erro = document.getElementById('erro-email');
-          if (erro) { erro.textContent = ''; erro.classList.remove('ativo'); }
-          email.classList.remove('erro');
-        }
+  const validacoes = [validarEmail, validarDadosPessoais, validarCepPagina, validarSenhaPagina];
+  if (validacoes[currentPage] && validacoes[currentPage]()) {
+    if (currentPage < pages.length - 1) {
+      
+      // LIMPEZA AGRESSIVA DO ERRO DE EMAIL
+      const erroEmail = document.getElementById('erro-email');
+      if (erroEmail) {
+        erroEmail.textContent = '';
+        erroEmail.classList.remove('ativo');
       }
+      email.classList.remove('erro');
+      email.classList.add('sucesso'); // Mantém verde se quiser, ou apenas remove erro
+
+      currentPage += 1;
+      mostrarPagina(currentPage);
     }
   }
+}
 
   function irParaPaginaAnterior() {
     if (currentPage > 0) {
@@ -524,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setTimeout(() => {
           if (overlay) overlay.classList.remove('ativo');
-          window.location.href = "/login.html";
+          window.location.href = "/.vscode/src/login.html";
         }, 5000);
 
       } else {
