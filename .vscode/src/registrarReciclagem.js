@@ -1,46 +1,47 @@
-  // MENU MOBILE TOGGLE (comum a ambas)
-const menuToggle = document.getElementById('menuToggle');
-const navbar = document.getElementById('navbar');
-const navLinks = document.querySelectorAll('.nav-link');
+document.addEventListener('DOMContentLoaded', () => {
+  // MENU MOBILE TOGGLE (comum a ambas) - protegido por DOMContentLoaded
+  const menuToggle = document.getElementById('menuToggle');
+  const navbar = document.getElementById('navbar');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-// Toggle menu ao clicar no botão
-if (menuToggle) {
+  // Toggle menu ao clicar no botão
+  if (menuToggle && navbar) {
     menuToggle.addEventListener('click', () => {
-        navbar.classList.toggle('active');
-        menuToggle.classList.toggle('active');
+      navbar.classList.toggle('active');
+      menuToggle.classList.toggle('active');
     });
-}
+  }
 
-// Fechar menu ao clicar em um link
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        navbar.classList.remove('active');
-        menuToggle.classList.remove('active');
+  // Fechar menu ao clicar em um link
+  if (navLinks && navLinks.length) {
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (navbar) navbar.classList.remove('active');
+        if (menuToggle) menuToggle.classList.remove('active');
+      });
     });
-});
+  }
 
-// Fechar menu ao redimensionar para desktop
-window.addEventListener('resize', () => {
+  // Fechar menu ao redimensionar para desktop
+  window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
-        navbar.classList.remove('active');
-        menuToggle.classList.remove('active');
+      if (navbar) navbar.classList.remove('active');
+      if (menuToggle) menuToggle.classList.remove('active');
     }
-});
+  });
 
-  // Adicione aqui o código da foto
+  // FOTO DO USUÁRIO (se estiver logado)
   const email = localStorage.getItem('email');
   if (email) {
-    // ✅ FOTO DO USUÁRIO
     fetch("https://lixie-production.up.railway.app/perfil", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `email=${encodeURIComponent(email)}`
     })
     .then(res => res.json())
     .then(usuario => {
       const fotoHome = document.getElementById("fotoHome");
+      if (!fotoHome) return;
       if (usuario.foto && usuario.foto.trim().startsWith("http")) {
         fotoHome.src = usuario.foto.trim();
       } else {
@@ -50,38 +51,46 @@ window.addEventListener('resize', () => {
     .catch(err => console.error("Erro ao carregar foto:", err));
   }
 
+  let tipoSelecionado = "";
+  let pontosTotais = 0;
+  let cepValido = false;
 
-let tipoSelecionado = "";
-let pontosTotais = 0;
-let cepValido = false; 
+  const quantidadeEl = document.getElementById("quantidade");
+  if (quantidadeEl) {
+    quantidadeEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
 
+        const quantidade = parseFloat(document.getElementById("quantidade").value);
+        const resultado = document.getElementById("resultado");
 
-document.getElementById("quantidade").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
+        if (!tipoSelecionado) {
+          if (resultado) {
+            resultado.className = "erro";
+            resultado.innerHTML =  "⚠️ Selecione um material primeiro!";
+          }
+          return;
+        }
 
-    const quantidade = parseFloat(document.getElementById("quantidade").value);
-    const resultado = document.getElementById("resultado");
+        if (!quantidade || quantidade <= 0) {
+          if (resultado) {
+            resultado.className = "erro";
+            resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
+          }
+          return;
+        }
 
-    if (!tipoSelecionado) {
-        resultado.className = "erro";
-        resultado.innerHTML =  "⚠️ Selecione um material primeiro!";
-        return;
-    }
+        if (resultado) {
+          resultado.innerHTML = "";
+          resultado.className = "";
+        }
 
-    if (!quantidade || quantidade <= 0) {
-        resultado.className = "erro";
-        resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
-        return;
-    }
-
-    resultado.innerHTML = "";
-    resultado.className = "";
-
-    document.getElementById("cep").focus();
-    verificarPreenchimento();
+        const cepInput = document.getElementById("cep");
+        if (cepInput) cepInput.focus();
+        verificarPreenchimento();
+      }
+    });
   }
-});
 
 // pontos por material
 const pontosPorMaterial = {
@@ -294,4 +303,6 @@ cep.addEventListener("input", async (e) => {
     erroCep.innerText = "";
     erroCep.className = "";
   }
+});
+
 });

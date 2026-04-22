@@ -462,12 +462,12 @@ header {
   }
 
   .logo-img {
-    max-height: 40px;
+    max-height: 50px; /* manter igual ao home.css */
   }
 
   .profile {
-    width: 36px;
-    height: 36px;
+    width: 42px; /* manter igual ao home.css */
+    height: 42px;
   }
 }
 
