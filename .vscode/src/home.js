@@ -81,13 +81,32 @@ if (usuarioLogado) {
 
 // FUNÇÃO LOGOUT
 function logout() {
-    // remove possíveis flags de sessão e evita prompt de unload
+    // tentativa robusta de sair sem prompt e redirecionar imediatamente
     try { window.onbeforeunload = null; } catch (e) { /* ignore */ }
+
+    // fechar dialogs abertos
+    try {
+        document.querySelectorAll('dialog').forEach(d => { try { if (typeof d.close === 'function') d.close(); } catch(e){} });
+    } catch (e) {}
+
+    // clonar e substituir formulários/inputs para remover event listeners ligados aos elementos
+    try {
+        document.querySelectorAll('form, input, textarea, select, button').forEach(el => {
+            const clone = el.cloneNode(true);
+            el.parentNode && el.parentNode.replaceChild(clone, el);
+        });
+    } catch (e) {}
+
+    // limpar localStorage e redirecionar sem criar histórico
     localStorage.removeItem("usuarioEmail");
     localStorage.removeItem("email");
-    // use replace para não deixar histórico de página de sessão
-    window.location.replace('/.vscode/src/homeNaoLogado.html');
-    window.location.href = "/homeNaoLogado.html";
+
+    // usar replace (sem histórico) e também assign como fallback
+    try {
+        window.location.replace('/.vscode/src/homeNaoLogado.html');
+    } catch (e) {
+        window.location.href = '/.vscode/src/homeNaoLogado.html';
+    }
 }
 
 // CARREGAR RANKING 
