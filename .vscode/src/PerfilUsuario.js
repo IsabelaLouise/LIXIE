@@ -572,6 +572,6 @@ function toggleSenhaLogin(icon) {
 const logado = localStorage.getItem("logado");
 
 if (logado !== "true") {
-  window.location.href = "cadastro.html"; 
+  window.location.href = "/cadastrese.html"; 
 }
 
