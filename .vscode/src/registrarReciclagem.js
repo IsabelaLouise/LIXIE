@@ -157,7 +157,7 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
   resultado.className = "";
   erroCep.innerHTML = "";
   erroCep.className = "";
-  
+
   // validações
   if (!tipoSelecionado) {
     resultado.className = "erro";
