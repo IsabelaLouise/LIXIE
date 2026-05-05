@@ -21,6 +21,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # === CONFIGURAÇÕES DO BANCO ===
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+import cloudinary
+
 DB_CONFIG = {
     "host": "mainline.proxy.rlwy.net",
     "user": "root",
@@ -34,9 +40,9 @@ print("ENV API KEY:", os.getenv('CLOUDINARY_API_KEY'))
 print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
 
 cloudinary.config(
-    cloud_name = "dkcyjejp6",
-    api_key = "452934599459777",
-    api_secret = "6cc8gmWOynE4YOYibmXt3gG2Ndk"
+    cloud_name="dkcyjejp6",
+    api_key="452934599459777",
+    api_secret="6cc8gmWOynE4YOYibmXt3gG2Ndk"
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
@@ -172,16 +178,27 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                cursor.execute("SELECT Senha FROM Usuario WHERE Email = %s", (email,))
+                cursor.execute("""
+                    SELECT u.Senha, p.Nome as permissao
+                    FROM Usuario u
+                    JOIN Permissao p ON u.fk_permissao = p.ID_permissao
+                    WHERE u.Email = %s
+                """, (email,))
+
                 resultado = cursor.fetchone()
 
                 if resultado is None:
                     resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
+                    permissao = resultado[1]
 
                     if bcrypt.checkpw(senha, senha_hash):
-                        resposta = {"sucesso": True, "mensagem": "Login realizado"}
+                        resposta = {
+                            "sucesso": True,
+                            "mensagem": "Login realizado",
+                            "permissao": permissao
+                        }
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
