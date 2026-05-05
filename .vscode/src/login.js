@@ -66,3 +66,5 @@ function toggleSenhaLogin(elemento) {
     elemento.classList.add("fa-eye");
   }
 }
+
+localStorage.setItem("logado", "true");

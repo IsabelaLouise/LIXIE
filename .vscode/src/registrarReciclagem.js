@@ -308,3 +308,10 @@ cep.addEventListener("input", async (e) => {
 });
 
 });
+
+//para jogar para o cadastrese caso nao esteja logado
+const logado = localStorage.getItem("logado");
+
+if (logado !== "true") {
+  window.location.href = "cadastro.html"; 
+}
