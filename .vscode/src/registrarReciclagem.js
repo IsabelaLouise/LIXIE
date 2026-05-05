@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let pontosTotais = 0;
   let cepValido = false;
 
+  // material e quantidade
   const quantidadeEl = document.getElementById("quantidade");
   if (quantidadeEl) {
     quantidadeEl.addEventListener("keydown", (e) => {
@@ -117,7 +118,7 @@ function converterParaKg(valor, unidade) {
   }
 }
 
-
+// verificação de preenchimento
     function verificarPreenchimento() {
     const quantidade = parseFloat(document.getElementById("quantidade").value);
 
@@ -156,6 +157,7 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
   resultado.className = "";
   erroCep.innerHTML = "";
   erroCep.className = "";
+
   // validações
   if (!tipoSelecionado) {
     resultado.className = "erro";
@@ -306,3 +308,10 @@ cep.addEventListener("input", async (e) => {
 });
 
 });
+
+//para jogar para o cadastrese caso nao esteja logado
+const logado = localStorage.getItem("logado");
+
+if (logado !== "true") {
+  window.location.href = "/cadastrese.html"; 
+}

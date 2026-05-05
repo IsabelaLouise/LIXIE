@@ -1,6 +1,5 @@
 // home.js - Arquivo único para homeNaoLogado.html e homeLogado.html
 
-console.log("Home carregada!");
 
 // MENU MOBILE TOGGLE (comum a ambas)
 const menuToggle = document.getElementById('menuToggle');
@@ -351,3 +350,4 @@ if (logoutBtn) {
         window.location.href = "/.vscode/src/homeNaoLogado.html";
     });
 }
+

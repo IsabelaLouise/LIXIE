@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapa de Coleta</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    #map {
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Pontos de Coleta</h2>
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Criar mapa
+  const map = L.map('map').setView([-25.43, -49.27], 13); // Curitiba
+
+  // Adicionar mapa base
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+</script>
+
+</body>
+</html>
