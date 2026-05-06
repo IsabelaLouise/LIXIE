@@ -350,3 +350,4 @@ if (logoutBtn) {
         window.location.href = "/.vscode/src/homeNaoLogado.html";
     });
 }
+
