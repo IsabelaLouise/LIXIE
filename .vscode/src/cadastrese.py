@@ -177,25 +177,25 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor = conexao.cursor()
 
                 cursor.execute("""
-                    SELECT u.Senha, p.Nome as permissao
-                    FROM Usuario u
-                    JOIN Permissao p ON u.fk_permissao = p.ID_permissao
-                    WHERE u.Email = %s
+                    SELECT Senha, Nivel
+                    FROM Usuario
+                    WHERE Email = %s
                 """, (email,))
 
                 resultado = cursor.fetchone()
 
                 if resultado is None:
                     resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
+
                 else:
                     senha_hash = resultado[0].encode('utf-8')
-                    permissao = resultado[1]
+                    nivel = resultado[1]
 
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {
                             "sucesso": True,
                             "mensagem": "Login realizado",
-                            "permissao": permissao
+                            "permissao": "admin" if nivel == 10 else "usuario"
                         }
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
@@ -206,7 +206,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(resposta).encode())
 
             except Exception as e:
-                print(f"Erro no Esqueci Senha: {e}") 
+                print(f"Erro no Login: {e}")
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()

@@ -5,6 +5,8 @@
 const menuToggle = document.getElementById('menuToggle');
 const navbar = document.getElementById('navbar');
 const navLinks = document.querySelectorAll('.nav-link');
+const permissao = localStorage.getItem("permissao");
+const isAdmin = permissao === "admin";
 
 // Toggle menu ao clicar no botão
 if (menuToggle) {
@@ -14,6 +16,28 @@ if (menuToggle) {
     });
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const navbar = document.getElementById("navbar");
+
+    if (!navbar) return;
+
+    if (isAdmin) {
+        // MENU DO ADMIN
+        navbar.innerHTML = `
+            <a href="/.vscode/src/adminUsuarios.html" class="nav-link">Usuários</a>
+            <a href="/.vscode/src/adminReciclagens.html" class="nav-link">Reciclagens</a>
+        `;
+    } else {
+        // MENU NORMAL
+        navbar.innerHTML = `
+            <a href="/.vscode/src/homeLogado.html" class="nav-link active">Home</a>
+            <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
+            <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
+            <a href="#" class="nav-link">Mapa de Coleta</a>
+            <a href="#" class="nav-link">Recompensas</a>
+        `;
+    }
+});
 // Fechar menu ao clicar em um link
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
