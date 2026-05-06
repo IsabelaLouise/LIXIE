@@ -190,6 +190,32 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
 
   // sucesso
   resultado.className = "sucesso";
+
+  const email = localStorage.getItem("email");
+
+fetch("http://localhost:8000/registrar-reciclagem", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: email,
+    tipo: tipoSelecionado,
+    quantidade: quantidade,
+    unidade: unidade,
+    pontos: pontos,
+    cep: document.getElementById("cep").value
+  })
+})
+.then(res => res.json())
+.then(data => {
+  console.log("SALVO NO BACK:", data);
+})
+.catch(err => {
+  console.error("ERRO AO SALVAR:", err);
+});
+
+
   let mensagem = `
   ✅ Registrado com sucesso! <br>
   ♻️ Material: ${tipoSelecionado} <br>
