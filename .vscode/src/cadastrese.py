@@ -177,10 +177,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 cursor = conexao.cursor()
 
                 cursor.execute("""
-                    SELECT u.Senha, p.Nome as permissao
-                    FROM Usuario u
-                    JOIN Permissao p ON u.fk_permissao = p.ID_permissao
-                    WHERE u.Email = %s
+                    SELECT Senha
+                    FROM Usuario
+                    WHERE Email = %s
                 """, (email,))
 
                 resultado = cursor.fetchone()
@@ -189,13 +188,11 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
                 else:
                     senha_hash = resultado[0].encode('utf-8')
-                    permissao = resultado[1]
 
                     if bcrypt.checkpw(senha, senha_hash):
                         resposta = {
                             "sucesso": True,
-                            "mensagem": "Login realizado",
-                            "permissao": permissao
+                            "mensagem": "Login realizado"
                         }
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}

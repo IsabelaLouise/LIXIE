@@ -19,8 +19,10 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
 
     if (dados.sucesso) {
       localStorage.setItem("email", email);
+      localStorage.setItem("permissao", dados.permissao); // 👈 NOVO
+
       window.location.href = "/.vscode/src/homeLogado.html";
-    } else {
+    }else {
       // Sempre mostrar a mensagem simples e visível (mais robusto em deploy)
       const texto = dados.mensagem || 'Email e/ou senha incorreto(s)';
       mensagem.textContent = texto;
