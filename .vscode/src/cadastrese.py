@@ -843,6 +843,98 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     cursor.close()
                     conexao.close()
 
+        elif self.path == '/registrar-reciclagem':
+            content_length = int(self.headers['Content-Length'])
+            dados = json.loads(self.rfile.read(content_length).decode())
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("SELECT ID_usuario FROM Usuario WHERE Email = %s", (dados["email"],))
+            usuario = cursor.fetchone()
+
+            if not usuario:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            id_usuario = usuario[0]
+
+            cursor.execute("""
+                INSERT INTO Reciclagem 
+                (Tipo_Material, Data, Quantidade, Unidade, CEP, Pontos, fk_Usuario_ID_usuario)
+                VALUES (%s, NOW(), %s, %s, %s, %s, %s)
+            """, (
+                dados["tipo"],
+                dados["quantidade"],
+                dados["unidade"],
+                dados["cep"],
+                dados["pontos"],
+                id_usuario
+            ))
+
+            cursor.execute("""
+                UPDATE Usuario 
+                SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
+                WHERE ID_usuario = %s
+            """, (dados["pontos"], id_usuario))
+
+            conexao.commit()
+
+            self.send_response(200)
+            self.end_headers()
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/editar-reciclagem':
+            dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("""
+                UPDATE Reciclagem SET Quantidade=%s WHERE ID_reciclagem=%s
+            """, (dados["quantidade"], dados["id"]))
+
+            conexao.commit()
+
+            self.send_response(200)
+            self.end_headers()
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/deletar-reciclagem':
+            dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("SELECT Pontos, fk_Usuario_ID_usuario FROM Reciclagem WHERE ID_reciclagem=%s", (dados["id"],))
+            reg = cursor.fetchone()
+
+            if reg:
+                pontos, id_usuario = reg
+
+                cursor.execute("DELETE FROM Reciclagem WHERE ID_reciclagem=%s", (dados["id"],))
+
+                cursor.execute("""
+                    UPDATE Usuario 
+                    SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) - %s
+                    WHERE ID_usuario = %s
+                """, (pontos, id_usuario))
+
+                conexao.commit()
+
+            self.send_response(200)
+            self.end_headers()
+
+            cursor.close()
+            conexao.close()
+
+
+
 # === INICIALIZAÇÃO ===
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000)) 
