@@ -1,4 +1,4 @@
-const TEMPO_MAXIMO = 0.1 * 60 * 1000; // 0.1 minutos em milissegundos
+const TEMPO_MAXIMO = 0.2 * 60 * 1000; // 0.2 minutos em milissegundos
 
 function verificarSessao() {
     const logado = localStorage.getItem("logado");
@@ -23,7 +23,7 @@ function atualizarAtividade() {
 }
 
 function redirecionarLogin() {
-    window.location.href = "homeNaoLogado.html";
+    window.location.href = "login.html";
 }
 
 // eventos de atividade
