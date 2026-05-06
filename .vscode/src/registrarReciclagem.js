@@ -193,7 +193,7 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
 
   const email = localStorage.getItem("email");
 
-fetch("http://localhost:8000/registrar-reciclagem", {
+fetch("https://lixie-production.up.railway.app/registrar-reciclagem",  {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
