@@ -49,6 +49,13 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   }
 });
 
+localStorage.setItem("logado", "true");
+localStorage.setItem("ultimoAcesso", Date.now());
+
+function logout() {
+    localStorage.clear();
+    window.location.href = "homeNaoLogado.html";
+}
 
 // 👇 FORA DO EVENTO (IMPORTANTE)
 function toggleSenhaLogin(elemento) {
