@@ -6,6 +6,10 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   const mensagem = document.getElementById("mensagem");
   const overlayErroLogin = document.getElementById("mensagem-erro-login");
 
+  
+  localStorage.setItem("logado", "true");
+  localStorage.setItem("ultimoAcesso", Date.now());
+
   try {
     const resposta = await fetch("https://lixie-production.up.railway.app/login", {
       method: "POST",
@@ -48,9 +52,6 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     mensagem.style.display = "block";
   }
 });
-
-localStorage.setItem("logado", "true");
-localStorage.setItem("ultimoAcesso", Date.now());
 
 function logout() {
     localStorage.clear();
