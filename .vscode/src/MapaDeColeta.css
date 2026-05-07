@@ -13,6 +13,10 @@ body {
     overflow-x: hidden;
 }
 
+#map {
+      height: 100%;
+    }
+
 /* HEADER */
 header {
     width: 100%;
