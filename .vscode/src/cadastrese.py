@@ -14,6 +14,8 @@ except Exception:
 import uuid
 import cloudinary
 import cloudinary.uploader
+import os
+import cloudinary
 from datetime import datetime
 
 import smtplib
@@ -21,26 +23,22 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # === CONFIGURAÇÕES DO BANCO ===
-
 import os
 import cloudinary
 
+# === BANCO (via ENV) ===
 DB_CONFIG = {
-    "host": "mainline.proxy.rlwy.net",
-    "user": "root",
-    "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
-    "database": "Lixie",
-    "port": 28939
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
+    "port": int(os.getenv("DB_PORT", 3306))
 }
-
-print("ENV CLOUD NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
-print("ENV API KEY:", os.getenv('CLOUDINARY_API_KEY'))
-print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
-
+# === CLOUDINARY (via ENV) ===
 cloudinary.config(
-    cloud_name="dkcyjejp6",
-    api_key="452934599459777",
-    api_secret="6cc8gmWOynE4YOYibmXt3gG2Ndk"
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
@@ -57,8 +55,6 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_GET(self):
-            # Como as fotos agora estão no Cloudinary, você não precisará mais 
-            # desse GET para buscar na pasta /uploads/, mas vou manter por segurança.
             if self.path.startswith("/uploads/"):
                 self.send_response(404) # Fotos locais não existem mais
                 self.end_headers()
