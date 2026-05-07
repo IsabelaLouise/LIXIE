@@ -31,7 +31,7 @@ window.addEventListener('resize', () => {
     }
 });
 
-  // Adicione aqui o código da foto
+  
   const email = localStorage.getItem('email');
   if (email) {
     // ✅ FOTO DO USUÁRIO
