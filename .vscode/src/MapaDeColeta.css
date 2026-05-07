@@ -9,7 +9,6 @@ body {
     position: relative;
     font-family: 'Roboto', sans-serif;
     min-height: 100vh;
-    background: #ede8d0;
     color: #333;
     overflow-x: hidden;
 }
