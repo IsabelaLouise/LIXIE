@@ -791,10 +791,304 @@ footer span {
     }
 }
 
+/* 1) AMBOS */
 
-/* =========================
-   IMPACTO (NOVA SEÇÃO)
-========================= */
+header {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    font-weight: bold;
+    background: #ede8d0;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    gap: 20px;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    max-height: 50px;
+    width: auto;
+    transition: transform 0.2s;
+}
+
+.logo-link:hover .logo-img {
+    transform: scale(1.05);
+}
+
+.navbar {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    flex: 1;
+    margin: 0 20px;
+}
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    color: #5b9e69;
+    border-bottom-color: #5b9e69;
+}
+
+.nav-link.active {
+    color: #5b9e69;
+    border-bottom-color: #5b9e69;
+    font-weight: 600;
+}
+
+.menu-toggle {
+    display: none; /* exibido apenas em mobile via media queries */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #085b1c;
+    cursor: pointer;
+    padding: 5px;
+    transition: 0.2s;
+}
+
+.menu-toggle:hover { color: #5b9e69; }
+
+.btn-auth {
+    background-color: #5b9e69;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-auth:hover { background-color: #20582d; transform: scale(1.05); }
+
+.btn-auth i { font-size: 16px; }
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 40px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+main h1 {
+    font-family: "DynaPuff", system-ui;
+    color: #085b1c;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* SECTIONS (entrance animation shared) */
+.ranking, .como-funciona, .impacto-ambiental, .artigos {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.ranking.fade-in, .como-funciona.fade-in, .impacto-ambiental.fade-in, .artigos.fade-in {
+    opacity: 1; transform: translateY(0);
+}
+
+.ranking { width: 100%; max-width: 1200px; margin-bottom: 40px; }
+.ranking-card h4 { font-size: 28px; color: #085b1c; margin-bottom: 40px; }
+.ranking-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+.ranking-card { background: rgba(237,232,208,0.8); border-radius:16px; padding:25px; box-shadow:none; text-align:center; }
+.ranking-card h3 { color:#5b9e69; font-size:18px; margin-bottom:20px; font-weight:600; }
+
+.card { background:#f1f8f2; border-radius:16px; padding:15px; box-shadow:0 4px 12px rgba(0,0,0,0.05); margin-top:40px; }
+.card h2 { margin-bottom:15px; color:#2e7d32; }
+
+.cta-image-card { position:relative; width:100%; border-radius:20px; overflow:hidden; margin-top:25px; }
+.cta-image-card img { width:100%; height:auto; display:block; border-radius:20px; }
+.cta-image-card .btn-join { position:absolute; left:50%; bottom:20px; transform:translateX(-50%); padding:12px 24px; border:none; border-radius:999px; font-weight:700; cursor:pointer; transition:background 0.2s ease; }
+
+.ranking-side { display:flex; flex-direction:column; gap:12px; }
+
+/* Unified buttons (shared) */
+.btn-ranking-complete, .btn-register-recycling, .btn-join {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    transition: background 0.2s ease;
+    background: rgba(255,255,255,0.95);
+    color: #085b1c;
+    margin: 0 auto;
+    display: block;
+}
+.btn-register-recycling:hover, .btn-register-recycling:focus { box-shadow:0 4px 12px rgba(91,158,105,0.3); color:white; background:#4a8456; transform:scale(1.05); }
+.btn-join:hover { color:#085b1c; box-shadow:0 4px 12px rgba(91,158,105,0.3); transform:scale(1.05); }
+.btn-ranking-complete { background:#5b9e69; color:white; }
+
+/* RANK ITEMS */
+.rank-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #eee; }
+.rank-item:last-child { border-bottom:none; }
+.rank-left { display:flex; gap:12px; align-items:center; flex:1; }
+.position { background:#e8f5e9; color:#2e7d32; font-weight:bold; padding:8px 12px; border-radius:100px; border:2px solid #4caf50; font-size:14px; min-width:40px; text-align:center; }
+.rank-item:nth-child(1) .position { background:linear-gradient(135deg,#c7ab0e 0%,#99840de3 100%); color:#fff; box-shadow:0 4px 12px rgba(153,131,6,0.459); }
+.rank-item:nth-child(2) .position { background:linear-gradient(135deg,#C0C0C0 0%,#E8E8E8 100%); color:#333; box-shadow:0 4px 12px rgba(192,192,192,0.5); }
+.rank-item:nth-child(3) .position { background:linear-gradient(135deg,#CD7F32 0%,#a75113d3 100%); color:white; box-shadow:0 4px 12px rgba(88,53,17,0.5); }
+.rank-name { font-size:15px; font-weight:500; color:#333; }
+.rank-points { font-size:15px; font-weight:600; color:#5b9e69; }
+
+/* CTA CARD */
+.cta-card { background:linear-gradient(135deg,#e8f5e9 0%,#f7f9f6 100%); border:2px solid #5b9e69; display:flex; align-items:center; justify-content:center; min-height:140px; }
+.cta-content { text-align:center; }
+.cta-content h3 { color:#085b1c; font-size:18px; margin-bottom:10px; }
+.cta-content p { color:#555; font-size:14px; line-height:1.5; }
+
+/* INFO BOX */
+.info-box { background:#f1f8f2; border-radius:12px; padding:15px; display:flex; align-items:center; gap:10px; font-size:15px; color:#555; border:1px solid white; }
+.info-box img, .reciclagem-img, .presente-img { width:24px; height:24px; }
+
+/* PROGRESS */
+.progress-bar { height:10px; background:#e0e0e0; border-radius:10px; margin:10px 0; overflow:hidden; }
+.progress { height:100%; width:60%; background:#4caf50; }
+.progress-text { font-size:14px; color:#555; margin-bottom:10px; }
+
+.ranking p, .como-funciona p, .impacto-ambiental p { font-size:16px; line-height:1.6; color:#555; margin-bottom:10px; }
+
+.artigos ul { list-style:none; padding:0; }
+.artigos li { padding:10px 0; border-bottom:1px solid #eee; font-size:16px; color:#555; }
+.artigos li:last-child { border-bottom:none; }
+
+.video-section { width:100%; max-width:1600px; margin:0 auto 30px; position:relative; overflow:hidden; border-radius:30px; }
+.home-video { width:100%; height:auto; display:block; object-fit:cover; aspect-ratio:24/9; border-radius:30px; }
+
+.video-overlay {
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; color:white; text-align:left; border-radius:30px; padding-left:60px;
+}
+.video-overlay h2 { opacity:0; transform:translateY(50px); animation:flyIn 1s ease-out 1s forwards; font-size:52px; font-weight:700; margin-bottom:15px; font-family:"Montserrat",sans-serif; letter-spacing:-1px; }
+.video-overlay .p1, .video-overlay .p2, .video-overlay .p3 { opacity:0; transform:translateY(50px); animation:flyIn 1s ease-out forwards; font-size:22px; font-weight:300; font-family:"Montserrat",sans-serif; letter-spacing:0.5px; max-width:400px; }
+.video-overlay .p1 { animation-delay:1.5s; }
+.video-overlay .p2 { animation-delay:2s; }
+.video-overlay .p3 { animation-delay:2.5s; }
+
+@keyframes flyIn { from { opacity:0; transform:translateY(50px); } to { opacity:1; transform:translateY(0); } }
+
+/* FOOTER */
+footer { width:100%; padding:20px; background:#ede8d0; position:relative; display:flex; justify-content:center; align-items:center; color:#6b7b6b; font-size:14px; }
+footer span { position:absolute; left:50%; transform:translateX(-50%); }
+
+
+/* 2) HOME_LOGADO */
+
+.profile-link { display:flex; align-items:center; justify-content:center; text-decoration:none; flex-shrink:0; }
+.profile { width:42px; height:42px; border-radius:50%; background:#cfd8cc; border:2px solid #e0e0e0; transition:transform 0.2s ease, background 0.2s ease; }
+.profile-link:hover .profile { transform:translateY(-2px); background:#d6e7d3; }
+
+.logout-footer { position:absolute; right:20px; text-decoration:none; color:#c0392b; font-weight:600; display:flex; align-items:center; gap:6px; transition:0.2s; }
+.logout-footer:hover { color:#922b21; transform:scale(1.05); }
+
+/* botão de registrar coleta/reciclagem — tipicamente visível apenas para usuários logados */
+.btn-register-recycling { background: rgba(255,255,255,0.95); color:#085b1c; padding:12px 24px; border:none; border-radius:999px; cursor:pointer; font-weight:700; font-size:15px; transition:background 0.2s ease; margin:0 auto; display:block; margin-top:10px; }
+
+/* sessão/modal usado para ações relacionadas à conta (login, confirmação) */
+.session-modal { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; }
+.session-modal.active { opacity:1; pointer-events:auto; }
+.session-box { background:#f1f8f2; padding:30px; border-radius:20px; text-align:center; width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.15); transform:translateY(20px); transition:0.3s; }
+.session-modal.active .session-box { transform:translateY(0); }
+.session-box h2 { color:#085b1c; margin-bottom:10px; }
+.session-box p { color:#555; margin-bottom:20px; }
+.session-box button { background:#5b9e69; color:white; border:none; padding:10px 20px; border-radius:999px; cursor:pointer; font-weight:bold; transition:0.2s; }
+.session-box button:hover { background:#4a8456; transform:scale(1.05); }
+
+
+/* 3) HOME_NAO_LOGADO */
+
+/* Botões e CTAs para visitantes (ex.: join, call-to-action) */
+.btn-join { /* já definido acima como shared; ajuste específico abaixo, se necessário */ }
+
+
+/* 4) RESPONSIVIDADE  */
+
+@media (max-width: 1024px) {
+    .navbar { gap: 15px; }
+    .nav-link { font-size: 13px; }
+    .btn-auth { padding: 8px 12px; font-size: 12px; }
+    .como-funciona-cards { grid-template-columns: repeat(2, 1fr); }
+    .impacto-grid, .artigos_grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .header-container { position:relative; justify-content:center; }
+    .menu-toggle { position:absolute; left:15px; display:flex; }
+    .logo-link { position:absolute; left:50%; transform:translateX(-50%); }
+    .btn-auth, .profile-link { position:absolute; right:15px; padding:6px 10px; gap:5px; }
+
+    .navbar { position:fixed; top:70px; left:0; right:0; background:white; flex-direction:column; max-height:0; overflow:hidden; opacity:0; pointer-events:none; transition:all 0.3s ease; }
+    .navbar.active { max-height:400px; opacity:1; pointer-events:auto; }
+    .nav-link { display:block; padding:12px 20px; border-bottom:1px solid #eee; border-bottom-color:transparent; width:100%; text-align:left; }
+    .nav-link:hover { background-color: rgba(91,158,105,0.1); }
+
+    .ranking, .como-funciona, .impacto-ambiental, .artigos { padding:20px; margin-bottom:20px; }
+    .ranking-grid { grid-template-columns: 1fr; gap:20px; }
+    .ranking-side { gap:15px; }
+    .btn-ranking-complete, .btn-register-recycling { font-size:14px; padding:10px 14px; }
+    main h1 { font-size:24px; }
+}
+
+@media (max-width: 768px) {
+    .ranking-card { padding:15px; }
+    .rank-item { flex-direction:column; align-items:flex-start; gap:5px; }
+    .rank-points { align-self:flex-end; }
+
+    .home-video { aspect-ratio:16/9; }
+    .video-overlay { padding:0 20px; align-items:flex-start; text-align:left; max-width:90%; }
+    .video-overlay h2 { font-size:26px; }
+    .video-overlay .p1, .video-overlay .p2, .video-overlay .p3 { font-size:14px; max-width:100%; }
+
+    .impacto-container { grid-template-columns: 1fr; }
+    .impacto-visual { order:2; }
+    .impacto-texto { order:1; }
+
+    .como-funciona-cards, .impacto-grid, .artigos-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .como-funciona-cards { grid-template-columns: 1fr; }
+}
+
+
+
+/* IMPACTO (NOVA SEÇÃO)  */
 .impacto-ambiental {
     width: 100%;
     max-width: 1200px;
@@ -869,9 +1163,7 @@ footer span {
 }
 
 
-/* =========================
-   ARTIGOS (LISTA CLEAN)
-========================= */
+/* ARTIGOS */
 .artigos {
     width: 100%;
     max-width: 900px;
