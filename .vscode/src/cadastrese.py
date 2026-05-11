@@ -12,6 +12,7 @@ except Exception:
     cgi = None
     HAVE_CGI = False
 import uuid
+import time
 import cloudinary
 import cloudinary.uploader
 import os
@@ -203,7 +204,17 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
+                # Ao fazer login com sucesso, setamos cookies de sessão com timeout de 30 minutos
+                # `session_token` fica HttpOnly e `session_expires` fica acessível ao JS (para exibir o modal)
                 self.send_response(200)
+                # criar token e timestamp de expiração
+                if resposta.get("sucesso"):
+                    token = uuid.uuid4().hex
+                    expires_ts = int(time.time()) + 30 * 60  # 30 minutos em segundos
+                    # session_token (HttpOnly) e session_expires (visível ao JS)
+                    self.send_header('Set-Cookie', f'session_token={token}; Max-Age=1800; Path=/; HttpOnly; SameSite=Lax')
+                    self.send_header('Set-Cookie', f'session_expires={expires_ts}; Max-Age=1800; Path=/; SameSite=Lax')
+
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps(resposta).encode())
