@@ -14,6 +14,8 @@ except Exception:
 import uuid
 import cloudinary
 import cloudinary.uploader
+import os
+import cloudinary
 from datetime import datetime
 
 import smtplib
@@ -21,26 +23,22 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # === CONFIGURAÇÕES DO BANCO ===
-
 import os
 import cloudinary
 
+# === BANCO (via ENV) ===
 DB_CONFIG = {
-    "host": "mainline.proxy.rlwy.net",
-    "user": "root",
-    "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
-    "database": "Lixie",
-    "port": 28939
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
+    "port": int(os.getenv("DB_PORT", 3306))
 }
-
-print("ENV CLOUD NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
-print("ENV API KEY:", os.getenv('CLOUDINARY_API_KEY'))
-print("ENV API SECRET:", os.getenv('CLOUDINARY_API_SECRET'))
-
+# === CLOUDINARY (via ENV) ===
 cloudinary.config(
-    cloud_name="dkcyjejp6",
-    api_key="452934599459777",
-    api_secret="6cc8gmWOynE4YOYibmXt3gG2Ndk"
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
@@ -57,8 +55,6 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_GET(self):
-            # Como as fotos agora estão no Cloudinary, você não precisará mais 
-            # desse GET para buscar na pasta /uploads/, mas vou manter por segurança.
             if self.path.startswith("/uploads/"):
                 self.send_response(404) # Fotos locais não existem mais
                 self.end_headers()
@@ -176,27 +172,34 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 conexao = mysql.connector.connect(**DB_CONFIG)
                 cursor = conexao.cursor()
 
-                cursor.execute("""
-                    SELECT Senha, Nivel
-                    FROM Usuario
-                    WHERE Email = %s
-                """, (email,))
-
+                # tentamos suportar tanto o modelo antigo (Nivel) quanto a nova FK de permissão
+                cursor.execute("SELECT Senha, COALESCE(fk_permissao, NULL), COALESCE(Nivel, NULL) FROM Usuario WHERE Email = %s", (email,))
                 resultado = cursor.fetchone()
 
                 if resultado is None:
                     resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
-
                 else:
                     senha_hash = resultado[0].encode('utf-8')
-                    nivel = resultado[1]
+                    fk_perm = resultado[1]
+                    nivel = resultado[2]
 
                     if bcrypt.checkpw(senha, senha_hash):
-                        resposta = {
-                            "sucesso": True,
-                            "mensagem": "Login realizado",
-                            "permissao": "admin" if nivel == 10 else "usuario"
-                        }
+                        perm_nome = 'usuario'
+                        # se existir fk_permissao, buscar nome na tabela Permissao
+                        if fk_perm:
+                            try:
+                                cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                                row = cursor.fetchone()
+                                if row and row[0]:
+                                    perm_nome = row[0]
+                            except Exception:
+                                perm_nome = 'usuario'
+                        else:
+                            # fallback pelo campo Nivel (compatibilidade retroativa)
+                            if nivel is not None and int(nivel) == 10:
+                                perm_nome = 'admin'
+
+                        resposta = {"sucesso": True, "mensagem": "Login realizado", "permissao": perm_nome}
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
 
@@ -227,34 +230,54 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
-            # buscar dados do usuário (tratar NULLs na pontuação)
+            # buscar dados do usuário (tratar NULLs na pontuação) e permissão
             cursor.execute("""
-                SELECT Nome, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos, Nivel
+                SELECT Nome, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos, Nivel, COALESCE(fk_permissao, NULL)
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
             usuario = cursor.fetchone()
 
             if not usuario:
-                resposta = {"nome": "", "pontos": 0, "nivel": "", "posicao": None}
+                resposta = {"nome": "", "pontos": 0, "nivel": "", "posicao": None, "permissao": "usuario"}
             else:
                 pontos_usuario = usuario[1]
                 # calcular posição do usuário no ranking geral de forma robusta
                 try:
                     cursor.execute(
-                        "SELECT COUNT(*) FROM Usuario WHERE (COALESCE(Pontuacao_Total_Acumulada_, 0) > %s) OR (COALESCE(Pontuacao_Total_Acumulada_, 0) = %s AND Email < %s)",
-                        (pontos_usuario, pontos_usuario, email)
+                        "SELECT COUNT(*) FROM Usuario WHERE (COALESCE(Pontuacao_Total_Acumulada_, 0) > %s) OR (COALESCE(Pontuacao_Total_Acumulada_, 0) = %s AND Nome < %s)",
+                        (pontos_usuario, pontos_usuario, usuario[0])
                     )
                     maior_count = cursor.fetchone()[0]
                     posicao = maior_count + 1
                 except Exception:
                     posicao = None
 
+                # determina nome da permissão
+                fk_perm = usuario[3]
+                perm_nome = 'usuario'
+                if fk_perm:
+                    try:
+                        cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                        r = cursor.fetchone()
+                        if r and r[0]:
+                            perm_nome = r[0]
+                    except Exception:
+                        perm_nome = 'usuario'
+                else:
+                    # fallback a partir do campo Nivel
+                    try:
+                        if usuario[2] is not None and int(usuario[2]) == 10:
+                            perm_nome = 'admin'
+                    except Exception:
+                        pass
+
                 resposta = {
                     "nome": usuario[0],
                     "pontos": pontos_usuario,
                     "nivel": usuario[2],
-                    "posicao": posicao
+                    "posicao": posicao,
+                    "permissao": perm_nome
                 }
 
             self.send_response(200)
@@ -449,11 +472,11 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
+            # Retornar ranking completo, ordenado por pontos desc e nome asc (desempate alfabético)
             cursor.execute("""
-                SELECT Nome, Email, Pontuacao_Total_Acumulada_
+                SELECT Nome, Email, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos
                 FROM Usuario
-                ORDER BY Pontuacao_Total_Acumulada_ DESC
-                LIMIT 10
+                ORDER BY pontos DESC, Nome ASC
             """)
 
             resultados = cursor.fetchall()
@@ -461,9 +484,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             ranking = []
             for i, user in enumerate(resultados):
                 ranking.append({
-                "posicao": i + 1,
-                "nome": user[0],
-                "pontos": user[2]
+                    "posicao": i + 1,
+                    "nome": user[0],
+                    "pontos": user[2]
                 })
 
             self.send_response(200)
@@ -893,8 +916,33 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
         elif self.path == '/editar-reciclagem':
             dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
 
+            # exige 'requester' (email) para validar permissão
+            requester = dados.get('requester')
+            if not requester:
+                self.send_response(403)
+                self.end_headers()
+                return
+
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
+
+            # checa permissão do requester
+            cursor.execute("SELECT COALESCE(fk_permissao, 0) FROM Usuario WHERE Email = %s", (requester,))
+            perm_row = cursor.fetchone()
+            fk_perm = perm_row[0] if perm_row else None
+
+            is_admin = False
+            if fk_perm:
+                cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                p = cursor.fetchone()
+                is_admin = (p and p[0] == 'admin')
+
+            if not is_admin:
+                self.send_response(403)
+                self.end_headers()
+                cursor.close()
+                conexao.close()
+                return
 
             cursor.execute("""
                 UPDATE Reciclagem SET Quantidade=%s WHERE ID_reciclagem=%s
@@ -911,8 +959,31 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
         elif self.path == '/deletar-reciclagem':
             dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
 
+            requester = dados.get('requester')
+            if not requester:
+                self.send_response(403)
+                self.end_headers()
+                return
+
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
+
+            cursor.execute("SELECT COALESCE(fk_permissao, 0) FROM Usuario WHERE Email = %s", (requester,))
+            perm_row = cursor.fetchone()
+            fk_perm = perm_row[0] if perm_row else None
+
+            is_admin = False
+            if fk_perm:
+                cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                p = cursor.fetchone()
+                is_admin = (p and p[0] == 'admin')
+
+            if not is_admin:
+                self.send_response(403)
+                self.end_headers()
+                cursor.close()
+                conexao.close()
+                return
 
             cursor.execute("SELECT Pontos, fk_Usuario_ID_usuario FROM Reciclagem WHERE ID_reciclagem=%s", (dados["id"],))
             reg = cursor.fetchone()
