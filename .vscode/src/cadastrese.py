@@ -210,7 +210,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 # criar token e timestamp de expiração
                 if resposta.get("sucesso"):
                     token = uuid.uuid4().hex
-                    expires_ts = int(time.time()) + 30 * 60  # 30 minutos em segundos
+                    expires_ts = int(time.time()) + 0.1 * 60  # 6 segundos
                     # session_token (HttpOnly) e session_expires (visível ao JS)
                     self.send_header('Set-Cookie', f'session_token={token}; Max-Age=1800; Path=/; HttpOnly; SameSite=Lax')
                     self.send_header('Set-Cookie', f'session_expires={expires_ts}; Max-Age=1800; Path=/; SameSite=Lax')
