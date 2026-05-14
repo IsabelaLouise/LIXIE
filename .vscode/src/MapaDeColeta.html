@@ -3,6 +3,12 @@
 <head>
   <title>Mapa de Coleta</title>
 
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="MapaDeColeta.css">
@@ -34,14 +40,35 @@
         </div>
     </header>
 
+    <main class="page-content">
+      <section class="map-section">
+        <div class="page-title">
+          <h1>Mapa de Coleta</h1>
+          <p>Encontre pontos de coleta próximos de você e ajude a transformar o futuro.</p>
+        </div>
 
+        <div class="map-layout">
+          <div class="map-card">
+            <div class="map-search">
+              <input type="text" placeholder="Buscar endereço ou bairro">
+            </div>
+            <div id="map"></div>
+            <div class="map-info">
+              <span>37 pontos de coleta encontrados</span>
+              <small>Mostrando todos os pontos</small>
+            </div>
+          </div>
 
-<div id="map"></div>
+          <aside class="filters-card">
+            <h2>Filtros</h2>
+            <!-- daqui a pouco eu adiciono os filtros reais -->
+          </aside>
+        </div>
+      </section>
+    </main>
 
-
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
   // Criar mapa
