@@ -33,7 +33,7 @@ DB_CONFIG = {
     "user": "root",
     "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
     "database": "Lixie",
-    "port": 28939
+    "port": 3306
 }
 # === CLOUDINARY ===
 cloudinary.config(
@@ -66,6 +66,12 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
         # CADASTRO
         # =========================
         if self.path.rstrip('/') == '/cadastrar':
+            try:
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                print("✅ Conectou no banco!")
+                conexao.close()
+            except Exception as e:
+                print("❌ ERRO DE CONEXÃO:", e)
             content_length = int(self.headers['Content-Length'])
             corpo_requisicao = self.rfile.read(content_length)
             from urllib.parse import parse_qs
