@@ -35,7 +35,7 @@ window.addEventListener('resize', () => {
   const email = localStorage.getItem('email');
   if (email) {
     // ✅ FOTO DO USUÁRIO
-    fetch("https://lixie-production.up.railway.app/perfil", {
+    fetch("http://localhost:8000/perfil", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -68,7 +68,7 @@ async function carregarRanking() {
   `;
 
   try {
-    const response = await fetch('https://lixie-production.up.railway.app/ranking', {
+    const response = await fetch("http://localhost:8000/ranking", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ async function carregarProgresso() {
 
   try {
     // 🔥 pega dados do usuário
-    const resUser = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
+    const resUser = await fetch("http://localhost:8000/dados-usuario", {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `email=${email}`
@@ -130,7 +130,7 @@ async function carregarProgresso() {
     const usuario = await resUser.json();
 
     // 🔥 pega ranking completo
-    const resRanking = await fetch('https://lixie-production.up.railway.app/ranking', {
+    const resRanking = await fetch("http://localhost:8000/ranking", {
       method: 'POST'
     });
 

@@ -11,7 +11,7 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   localStorage.setItem("ultimoAcesso", Date.now());
 
   try {
-    const resposta = await fetch("https://lixie-production.up.railway.app/login", {
+    const resposta = await fetch("http://localhost:8000/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"

@@ -67,7 +67,7 @@ if (window.location.pathname.includes('homeLogado.html') && !usuarioLogado) {
 // FUNÇÕES PARA USUÁRIO LOGADO
 if (usuarioLogado) {
     // DADOS DO USUÁRIO
-    fetch("https://lixie-production.up.railway.app/dados-usuario", {
+    fetch("http://localhost:8000/dados-usuario", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -79,11 +79,13 @@ if (usuarioLogado) {
         document.getElementById("nome").textContent = dados.nome;
         document.getElementById("pontos").textContent = dados.pontos;
         document.getElementById("nivel").textContent = dados.nivel;
+        // salvar permissão localmente para controle de menu
+        if (dados.permissao) localStorage.setItem('permissao', dados.permissao);
     })
     .catch(err => console.error("Erro ao conectar ao Railway:", err));
 
     // FOTO DO USUÁRIO
-    fetch("https://lixie-production.up.railway.app/perfil", {
+    fetch("http://localhost:8000/perfil", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -145,7 +147,7 @@ async function carregarRankingHome() {
     `;
 
     try {
-        const response = await fetch('https://lixie-production.up.railway.app/ranking', {
+        const response = await fetch("http://localhost:8000/ranking", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -193,7 +195,7 @@ async function carregarProgressoHomeLogada() {
     if (!container) return;
 
     try {
-        const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
+        const response = await fetch("http://localhost:8000/dados-usuario", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -206,7 +208,8 @@ async function carregarProgressoHomeLogada() {
 
             // se o backend já retornou a posição do usuário, use-a (inclui usuários fora do top-10)
             const posicaoUsuario = (typeof dados.posicao !== 'undefined' && dados.posicao !== null) ? dados.posicao : null;
-            const posText = posicaoUsuario ? `${posicaoUsuario}º Lugar` : `${dados.nivel}`;
+            // mostrar '-º' para usuarios fora do top-10 (posicao > 10) ou sem posicao
+            const posText = (posicaoUsuario && Number(posicaoUsuario) <= 10) ? `${posicaoUsuario}º Lugar` : '-º';
 
             container.innerHTML = `
                 <p class="progress-text">Você está em: <strong>${posText}</strong></p>
@@ -228,7 +231,7 @@ async function carregarReciclagemsemana() {
     if (!container) return;
 
     try {
-        const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
+        const response = await fetch("http://localhost:8000/dados-usuario", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -255,7 +258,7 @@ async function carregarRecompensas() {
     if (!container) return;
 
     try {
-        const response = await fetch('https://lixie-production.up.railway.app/dados-usuario', {
+        const response = await fetch("http://localhost:8000/dados-usuario", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

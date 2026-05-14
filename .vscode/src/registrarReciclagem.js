@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // FOTO DO USUÁRIO (se estiver logado)
   const email = localStorage.getItem('email');
   if (email) {
-    fetch("https://lixie-production.up.railway.app/perfil", {
+    fetch("http://localhost:8000/perfil", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `email=${encodeURIComponent(email)}`
@@ -193,7 +193,7 @@ document.getElementById("formReciclagem").addEventListener("submit", (e) => {
 
   const email = localStorage.getItem("email");
 
-fetch("https://lixie-production.up.railway.app/registrar-reciclagem",  {
+fetch("http://localhost:8000/registrar-reciclagem",  {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -339,5 +339,5 @@ cep.addEventListener("input", async (e) => {
 const logado = localStorage.getItem("logado");
 
 if (logado !== "true") {
-  window.location.href = "/cadastrese.html"; 
+  window.location.href = "cadastrese.html"; 
 }

@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const formData = new URLSearchParams();
     formData.append("email", emailValor);
 
-    const resposta = await fetch("https://lixie-production.up.railway.app/verificar-email", {
+    const resposta = await fetch("http://localhost:8000/verificar-email", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const formData = new URLSearchParams(new FormData(form));
 
-      const resposta = await fetch("https://lixie-production.up.railway.app/cadastrar", {
+      const resposta = await fetch("http://localhost:8000/cadastrar", {
         method: "POST",
         body: formData
       });

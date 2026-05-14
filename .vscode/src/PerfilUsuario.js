@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =========================
     if (emailUsuario) {
         try {
-            const res = await fetch("https://lixie-production.up.railway.app/perfil", {
+            const res = await fetch("http://localhost:8000/perfil", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!validarNovaSenha()) return;
 
       try {
-          const resposta = await fetch("https://lixie-production.up.railway.app/trocar-senha", {
+          const resposta = await fetch("http://localhost:8000/trocar-senha", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json"
@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const res = await fetch("https://lixie-production.up.railway.app/atualizar-perfil", {
+            const res = await fetch("http://localhost:8000/atualizar-perfil", {
                 method: "POST",
                 body: formData 
             });
@@ -457,7 +457,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const resposta = await fetch("https://lixie-production.up.railway.app/deletar-conta", {
+            const resposta = await fetch("http://localhost:8000/deletar-conta", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
