@@ -536,19 +536,39 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             usuario = cursor.fetchone()
 
-            resposta = {
-                "nome": usuario[0],
-                "email": usuario[1],
-                "telefone": usuario[2],
-                "dataNascimento": str(usuario[3]),
-                "cep": usuario[4],
-                "rua": usuario[5],
-                "cidade": usuario[6],
-                "estado": usuario[7],
-                "numero": usuario[8],
-                "complemento": usuario[9],
-                "foto": usuario[10]
-            }
+            if not usuario:
+                # usuário não encontrado -> responder campos vazios para o frontend não quebrar
+                resposta = {
+                    "nome": "",
+                    "email": "",
+                    "telefone": "",
+                    "dataNascimento": "",
+                    "cep": "",
+                    "rua": "",
+                    "cidade": "",
+                    "estado": "",
+                    "numero": "",
+                    "complemento": "",
+                    "foto": ""
+                }
+            else:
+                # normaliza valores None para string vazia
+                def norm(v):
+                    return "" if v is None else (str(v) if not isinstance(v, str) else v)
+
+                resposta = {
+                    "nome": norm(usuario[0]),
+                    "email": norm(usuario[1]),
+                    "telefone": norm(usuario[2]),
+                    "dataNascimento": norm(usuario[3]),
+                    "cep": norm(usuario[4]),
+                    "rua": norm(usuario[5]),
+                    "cidade": norm(usuario[6]),
+                    "estado": norm(usuario[7]),
+                    "numero": norm(usuario[8]),
+                    "complemento": norm(usuario[9]),
+                    "foto": norm(usuario[10])
+                }
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
