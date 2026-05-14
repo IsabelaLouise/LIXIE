@@ -1,5 +1,5 @@
 // ✅ FOTO DO USUÁRIO
-fetch("https://lixie-production.up.railway.app/perfil", {
+fetch("http://localhost:8000/perfil", {
   method: "POST",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded"

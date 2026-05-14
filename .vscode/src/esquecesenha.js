@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       console.log("📡 Enviando requisição para o Railway...");
 
-      fetch("https://lixie-production.up.railway.app/esqueci-senha", {
+      fetch("http://localhost:8000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!validarSenha()) return;
 
-      fetch("https://lixie-production.up.railway.app/redefinir-com-token", {
+      fetch("http://localhost:8000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"

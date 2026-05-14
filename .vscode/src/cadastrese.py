@@ -29,9 +29,9 @@ import cloudinary
 
 # === BANCO ===
 DB_CONFIG = {
-    "host": "mainline.proxy.rlwy.net",
+    "host": "localhost",
     "user": "root",
-    "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
+    "password": "Ilcs050607",
     "database": "Lixie",
     "port": 3306
 }
