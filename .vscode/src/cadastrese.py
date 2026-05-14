@@ -27,19 +27,19 @@ from email.mime.multipart import MIMEMultipart
 import os
 import cloudinary
 
-# === BANCO (via ENV) ===
+# === BANCO ===
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME"),
-    "port": int(os.getenv("DB_PORT", 3306))
+    "host": "mainline.proxy.rlwy.net",
+    "user": "root",
+    "password": "UeJIbFioQMlXgpJvTZNPlVGokTZiJfBm",
+    "database": "Lixie",
+    "port": 28939
 }
-# === CLOUDINARY (via ENV) ===
+# === CLOUDINARY ===
 cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+    cloud_name= "dkcyjejp6",
+    api_key= "452934599459777",
+    api_secret= "6cc8gmWOynE4YOYibmXt3gG2Ndk"
 )
 
 class ServidorCadastro(http.server.BaseHTTPRequestHandler):
