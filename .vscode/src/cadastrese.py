@@ -937,28 +937,62 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                 id_usuario = usuario[0]
 
-                cursor.execute("""
-                    INSERT INTO Reciclagem 
-                    (Tipo_Material, Data, Quantidade, Unidade, CEP, Pontos, fk_Usuario_ID_usuario)
-                    VALUES (%s, NOW(), %s, %s, %s, %s, %s)
-                """, (
-                    dados["tipo"],
-                    dados["quantidade"],
-                    dados["unidade"],
-                    dados["cep"],
-                    dados["pontos"],
-                    id_usuario
-                ))
+                # Inserir reciclagem usando colunas básicas (compatível com schemaseeder)
+                # Muitas versões do banco não têm Unidade/CEP/Pontos na tabela Reciclagem,
+                # então inserimos apenas nas colunas garantidas e calculamos os pontos à parte.
+                pontos = dados.get("pontos") if isinstance(dados.get("pontos"), (int, float)) else dados.get("pontos")
 
-                cursor.execute("""
-                    UPDATE Usuario 
-                    SET Pontuacao_Total_Acumulada_ = 
-                    COALESCE(Pontuacao_Total_Acumulada_,0) + %s
-                    WHERE ID_usuario = %s
-                """, (
-                    dados["pontos"],
-                    id_usuario
-                ))
+                try:
+                    cursor.execute("""
+                        INSERT INTO Reciclagem (Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
+                        VALUES (%s, NOW(), %s, %s)
+                    """, (
+                        dados["tipo"],
+                        dados["quantidade"],
+                        id_usuario
+                    ))
+                    # Log do ID inserido (útil para diagnosticar problemas de chave primária)
+                    try:
+                        last_id = cursor.lastrowid
+                        print(f"[DEBUG] Reciclagem inserida com ID: {last_id}")
+                    except Exception:
+                        last_id = None
+                except Exception as insert_err:
+                    # Se a tabela não tiver AUTO_INCREMENT para ID_reciclagem, tentar calcular próximo ID e inserir explicitamente
+                    print('[WARN] Inserção direta em Reciclagem falhou, tentando fallback com ID explícito:', insert_err)
+                    try:
+                        cursor.execute("SELECT COALESCE(MAX(ID_reciclagem), 0) + 1 FROM Reciclagem")
+                        next_id = cursor.fetchone()[0]
+                        cursor.execute("""
+                            INSERT INTO Reciclagem (ID_reciclagem, Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
+                            VALUES (%s, %s, NOW(), %s, %s)
+                        """, (
+                            next_id,
+                            dados["tipo"],
+                            dados["quantidade"],
+                            id_usuario
+                        ))
+                        last_id = next_id
+                        print(f"[DEBUG] Reciclagem inserida com ID (fallback): {last_id}")
+                    except Exception as e2:
+                        print('[ERROR] Fallback de inserção também falhou:', e2)
+                        raise
+
+                # Atualiza pontos do usuário (se fornecido)
+                try:
+                    if pontos is not None:
+                        cursor.execute("""
+                            UPDATE Usuario 
+                            SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
+                            WHERE ID_usuario = %s
+                        """, (
+                            pontos,
+                            id_usuario
+                        ))
+                    else:
+                        print('[WARN] Nenhum campo "pontos" enviado na requisição; pulando atualização de pontos')
+                except Exception as e:
+                    print('[ERROR] Falha ao atualizar pontos do usuário:', e)
 
                 conexao.commit()
 
