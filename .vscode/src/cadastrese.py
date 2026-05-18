@@ -907,48 +907,86 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     conexao.close()
 
         elif self.path == '/registrar-reciclagem':
-            content_length = int(self.headers['Content-Length'])
-            dados = json.loads(self.rfile.read(content_length).decode())
+            try:
+                content_length = int(self.headers['Content-Length'])
+                dados = json.loads(self.rfile.read(content_length).decode())
 
-            conexao = mysql.connector.connect(**DB_CONFIG)
-            cursor = conexao.cursor()
+                print("DADOS RECEBIDOS:", dados)
 
-            cursor.execute("SELECT ID_usuario FROM Usuario WHERE Email = %s", (dados["email"],))
-            usuario = cursor.fetchone()
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
 
-            if not usuario:
-                self.send_response(400)
+                cursor.execute(
+                    "SELECT ID_usuario FROM Usuario WHERE Email = %s",
+                    (dados["email"],)
+                )
+
+                usuario = cursor.fetchone()
+
+                if not usuario:
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+
+                    self.wfile.write(json.dumps({
+                        "sucesso": False,
+                        "mensagem": "Usuário não encontrado"
+                    }).encode())
+
+                    return
+
+                id_usuario = usuario[0]
+
+                cursor.execute("""
+                    INSERT INTO Reciclagem 
+                    (Tipo_Material, Data, Quantidade, Unidade, CEP, Pontos, fk_Usuario_ID_usuario)
+                    VALUES (%s, NOW(), %s, %s, %s, %s, %s)
+                """, (
+                    dados["tipo"],
+                    dados["quantidade"],
+                    dados["unidade"],
+                    dados["cep"],
+                    dados["pontos"],
+                    id_usuario
+                ))
+
+                cursor.execute("""
+                    UPDATE Usuario 
+                    SET Pontuacao_Total_Acumulada_ = 
+                    COALESCE(Pontuacao_Total_Acumulada_,0) + %s
+                    WHERE ID_usuario = %s
+                """, (
+                    dados["pontos"],
+                    id_usuario
+                ))
+
+                conexao.commit()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                return
 
-            id_usuario = usuario[0]
+                self.wfile.write(json.dumps({
+                    "sucesso": True,
+                    "mensagem": "Reciclagem registrada"
+                }).encode())
 
-            cursor.execute("""
-                INSERT INTO Reciclagem 
-                (Tipo_Material, Data, Quantidade, Unidade, CEP, Pontos, fk_Usuario_ID_usuario)
-                VALUES (%s, NOW(), %s, %s, %s, %s, %s)
-            """, (
-                dados["tipo"],
-                dados["quantidade"],
-                dados["unidade"],
-                dados["cep"],
-                dados["pontos"],
-                id_usuario
-            ))
+            except Exception as e:
+                print("ERRO AO REGISTRAR:", e)
 
-            cursor.execute("""
-                UPDATE Usuario 
-                SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
-                WHERE ID_usuario = %s
-            """, (dados["pontos"], id_usuario))
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
 
-            conexao.commit()
+                self.wfile.write(json.dumps({
+                    "sucesso": False,
+                    "erro": str(e)
+                }).encode())
 
-            self.send_response(200)
-            self.end_headers()
-
-            cursor.close()
-            conexao.close()
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
         elif self.path == '/editar-reciclagem':
             dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
