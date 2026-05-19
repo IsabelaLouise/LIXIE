@@ -1,12 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin - Reciclagens</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-    
+    <header>
+        <div class="header-container">
+            <a href="/.vscode/src/homeLogado.html" class="logo-link">
+                <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="navbar" id="navbar">
+                <a href="/.vscode/src/adminUsuarios.html" class="nav-link">Usuários</a>
+                <a href="/.vscode/src/adminReciclagens.html" class="nav-link active">Reciclagens</a>
+            </nav>
+
+            <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
+                <img id="fotoHome" class="profile" src="img/avatar.png">
+            </a>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="admin-container">
+            <h2>Gerenciar Reciclagens</h2>
+            <div class="admin-table-wrap">
+                <table class="admin-table" id="reciclagensTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Quantidade</th>
+                            <th>Usuário</th>
+                            <th>Pontos</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="admin.js"></script>
 </body>
-<script src="/.vscode/src/session.js"></script>
 </html>
+
+<!-- Modal de edição de reciclagem e overlay de sucesso -->
+<div id="admin-mensagem-sucesso" class="overlay" style="display:none;">
+    <div class="popup">
+        <p>Alterações salvas com sucesso</p>
+    </div>
+</div>
+
+<dialog id="dialog-editar-reciclagem" class="popup-grande">
+    <button id="fechar-editar-reciclagem">X</button>
+    <h3>Editar Reciclagem</h3>
+    <form id="form-editar-reciclagem">
+        <div class="campo">
+            <label for="edit-id-rec">ID</label>
+            <input type="text" id="edit-id-rec" name="id" disabled>
+        </div>
+        <div class="campo">
+            <label for="edit-tipo">Tipo</label>
+            <input type="text" id="edit-tipo" name="tipo">
+        </div>
+        <div class="campo">
+            <label for="edit-quantidade">Quantidade</label>
+            <input type="text" id="edit-quantidade" name="quantidade">
+        </div>
+        <div class="campo">
+            <label for="edit-data">Data</label>
+            <input type="date" id="edit-data" name="data">
+        </div>
+        <div class="botoes-dialog">
+            <button type="button" id="cancelar-editar-reciclagem">Cancelar</button>
+            <button type="submit" id="salvar-editar-reciclagem" class="btn-confirmar">Salvar</button>
+        </div>
+    </form>
+</dialog>

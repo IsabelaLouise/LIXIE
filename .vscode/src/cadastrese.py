@@ -56,9 +56,68 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_GET(self):
+            # Serve uploads 404 explicitly
             if self.path.startswith("/uploads/"):
                 self.send_response(404) # Fotos locais não existem mais
                 self.end_headers()
+                return
+
+            # Serve arquivos estáticos da pasta .vscode/src para facilitar desenvolvimento
+            try:
+                import urllib.parse
+                import mimetypes
+
+                root = os.path.join(os.getcwd(), '.vscode', 'src')
+                req_path = urllib.parse.unquote(self.path.split('?',1)[0])
+                if req_path == '/' or req_path == '':
+                    # você pode mudar o index se quiser
+                    req_path = '/adminUsuarios.html'
+
+                # remove leading slash
+                rel_path = req_path.lstrip('/')
+                fs_path = os.path.normpath(os.path.join(root, rel_path))
+
+                # evitar path traversal
+                if not fs_path.startswith(root):
+                    self.send_response(403)
+                    self.end_headers()
+                    return
+
+                if os.path.isdir(fs_path):
+                    # procurar index.html
+                    index_file = os.path.join(fs_path, 'index.html')
+                    if os.path.exists(index_file):
+                        fs_path = index_file
+                    else:
+                        self.send_response(404)
+                        self.end_headers()
+                        return
+
+                if not os.path.exists(fs_path):
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+
+                ctype, _ = mimetypes.guess_type(fs_path)
+                if not ctype:
+                    ctype = 'application/octet-stream'
+
+                with open(fs_path, 'rb') as f:
+                    data = f.read()
+
+                self.send_response(200)
+                self.send_header('Content-Type', ctype)
+                self.send_header('Content-Length', str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+                return
+            except Exception as e:
+                print('Erro servindo arquivo estático:', e)
+                try:
+                    self.send_response(500)
+                    self.end_headers()
+                except Exception:
+                    pass
 
     def do_POST(self):
 
@@ -489,9 +548,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             conexao = mysql.connector.connect(**DB_CONFIG)
             cursor = conexao.cursor()
 
-            # Retornar ranking completo, ordenado por pontos desc e nome asc (desempate alfabético)
+            # Retornar ranking completo com id, email, nome, pontos e permissão (nome)
             cursor.execute("""
-                SELECT Nome, Email, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos
+                SELECT ID_usuario, Nome, Email, COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos, COALESCE(fk_permissao, NULL), COALESCE(Nivel, NULL)
                 FROM Usuario
                 ORDER BY pontos DESC, Nome ASC
             """)
@@ -500,16 +559,139 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             ranking = []
             for i, user in enumerate(resultados):
+                uid = user[0]
+                nome = user[1]
+                email = user[2]
+                pontos = user[3]
+                fk_perm = user[4]
+                nivel = user[5]
+
+                perm_nome = 'usuario'
+                if fk_perm:
+                    try:
+                        cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                        r = cursor.fetchone()
+                        if r and r[0]:
+                            perm_nome = r[0]
+                    except Exception:
+                        perm_nome = 'usuario'
+                else:
+                    try:
+                        if nivel is not None and int(nivel) == 10:
+                            perm_nome = 'admin'
+                    except Exception:
+                        pass
+
                 ranking.append({
                     "posicao": i + 1,
-                    "nome": user[0],
-                    "pontos": user[2]
+                    "id": uid,
+                    "nome": nome,
+                    "email": email,
+                    "pontos": pontos,
+                    "permissao": perm_nome
                 })
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(ranking).encode())
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/listar-reciclagens':
+            # Lista reciclagens, juntando com usuário para obter email/nome
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+            try:
+                cursor.execute("""
+                    SELECT R.ID_reciclagem, R.Tipo_Material, R.Data, R.Quantidade, R.fk_Usuario_ID_usuario, U.Email, U.Nome
+                    FROM Reciclagem R
+                    LEFT JOIN Usuario U ON R.fk_Usuario_ID_usuario = U.ID_usuario
+                    ORDER BY R.Data DESC
+                """)
+            except Exception:
+                # fallback se a coluna Data for nome diferente
+                cursor.execute("SELECT ID_reciclagem, Tipo_Material, Quantidade, fk_Usuario_ID_usuario FROM Reciclagem")
+
+            rows = cursor.fetchall()
+            lista = []
+            for r in rows:
+                # adaptação: se a query foi a primeira, terá 6 colunas; se fallback, 4
+                if len(r) >= 6:
+                    lista.append({
+                        'id': r[0],
+                        'tipo': r[1],
+                        'data': str(r[2]),
+                        'quantidade': r[3],
+                        'fk_usuario': r[4],
+                        'usuario_email': r[5],
+                        'usuario_nome': r[6] if len(r) > 6 else ''
+                    })
+                else:
+                    lista.append({
+                        'id': r[0],
+                        'tipo': r[1],
+                        'data': '',
+                        'quantidade': r[2],
+                        'fk_usuario': r[3],
+                        'usuario_email': '',
+                        'usuario_nome': ''
+                    })
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(lista).encode())
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/deletar-usuario':
+            # Deleta usuário por email (admin only)
+            content_length = int(self.headers.get('Content-Length', 0))
+            corpo = self.rfile.read(content_length).decode()
+            try:
+                dados = json.loads(corpo)
+            except Exception:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            requester = dados.get('requester')
+            target_email = dados.get('email')
+            if not requester or not target_email:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            cursor.execute("SELECT COALESCE(fk_permissao,0) FROM Usuario WHERE Email = %s", (requester,))
+            perm_row = cursor.fetchone()
+            fk_perm = perm_row[0] if perm_row else None
+            is_admin = False
+            if fk_perm:
+                cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                p = cursor.fetchone()
+                is_admin = (p and p[0] == 'admin')
+
+            if not is_admin:
+                self.send_response(403)
+                self.end_headers()
+                cursor.close()
+                conexao.close()
+                return
+
+            # delete user
+            cursor.execute("DELETE FROM Usuario WHERE Email = %s", (target_email,))
+            conexao.commit()
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'sucesso': True}).encode())
 
             cursor.close()
             conexao.close()
@@ -907,48 +1089,120 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     conexao.close()
 
         elif self.path == '/registrar-reciclagem':
-            content_length = int(self.headers['Content-Length'])
-            dados = json.loads(self.rfile.read(content_length).decode())
+            try:
+                content_length = int(self.headers['Content-Length'])
+                dados = json.loads(self.rfile.read(content_length).decode())
 
-            conexao = mysql.connector.connect(**DB_CONFIG)
-            cursor = conexao.cursor()
+                print("DADOS RECEBIDOS:", dados)
 
-            cursor.execute("SELECT ID_usuario FROM Usuario WHERE Email = %s", (dados["email"],))
-            usuario = cursor.fetchone()
+                conexao = mysql.connector.connect(**DB_CONFIG)
+                cursor = conexao.cursor()
 
-            if not usuario:
-                self.send_response(400)
+                cursor.execute(
+                    "SELECT ID_usuario FROM Usuario WHERE Email = %s",
+                    (dados["email"],)
+                )
+
+                usuario = cursor.fetchone()
+
+                if not usuario:
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+
+                    self.wfile.write(json.dumps({
+                        "sucesso": False,
+                        "mensagem": "Usuário não encontrado"
+                    }).encode())
+
+                    return
+
+                id_usuario = usuario[0]
+
+                # Inserir reciclagem usando colunas básicas (compatível com schemaseeder)
+                # Muitas versões do banco não têm Unidade/CEP/Pontos na tabela Reciclagem,
+                # então inserimos apenas nas colunas garantidas e calculamos os pontos à parte.
+                pontos = dados.get("pontos") if isinstance(dados.get("pontos"), (int, float)) else dados.get("pontos")
+
+                try:
+                    cursor.execute("""
+                        INSERT INTO Reciclagem (Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
+                        VALUES (%s, NOW(), %s, %s)
+                    """, (
+                        dados["tipo"],
+                        dados["quantidade"],
+                        id_usuario
+                    ))
+                    # Log do ID inserido (útil para diagnosticar problemas de chave primária)
+                    try:
+                        last_id = cursor.lastrowid
+                        print(f"[DEBUG] Reciclagem inserida com ID: {last_id}")
+                    except Exception:
+                        last_id = None
+                except Exception as insert_err:
+                    # Se a tabela não tiver AUTO_INCREMENT para ID_reciclagem, tentar calcular próximo ID e inserir explicitamente
+                    print('[WARN] Inserção direta em Reciclagem falhou, tentando fallback com ID explícito:', insert_err)
+                    try:
+                        cursor.execute("SELECT COALESCE(MAX(ID_reciclagem), 0) + 1 FROM Reciclagem")
+                        next_id = cursor.fetchone()[0]
+                        cursor.execute("""
+                            INSERT INTO Reciclagem (ID_reciclagem, Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
+                            VALUES (%s, %s, NOW(), %s, %s)
+                        """, (
+                            next_id,
+                            dados["tipo"],
+                            dados["quantidade"],
+                            id_usuario
+                        ))
+                        last_id = next_id
+                        print(f"[DEBUG] Reciclagem inserida com ID (fallback): {last_id}")
+                    except Exception as e2:
+                        print('[ERROR] Fallback de inserção também falhou:', e2)
+                        raise
+
+                # Atualiza pontos do usuário (se fornecido)
+                try:
+                    if pontos is not None:
+                        cursor.execute("""
+                            UPDATE Usuario 
+                            SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
+                            WHERE ID_usuario = %s
+                        """, (
+                            pontos,
+                            id_usuario
+                        ))
+                    else:
+                        print('[WARN] Nenhum campo "pontos" enviado na requisição; pulando atualização de pontos')
+                except Exception as e:
+                    print('[ERROR] Falha ao atualizar pontos do usuário:', e)
+
+                conexao.commit()
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                return
 
-            id_usuario = usuario[0]
+                self.wfile.write(json.dumps({
+                    "sucesso": True,
+                    "mensagem": "Reciclagem registrada"
+                }).encode())
 
-            cursor.execute("""
-                INSERT INTO Reciclagem 
-                (Tipo_Material, Data, Quantidade, Unidade, CEP, Pontos, fk_Usuario_ID_usuario)
-                VALUES (%s, NOW(), %s, %s, %s, %s, %s)
-            """, (
-                dados["tipo"],
-                dados["quantidade"],
-                dados["unidade"],
-                dados["cep"],
-                dados["pontos"],
-                id_usuario
-            ))
+            except Exception as e:
+                print("ERRO AO REGISTRAR:", e)
 
-            cursor.execute("""
-                UPDATE Usuario 
-                SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
-                WHERE ID_usuario = %s
-            """, (dados["pontos"], id_usuario))
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
 
-            conexao.commit()
+                self.wfile.write(json.dumps({
+                    "sucesso": False,
+                    "erro": str(e)
+                }).encode())
 
-            self.send_response(200)
-            self.end_headers()
-
-            cursor.close()
-            conexao.close()
+            finally:
+                if conexao and conexao.is_connected():
+                    cursor.close()
+                    conexao.close()
 
         elif self.path == '/editar-reciclagem':
             dados = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
@@ -982,13 +1236,95 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                 return
 
             cursor.execute("""
-                UPDATE Reciclagem SET Quantidade=%s WHERE ID_reciclagem=%s
-            """, (dados["quantidade"], dados["id"]))
+                UPDATE Reciclagem 
+                SET Tipo_Material=%s, Data=%s, Quantidade=%s 
+                WHERE ID_reciclagem=%s
+            """, (
+                dados["tipo"],
+                dados["data"],
+                dados["quantidade"],
+                dados["id"]
+            ))
 
             conexao.commit()
 
             self.send_response(200)
             self.end_headers()
+
+            cursor.close()
+            conexao.close()
+
+        elif self.path == '/editar-usuario':
+            # Admin pode editar nome, pontos e permissão de um usuário
+            try:
+                dados = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))).decode())
+            except Exception:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            requester = dados.get('requester')
+            target_email = dados.get('email')
+            novo_nome = dados.get('nome')
+            novos_pontos = dados.get('pontos')
+            nova_permissao = dados.get('permissao')
+
+            if not requester or not target_email:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            conexao = mysql.connector.connect(**DB_CONFIG)
+            cursor = conexao.cursor()
+
+            # valida permissões do requester
+            cursor.execute("SELECT COALESCE(fk_permissao, 0) FROM Usuario WHERE Email = %s", (requester,))
+            perm_row = cursor.fetchone()
+            fk_perm = perm_row[0] if perm_row else None
+
+            is_admin = False
+            if fk_perm:
+                cursor.execute("SELECT Nome FROM Permissao WHERE ID_permissao = %s", (fk_perm,))
+                p = cursor.fetchone()
+                is_admin = (p and p[0] == 'admin')
+
+            if not is_admin:
+                self.send_response(403)
+                self.end_headers()
+                cursor.close()
+                conexao.close()
+                return
+
+            # mapear permissao textual para fk_permissao se existir
+            fk_to_set = None
+            if nova_permissao:
+                try:
+                    cursor.execute("SELECT ID_permissao FROM Permissao WHERE Nome = %s", (nova_permissao,))
+                    r = cursor.fetchone()
+                    if r:
+                        fk_to_set = r[0]
+                except Exception:
+                    fk_to_set = None
+
+            updates = []
+            params = []
+            if novo_nome is not None:
+                updates.append("Nome=%s"); params.append(novo_nome)
+            if novos_pontos is not None:
+                updates.append("Pontuacao_Total_Acumulada_=%s"); params.append(novos_pontos)
+            if fk_to_set is not None:
+                updates.append("fk_permissao=%s"); params.append(fk_to_set)
+
+            if updates:
+                sql = "UPDATE Usuario SET " + ", ".join(updates) + " WHERE Email=%s"
+                params.append(target_email)
+                cursor.execute(sql, tuple(params))
+                conexao.commit()
+
+            self.send_response(200)
+            self.send_header('Content-Type','application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'sucesso': True}).encode())
 
             cursor.close()
             conexao.close()
