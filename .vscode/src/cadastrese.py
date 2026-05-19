@@ -605,7 +605,15 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
             try:
                 cursor.execute("""
-                    SELECT R.ID_reciclagem, R.Tipo_Material, R.Data, R.Quantidade, R.fk_Usuario_ID_usuario, U.Email, U.Nome
+                    SELECT 
+                        R.ID_reciclagem,
+                        R.Tipo_Material,
+                        R.Data,
+                        R.Quantidade,
+                        R.Pontos,
+                        R.fk_Usuario_ID_usuario,
+                        U.Email,
+                        U.Nome
                     FROM Reciclagem R
                     LEFT JOIN Usuario U ON R.fk_Usuario_ID_usuario = U.ID_usuario
                     ORDER BY R.Data DESC
@@ -624,9 +632,10 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         'tipo': r[1],
                         'data': str(r[2]),
                         'quantidade': r[3],
-                        'fk_usuario': r[4],
-                        'usuario_email': r[5],
-                        'usuario_nome': r[6] if len(r) > 6 else ''
+                        'pontos': r[4],
+                        'fk_usuario': r[5],
+                        'usuario_email': r[6],
+                        'usuario_nome': r[7]if len(r) > 6 else ''
                     })
                 else:
                     lista.append({
@@ -1126,11 +1135,18 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                 try:
                     cursor.execute("""
-                        INSERT INTO Reciclagem (Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
-                        VALUES (%s, NOW(), %s, %s)
+                        INSERT INTO Reciclagem (
+                            Tipo_Material,
+                            Data,
+                            Quantidade,
+                            Pontos,
+                            fk_Usuario_ID_usuario
+                        )
+                        VALUES (%s, NOW(), %s, %s, %s)
                     """, (
                         dados["tipo"],
                         dados["quantidade"],
+                        pontos,
                         id_usuario
                     ))
                     # Log do ID inserido (útil para diagnosticar problemas de chave primária)
@@ -1146,12 +1162,20 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         cursor.execute("SELECT COALESCE(MAX(ID_reciclagem), 0) + 1 FROM Reciclagem")
                         next_id = cursor.fetchone()[0]
                         cursor.execute("""
-                            INSERT INTO Reciclagem (ID_reciclagem, Tipo_Material, Data, Quantidade, fk_Usuario_ID_usuario)
-                            VALUES (%s, %s, NOW(), %s, %s)
+                            INSERT INTO Reciclagem (
+                                ID_reciclagem,
+                                Tipo_Material,
+                                Data,
+                                Quantidade,
+                                Pontos,
+                                fk_Usuario_ID_usuario
+                            )
+                            VALUES (%s, %s, NOW(), %s, %s, %s)
                         """, (
                             next_id,
                             dados["tipo"],
                             dados["quantidade"],
+                            pontos,
                             id_usuario
                         ))
                         last_id = next_id
@@ -1237,12 +1261,13 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
             cursor.execute("""
                 UPDATE Reciclagem 
-                SET Tipo_Material=%s, Data=%s, Quantidade=%s 
+                SET Tipo_Material=%s, Data=%s, Quantidade=%s, Pontos=%s
                 WHERE ID_reciclagem=%s
             """, (
                 dados["tipo"],
                 dados["data"],
                 dados["quantidade"],
+                dados.get("pontos"),
                 dados["id"]
             ))
 

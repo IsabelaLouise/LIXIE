@@ -292,12 +292,14 @@ window.loadReciclagens = loadReciclagens;
         const tipo = tr.children[1].textContent.trim();
         const data = tr.children[2].textContent.trim();
         const quantidade = tr.children[3].textContent.trim();
+        const pontos = tr.children[5].textContent.trim();
 
         document.getElementById('edit-id-rec').value = id;
         document.getElementById('edit-tipo').value = tipo;
         // tenta formatar data para YYYY-MM-DD se necessário
         document.getElementById('edit-data').value = data ? data.split(' ')[0] : '';
         document.getElementById('edit-quantidade').value = quantidade;
+        document.getElementById('edit-pontos').value = pontos || 0;
 
         try { dialogRec.showModal(); } catch (e) { dialogRec.style.display = 'block'; }
       }
@@ -309,10 +311,15 @@ window.loadReciclagens = loadReciclagens;
       const tipo = document.getElementById('edit-tipo').value;
       const data = document.getElementById('edit-data').value;
       const quantidade = document.getElementById('edit-quantidade').value;
+      const pontos = Number(document.getElementById('edit-pontos').value) || 0;
 
       try {
         const requester = localStorage.getItem('email');
-        const res = await fetch(`${API_BASE}/editar-reciclagem`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ requester, id, quantidade }) });
+        const res = await fetch(`${API_BASE}/editar-reciclagem`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ requester, id, tipo, data, quantidade, pontos })
+        });
         if (res.ok) {
           const overlay = document.getElementById('admin-mensagem-sucesso') || document.getElementById('mensagem-sucesso');
           if (overlay) {
