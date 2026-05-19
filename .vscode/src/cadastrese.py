@@ -5,7 +5,7 @@ import bcrypt
 import secrets
 import os
 import io
-try:
+try: # 
     import cgi
     HAVE_CGI = True
 except Exception:
@@ -31,7 +31,7 @@ import cloudinary
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "LIPEfer7",
+    "password": "Ilcs050607",
     "database": "Lixie",
     "port": 3306
 }
