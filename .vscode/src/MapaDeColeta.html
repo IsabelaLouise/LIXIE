@@ -1,22 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Mapa de Coleta</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lixie - Mapa de Coleta</title>
 
   <!-- Fontes -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
 
-  <!-- Leaflet CSS -->
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <link rel="stylesheet" href="MapaDeColeta.css">
-  
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+   <link rel="stylesheet" href="MapaDeColeta.css">
 </head>
 <body>
 
-  <header>
+  <!-- HEADER -->
+
+ <header>
         <div class="header-container">
             <a href="/.vscode/src/homeLogado.html" class="logo-link">
                 <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
@@ -27,10 +35,10 @@
             </button>
 
             <nav class="navbar" id="navbar">
-                <a href="/.vscode/src/homeLogado.html" class="nav-link active">Home</a>
-                <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
+                <a href="/.vscode/src/homeLogado.html" class="nav-link ">Home</a>
+                <a href="/.vscode/src/ranking.html" class="nav-link active">Ranking</a>
                 <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
-                <a href="#" class="nav-link">Mapa de Coleta</a>
+                <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">Mapa de Coleta</a>
                 <a href="#" class="nav-link">Recompensas</a>
             </nav>
 
@@ -40,48 +48,199 @@
         </div>
     </header>
 
-    <main class="page-content">
-      <section class="map-section">
-        <div class="page-title">
-          <h1>Mapa de Coleta</h1>
-          <p>Encontre pontos de coleta próximos de você e ajude a transformar o futuro.</p>
-        </div>
+  <!-- MAIN -->
 
-        <div class="map-layout">
-          <div class="map-card">
-            <div class="map-search">
-              <input type="text" placeholder="Buscar endereço ou bairro">
-            </div>
-            <div id="map"></div>
-            <div class="map-info">
-              <span>37 pontos de coleta encontrados</span>
-              <small>Mostrando todos os pontos</small>
-            </div>
+  <div class="container">
+
+    <!-- LEFT -->
+
+    <div class="left">
+
+      <div class="title">
+        <span class="material-icons">location_on</span>
+        <h1>Mapa de Coleta</h1>
+      </div>
+
+      <p class="subtitle">
+        Encontre pontos de coleta próximos de você e ajude a transformar o futuro.
+      </p>
+
+      <!-- MAP -->
+
+      <div class="map-container">
+
+        
+
+        <div id="map"></div>
+
+      </div>
+
+      <!-- INFO -->
+
+      <div class="info-card">
+
+        <div class="info-left">
+
+          <div class="pin">
+            <span class="material-icons">place</span>
           </div>
 
-          <aside class="filters-card">
-            <h2>Filtros</h2>
-            <!-- daqui a pouco eu adiciono os filtros reais -->
-          </aside>
+          <div class="info-text">
+            <h3>37 pontos de coleta encontrados</h3>
+            <p>Mostrando todos os pontos</p>
+          </div>
+
         </div>
-      </section>
-    </main>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <button class="list-btn">
+          Ver lista
+        </button>
 
-<script>
-  // Criar mapa
-  const map = L.map('map').setView([-25.43, -49.27], 13); // Curitiba
+      </div>
 
-  // Adicionar mapa base
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+    </div>
 
-</script>
+    <!-- FILTERS -->
 
-<script src="/.vscode/src/session.js"></script>
+    <div class="filters">
+
+      <h2>Filtros</h2>
+
+      <div class="filter-group">
+
+        <h3>Material reciclável</h3>
+
+        <div class="materials">
+
+          <button class="material-btn">♻️ Todos</button>
+          <button class="material-btn">🧴 Plástico</button>
+          <button class="material-btn">📄 Papel</button>
+          <button class="material-btn">🍾 Vidro</button>
+          <button class="material-btn">🔩 Metal</button>
+          <button class="material-btn">💻 Eletrônicos</button>
+
+        </div>
+
+      </div>
+
+      <div class="filter-group">
+
+        <h3>Bairro</h3>
+
+        <select>
+          <option>Todos os bairros</option>
+          <option>Centro</option>
+          <option>Boqueirão</option>
+          <option>Água Verde</option>
+        </select>
+
+      </div>
+
+      <div class="filter-group">
+
+        <h3>Distância</h3>
+
+        <input type="range" class="range">
+
+      </div>
+
+      <div class="filter-group">
+
+        <h3>Tipo de ponto</h3>
+
+        <div class="checkboxes">
+
+          <label>
+            <input type="checkbox" checked>
+            Ecopontos
+          </label>
+
+          <label>
+            <input type="checkbox" checked>
+            Cooperativas
+          </label>
+
+          <label>
+            <input type="checkbox" checked>
+            Pontos voluntários
+          </label>
+
+        </div>
+
+      </div>
+
+      <button class="apply-btn">
+        Aplicar filtros
+      </button>
+
+      <button class="clear-btn">
+        Limpar filtros
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // Inicializar mapa
+
+    const map = L.map('map').setView([-25.4284, -49.2733], 12);
+
+    // Camada do mapa
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Pontos de coleta
+
+    const pontos = [
+
+      {
+        nome:"Ecoponto Centro",
+        tipo:"Plástico",
+        lat:-25.4284,
+        lng:-49.2733
+      },
+
+      {
+        nome:"Coleta Bairro Alto",
+        tipo:"Vidro",
+        lat:-25.445,
+        lng:-49.29
+      },
+
+      {
+        nome:"Ponto Sustentável",
+        tipo:"Metal",
+        lat:-25.40,
+        lng:-49.25
+      },
+
+      {
+        nome:"Eco Verde",
+        tipo:"Papel",
+        lat:-25.47,
+        lng:-49.28
+      }
+
+    ];
+
+    // Adicionar marcadores
+
+    pontos.forEach(ponto => {
+
+      L.marker([ponto.lat, ponto.lng])
+        .addTo(map)
+        .bindPopup(`
+          <b>${ponto.nome}</b><br>
+          Material: ${ponto.tipo}
+        `);
+
+    });
+
+  </script>
 
 </body>
 </html>

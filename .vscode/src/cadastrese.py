@@ -31,7 +31,7 @@ import cloudinary
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "Ilcs050607",
+    "password": "LIPEfer7",
     "database": "Lixie",
     "port": 3306
 }
