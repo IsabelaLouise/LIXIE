@@ -1,13 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin - Usuários</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-</body>
-<script src="/.vscode/src/session.js"></script>
-</html>
+    <header>
+        <div class="header-container">
+            <a href="/.vscode/src/homeLogado.html" class="logo-link">
+                <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="navbar" id="navbar">
+                <a href="/.vscode/src/adminUsuarios.html" class="nav-link active">Usuários</a>
+                <a href="/.vscode/src/adminReciclagens.html" class="nav-link">Reciclagens</a>
+            </nav>
+
+            <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
+                <img id="fotoHome" class="profile" src="/.vscode/src/img/avatar.png">
+            </a>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div id="admin-debug-bar" style="background:#fff3cd;padding:8px;border:1px solid #ffeeba;margin:8px 0;font-size:14px;">
+            <strong>Debug:</strong> <span id="dbg-email">email:</span> <span id="dbg-perm">perm:</span>
+            <button id="dbg-toggle-admin" style="margin-left:16px">Assumir Admin (teste)</button>
+        </div>
+        <div class="admin-container">
+            <h2>Gerenciar Usuários</h2>
+            <div class="admin-table-wrap">
+                <table class="admin-table" id="usuariosTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Pontos</th>
+                            <th>Permissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de edição de usuário (reaproveita estilo de overlays do perfil) -->
+    <div id="admin-mensagem-sucesso" class="overlay" style="display:none;">
+        <div class="popup">
+            <p>Alterações salvas com sucesso</p>
+        </div>
+    </div>
+
+    <dialog id="dialog-editar-usuario" class="popup-grande">
+        <button id="fechar-editar-usuario">X</button>
+        <h3>Editar Usuário</h3>
+        <form id="form-editar-usuario">
+            <div class="campo">
+                <label for="edit-nome">Nome</label>
+                <input type="text" id="edit-nome" name="nome">
+            </div>
+            <div class="campo">
+                <label for="edit-email">Email</label>
+                <input type="text" id="edit-email" name="email" disabled>
+            </div>
+            <div class="campo">
+                <label for="edit-pontos">Pontos</label>
+                <input type="number" id="edit-pontos" name="pontos">
+            </div>
+            <div class="campo">
+                <label for="edit-permissao">Permissão</label>
+                <select id="edit-permissao" name="permissao">
+                    <option value="usuario">usuario</option>
+                    <option value="admin">admin</option>
+                </select>
+            </div>
+            <div class="botoes-dialog">
+                <button type="button" id="cancelar-editar-usuario">Cancelar</button>
+                <button type="submit" id="salvar-editar-usuario" class="btn-confirmar">Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
