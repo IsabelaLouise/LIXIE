@@ -158,88 +158,84 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
         // attach handlers (only present for admins)
         if (IS_ADMIN) {
           tbody.querySelectorAll('button.small.danger').forEach(btn => {
+
             btn.addEventListener('click', async (e) => {
+
               const email = e.currentTarget.dataset.email;
-              const dialogExcluirUsuario = document.getElementById('dialog-excluir-usuario');
-              const btnConfirmarExcluirUsuario = document.getElementById('confirmar-excluir-usuario');
+
+              const dialogExcluirUsuario =
+                document.getElementById('dialog-excluir-usuario');
+
+              const btnConfirmarExcluirUsuario =
+                document.getElementById('confirmar-excluir-usuario');
 
               dialogExcluirUsuario.showModal();
 
               btnConfirmarExcluirUsuario.onclick = async () => {
+
                 try {
+
                   const requester = localStorage.getItem('email');
 
                   const resp = await fetch(`${API_BASE}/deletar-usuario`, {
                     method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ requester, email })
+                    headers: {
+                      'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({
+                      requester,
+                      email
+                    })
                   });
 
-                  const j = await resp.json();
-
                   if (resp.ok) {
+
                     dialogExcluirUsuario.close();
 
-                    const overlay = document.getElementById('admin-mensagem-sucesso');
-                    overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
+                    const overlay =
+                      document.getElementById('admin-mensagem-sucesso');
+
+                    overlay.querySelector('p').textContent =
+                      'Usuário deletado com sucesso';
+
                     overlay.style.display = '';
                     overlay.classList.add('ativo');
 
                     setTimeout(() => {
+
                       overlay.classList.remove('ativo');
                       overlay.style.display = 'none';
+
                     }, 2000);
 
-<<<<<<< HEAD
                     loadUsuarios();
+
                   } else {
-                    alert('Erro ao deletar usuário');
+
+                    mostrarPopup(
+                      "Erro",
+                      "Ocorreu um erro inesperado."
+                    );
+
                   }
+
                 } catch (err) {
+
                   console.error(err);
-                  alert('Erro');
+
+                  mostrarPopup(
+                    "Erro",
+                    "Ocorreu um erro inesperado."
+                  );
+
                 }
+
               };
+
             });
-=======
-                overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
 
-                overlay.style.display = '';
-                overlay.classList.add('ativo');
-
-                setTimeout(() => {
-                    overlay.classList.remove('ativo');
-                    overlay.style.display = 'none';
-                }, 2000);
-
-                loadUsuarios();
-
-                } else {
-                mostrarPopup(
-                    "Erro",
-                    "Ocorreu um erro inesperado."
-                );
-                }
-
-            } catch (err) {
-                console.error(err);
-                mostrarPopup(
-                    "Erro",
-                    "Ocorreu um erro inesperado."
-                );
-            }
-            };
-          });
->>>>>>> 1814635 (mensagens sem alert)
           });
         }
-      } else {
-        console.warn('[admin] /ranking retornou sem ser array:', dados);
-      }
-    } catch (e) {
-      console.error('Erro ao carregar usuarios:', e);
-    }
-  }
 
   window.loadReciclagens = async function() {
     try {
