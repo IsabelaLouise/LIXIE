@@ -590,76 +590,12 @@ header {
     }
 }
 
-/* MODAL OVERLAY */
-.session-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    background: rgba(0, 0, 0, 0.4);
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.3s;
-    z-index: 9999;
-}
-
-/* ATIVO */
-.session-modal.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* CAIXA */
-.session-box {
-    background: #f1f8f2;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    width: 320px;
-
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-
-    transform: translateY(20px);
-    transition: 0.3s;
-}
-
-/* animação */
-.session-modal.active .session-box {
-    transform: translateY(0);
-}
-
-/* título */
-.session-box h2 {
-    color: #085b1c;
-    margin-bottom: 10px;
-}
-
-/* texto */
-.session-box p {
-    color: #555;
-    margin-bottom: 20px;
-}
-
-/* botão */
-.session-box button {
-    background: #5b9e69;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 999px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.session-box button:hover {
-    background: #4a8456;
-    transform: scale(1.05);
-}
+/* sessão/modal usado para ações relacionadas à conta (login, confirmação) */
+.session-modal { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; }
+.session-modal.active { opacity:1; pointer-events:auto; }
+.session-box { background:#f1f8f2; padding:30px; border-radius:20px; text-align:center; width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.15); transform:translateY(20px); transition:0.3s; }
+.session-modal.active .session-box { transform:translateY(0); }
+.session-box h2 { color:#085b1c; margin-bottom:10px; }
+.session-box p { color:#555; margin-bottom:20px; }
+.session-box button { background:#5b9e69; color:white; border:none; padding:10px 20px; border-radius:999px; cursor:pointer; font-weight:bold; transition:0.2s; }
+.session-box button:hover { background:#4a8456; transform:scale(1.05); }
