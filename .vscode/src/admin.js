@@ -73,7 +73,7 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       try {
         dados = await res.json();
       } catch (e) {
-        const txt = await res.text().catch(()=>'<no-body>');
+        const txt = await res.text().catch(() => '<no-body>');
         console.error('[admin] resposta do /ranking não é JSON, status=', res.status, 'body=', txt);
         return;
       }
@@ -86,89 +86,81 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       if (!tbody) return;
       tbody.innerHTML = '';
       if (Array.isArray(dados)) {
-
         dados.sort((a, b) => a.id - b.id);
-
         dados.forEach(u => {
-            const tr = document.createElement('tr');
-            if (IS_ADMIN) {
-              tr.innerHTML = `
-                <td>${u.id || ''}</td>
-                <td>${u.nome || ''}</td>
-                <td>${u.email || ''}</td>
-                <td>${u.pontos || 0}</td>
-                <td>${u.permissao || ''}</td>
-                <td>
-                  <button class="btn small" data-email="${u.email}">Editar</button>
-                  <button class="btn small danger" data-email="${u.email}">Excluir</button>
-                </td>
-              `;
-            } else {
-              tr.innerHTML = `
-                <td>${u.id || ''}</td>
-                <td>${u.nome || ''}</td>
-                <td>${u.email || ''}</td>
-                <td>${u.pontos || 0}</td>
-                <td>${u.permissao || ''}</td>
-                <td>—</td>
-              `;
-            }
+          const tr = document.createElement('tr');
+          if (IS_ADMIN) {
+            tr.innerHTML = `
+              <td>${u.id || ''}</td>
+              <td>${u.nome || ''}</td>
+              <td>${u.email || ''}</td>
+              <td>${u.pontos || 0}</td>
+              <td>${u.permissao || ''}</td>
+              <td>
+                <button class="btn small" data-email="${u.email}">Editar</button>
+                <button class="btn small danger" data-email="${u.email}">Excluir</button>
+              </td>
+            `;
+          } else {
+            tr.innerHTML = `
+              <td>${u.id || ''}</td>
+              <td>${u.nome || ''}</td>
+              <td>${u.email || ''}</td>
+              <td>${u.pontos || 0}</td>
+              <td>${u.permissao || ''}</td>
+              <td>—</td>
+            `;
+          }
           tbody.appendChild(tr);
         });
         // attach handlers (only present for admins)
         if (IS_ADMIN) {
           tbody.querySelectorAll('button.small.danger').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const email = e.currentTarget.dataset.email;
-            const dialogExcluirUsuario = document.getElementById('dialog-excluir-usuario');
-            const btnConfirmarExcluirUsuario = document.getElementById('confirmar-excluir-usuario');
+            btn.addEventListener('click', async (e) => {
+              const email = e.currentTarget.dataset.email;
+              const dialogExcluirUsuario = document.getElementById('dialog-excluir-usuario');
+              const btnConfirmarExcluirUsuario = document.getElementById('confirmar-excluir-usuario');
 
-            dialogExcluirUsuario.showModal();
+              dialogExcluirUsuario.showModal();
 
-            btnConfirmarExcluirUsuario.onclick = async () => {
-            try {
-                const requester = localStorage.getItem('email');
+              btnConfirmarExcluirUsuario.onclick = async () => {
+                try {
+                  const requester = localStorage.getItem('email');
 
-                const resp = await fetch(`${API_BASE}/deletar-usuario`, {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ requester, email })
-                });
+                  const resp = await fetch(`${API_BASE}/deletar-usuario`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ requester, email })
+                  });
 
-                const j = await resp.json();
+                  const j = await resp.json();
 
-                if (resp.ok) {
+                  if (resp.ok) {
+                    dialogExcluirUsuario.close();
 
-                dialogExcluirUsuario.close();
+                    const overlay = document.getElementById('admin-mensagem-sucesso');
+                    overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
+                    overlay.style.display = '';
+                    overlay.classList.add('ativo');
 
-                const overlay = document.getElementById('admin-mensagem-sucesso');
+                    setTimeout(() => {
+                      overlay.classList.remove('ativo');
+                      overlay.style.display = 'none';
+                    }, 2000);
 
-                overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
-
-                overlay.style.display = '';
-                overlay.classList.add('ativo');
-
-                setTimeout(() => {
-                    overlay.classList.remove('ativo');
-                    overlay.style.display = 'none';
-                }, 2000);
-
-                loadUsuarios();
-
-                } else {
-                alert('Erro ao deletar usuário');
+                    loadUsuarios();
+                  } else {
+                    alert('Erro ao deletar usuário');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('Erro');
                 }
-
-            } catch (err) {
-                console.error(err);
-                alert('Erro');
-            }
-            };
-          });
+              };
+            });
           });
         }
-      }
-      else {
+      } else {
         console.warn('[admin] /ranking retornou sem ser array:', dados);
       }
     } catch (e) {
@@ -189,7 +181,7 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       try {
         dados = await res.json();
       } catch (e) {
-        const txt = await res.text().catch(()=>'<no-body>');
+        const txt = await res.text().catch(() => '<no-body>');
         console.error('[admin] resposta do /listar-reciclagens não é JSON, status=', res.status, 'body=', txt);
         return;
       }
@@ -200,10 +192,8 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       const tbody = document.querySelector('#reciclagensTable tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
-  if (Array.isArray(dados)) {
-
+      if (Array.isArray(dados)) {
         dados.sort((a, b) => a.id - b.id);
-
         dados.forEach(r => {
           const tr = document.createElement('tr');
           if (IS_ADMIN) {
@@ -232,67 +222,56 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
           }
           tbody.appendChild(tr);
         });
-
         if (IS_ADMIN) {
-            tbody.querySelectorAll('button.small.danger').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+          tbody.querySelectorAll('button.small.danger').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const id = e.currentTarget.dataset.id;
+              const dialogExcluirRec = document.getElementById('dialog-excluir-reciclagem');
+              const btnConfirmarExcluirRec = document.getElementById('confirmar-excluir-reciclagem');
 
-                const id = e.currentTarget.dataset.id;
+              dialogExcluirRec.showModal();
 
-                const dialogExcluirRec = document.getElementById('dialog-excluir-reciclagem');
-                const btnConfirmarExcluirRec = document.getElementById('confirmar-excluir-reciclagem');
+              btnConfirmarExcluirRec.onclick = async () => {
+                try {
+                  const requester = localStorage.getItem('email');
 
-                dialogExcluirRec.showModal();
+                  const resp = await fetch(`${API_BASE}/deletar-reciclagem`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ requester, id })
+                  });
 
-                btnConfirmarExcluirRec.onclick = async () => {
+                  if (resp.ok) {
+                    dialogExcluirRec.close();
+                    const overlay = document.getElementById('admin-mensagem-sucesso');
+                    overlay.querySelector('p').textContent = 'Reciclagem deletada com sucesso';
+                    overlay.style.display = '';
+                    overlay.classList.add('ativo');
 
-                    try {
-                    const requester = localStorage.getItem('email');
+                    setTimeout(() => {
+                      overlay.classList.remove('ativo');
+                      overlay.style.display = 'none';
+                    }, 2000);
 
-                    const resp = await fetch(`${API_BASE}/deletar-reciclagem`, {
-                        method: 'POST',
-                        headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({ requester, id })
-                    });
-
-                    if (resp.ok) {
-
-                        dialogExcluirRec.close();
-
-                        const overlay = document.getElementById('admin-mensagem-sucesso');
-
-                        overlay.querySelector('p').textContent =
-                        'Reciclagem deletada com sucesso';
-
-                        overlay.style.display = '';
-                        overlay.classList.add('ativo');
-
-                        setTimeout(() => {
-                        overlay.classList.remove('ativo');
-                        overlay.style.display = 'none';
-                        }, 2000);
-
-                        loadReciclagens();
-
-                    } else {
-                        alert('Erro ao deletar reciclagem');
-                    }
-
-                    } catch (err) {
-                    console.error(err);
-                    alert('Erro');
-                    }
-                };
-                });
+                    loadReciclagens();
+                  } else {
+                    alert('Erro ao deletar reciclagem');
+                  }
+                } catch (err) {
+                  console.error(err);
+                  alert('Erro');
+                }
+              };
             });
+          });
         }
-        } else {
+      } else {
         console.warn('[admin] /listar-reciclagens retornou sem ser array:', dados);
-        }
-        } catch (e) {
-        console.error('Erro ao carregar reciclagens:', e);
-        }
+      }
+    } catch (e) {
+      console.error('Erro ao carregar reciclagens:', e);
     }
+  }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadUsuarios();
@@ -410,6 +389,8 @@ window.loadReciclagens = loadReciclagens;
   // Reciclagem
   const dialogRec = document.getElementById('dialog-editar-reciclagem');
   const formRec = document.getElementById('form-editar-reciclagem');
+
+  
   if (dialogRec) {
     document.getElementById('fechar-editar-reciclagem').addEventListener('click', () => dialogRec.close());
     document.getElementById('cancelar-editar-reciclagem').addEventListener('click', () => dialogRec.close());
@@ -444,6 +425,21 @@ window.loadReciclagens = loadReciclagens;
       const quantidade = document.getElementById('edit-quantidade').value;
       const pontos = Number(document.getElementById('edit-pontos').value) || 0;
 
+
+      const quantidade = Number(document.getElementById('edit-quantidade').value);
+      const pontos = Number(document.getElementById('edit-pontos').value) || 0;
+
+// bloqueia negativos
+      if (quantidade < 0 || pontos < 0) {
+        alert('Não é permitido inserir valores negativos.');
+        return;
+}
+
+// bloqueia NaN (campo vazio ou inválido)
+      if (isNaN(quantidade) || isNaN(pontos)) {
+        alert('Preencha os campos corretamente.');
+        return;
+}
       try {
         const requester = localStorage.getItem('email');
         const res = await fetch(`${API_BASE}/editar-reciclagem`, {
