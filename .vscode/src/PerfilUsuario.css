@@ -180,6 +180,11 @@ button[type="button"]:hover {
     transform: none;
 }
 
+button.btn-logout {
+    background-color: #c74040;
+    color: white;
+}
+
 /*VARIAÇÕES*/
 button.btn-primary {
     background-color: #5b9e69;

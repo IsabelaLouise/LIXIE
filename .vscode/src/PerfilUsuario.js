@@ -570,3 +570,11 @@ function toggleSenhaLogin(icon) {
 }
 
 
+//botão de logout (comum a ambas as páginas home e perfil)
+const logoutBtn = document.getElementById("logoutBtn");
+
+logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("usuarioEmail");
+    window.location.href = "homeNaoLogado.html";
+});
