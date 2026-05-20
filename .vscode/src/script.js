@@ -562,7 +562,7 @@ campos.forEach((campo, index) => {
 
 mostrarPagina(currentPage);
 
-function toggleSenha() {
+window.toggleSenha = function () {
   const senha = document.getElementById("senha");
   const confirmar = document.getElementById("confirmarSenha");
 
