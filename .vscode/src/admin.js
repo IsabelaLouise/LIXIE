@@ -1,3 +1,46 @@
+(function(){
+  // MENU MOBILE TOGGLE igual home.js
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const navbar = document.getElementById('navbar');
+    if (menuToggle && navbar) {
+      menuToggle.addEventListener('click', function() {
+        navbar.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+      });
+      // Fecha menu ao clicar em um link (mobile UX)
+      navbar.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          navbar.classList.remove('active');
+          menuToggle.classList.remove('active');
+        });
+      });
+    }
+  });
+})();
+(function(){
+  // Foto do usuário logado no admin
+  document.addEventListener('DOMContentLoaded', function() {
+    const fotoHome = document.getElementById("fotoHome");
+    if (!fotoHome) return;
+    const email = localStorage.getItem("email");
+    if (!email) return;
+    fetch("http://localhost:8000/perfil", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `email=${encodeURIComponent(email)}`
+    })
+    .then(res => res.json())
+    .then(usuario => {
+      if (usuario.foto && usuario.foto.trim().startsWith("http")) {
+        fotoHome.src = usuario.foto.trim();
+      } else {
+        fotoHome.src = "img/avatar.png";
+      }
+    })
+    .catch(err => console.error("Erro ao carregar foto:", err));
+  });
+})();
 // Simple admin guard and table loader
 // Define base API URL: when the page origin is NOT the backend origin, point to backend at localhost:8000
 const BACKEND_ORIGIN = 'http://localhost:8000';
@@ -43,6 +86,9 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       if (!tbody) return;
       tbody.innerHTML = '';
       if (Array.isArray(dados)) {
+
+        dados.sort((a, b) => a.id - b.id);
+
         dados.forEach(u => {
             const tr = document.createElement('tr');
             if (IS_ADMIN) {
@@ -74,18 +120,50 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
           tbody.querySelectorAll('button.small.danger').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const email = e.currentTarget.dataset.email;
-            if (!confirm(`Deletar usuário ${email}?`)) return;
+            const dialogExcluirUsuario = document.getElementById('dialog-excluir-usuario');
+            const btnConfirmarExcluirUsuario = document.getElementById('confirmar-excluir-usuario');
+
+            dialogExcluirUsuario.showModal();
+
+            btnConfirmarExcluirUsuario.onclick = async () => {
             try {
-              const requester = localStorage.getItem('email');
-              const resp = await fetch(`${API_BASE}/deletar-usuario`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ requester, email }) });
-              const j = await resp.json();
-              if (resp.ok) {
-                alert('Usuário deletado');
+                const requester = localStorage.getItem('email');
+
+                const resp = await fetch(`${API_BASE}/deletar-usuario`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ requester, email })
+                });
+
+                const j = await resp.json();
+
+                if (resp.ok) {
+
+                dialogExcluirUsuario.close();
+
+                const overlay = document.getElementById('admin-mensagem-sucesso');
+
+                overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
+
+                overlay.style.display = '';
+                overlay.classList.add('ativo');
+
+                setTimeout(() => {
+                    overlay.classList.remove('ativo');
+                    overlay.style.display = 'none';
+                }, 2000);
+
                 loadUsuarios();
-              } else {
+
+                } else {
                 alert('Erro ao deletar usuário');
-              }
-            } catch (err) { console.error(err); alert('Erro') }
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro');
+            }
+            };
           });
           });
         }
@@ -123,6 +201,9 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
       if (!tbody) return;
       tbody.innerHTML = '';
   if (Array.isArray(dados)) {
+
+        dados.sort((a, b) => a.id - b.id);
+
         dados.forEach(r => {
           const tr = document.createElement('tr');
           if (IS_ADMIN) {
@@ -153,32 +234,67 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
         });
 
         if (IS_ADMIN) {
-          tbody.querySelectorAll('button.small.danger').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-              const id = e.currentTarget.dataset.id;
-              if (!confirm(`Deletar reciclagem ${id}?`)) return;
-              try {
-                const requester = localStorage.getItem('email');
-                const resp = await fetch(`${API_BASE}/deletar-reciclagem`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ requester, id }) });
-                if (resp.ok) {
-                  alert('Reciclagem deletada');
-                  loadReciclagens();
-                } else {
-                  alert('Erro ao deletar reciclagem');
-                }
-              } catch (err) { console.error(err); alert('Erro') }
-            });
-          });
-        }
-      } else {
-        console.warn('[admin] /listar-reciclagens retornou sem ser array:', dados);
-      }
-    } catch (e) {
-      console.error('Erro ao carregar reciclagens:', e);
-    }
-  }
+            tbody.querySelectorAll('button.small.danger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
 
-  document.addEventListener('DOMContentLoaded', () => {
+                const id = e.currentTarget.dataset.id;
+
+                const dialogExcluirRec = document.getElementById('dialog-excluir-reciclagem');
+                const btnConfirmarExcluirRec = document.getElementById('confirmar-excluir-reciclagem');
+
+                dialogExcluirRec.showModal();
+
+                btnConfirmarExcluirRec.onclick = async () => {
+
+                    try {
+                    const requester = localStorage.getItem('email');
+
+                    const resp = await fetch(`${API_BASE}/deletar-reciclagem`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ requester, id })
+                    });
+
+                    if (resp.ok) {
+
+                        dialogExcluirRec.close();
+
+                        const overlay = document.getElementById('admin-mensagem-sucesso');
+
+                        overlay.querySelector('p').textContent =
+                        'Reciclagem deletada com sucesso';
+
+                        overlay.style.display = '';
+                        overlay.classList.add('ativo');
+
+                        setTimeout(() => {
+                        overlay.classList.remove('ativo');
+                        overlay.style.display = 'none';
+                        }, 2000);
+
+                        loadReciclagens();
+
+                    } else {
+                        alert('Erro ao deletar reciclagem');
+                    }
+
+                    } catch (err) {
+                    console.error(err);
+                    alert('Erro');
+                    }
+                };
+                });
+            });
+        }
+        } else {
+        console.warn('[admin] /listar-reciclagens retornou sem ser array:', dados);
+        }
+        } catch (e) {
+        console.error('Erro ao carregar reciclagens:', e);
+        }
+    }
+
+document.addEventListener('DOMContentLoaded', () => {
     loadUsuarios();
     loadReciclagens();
   });
@@ -216,6 +332,21 @@ window.loadReciclagens = loadReciclagens;
   const dialogUsuario = document.getElementById('dialog-editar-usuario');
   const formUsuario = document.getElementById('form-editar-usuario');
   if (dialogUsuario) {
+    const fecharExcluirUsuario = document.getElementById('fechar-excluir-usuario');
+    const cancelarExcluirUsuario = document.getElementById('cancelar-excluir-usuario');
+    const dialogExcluirUsuario = document.getElementById('dialog-excluir-usuario');
+
+    if (fecharExcluirUsuario) {
+    fecharExcluirUsuario.addEventListener('click', () => {
+        dialogExcluirUsuario.close();
+    });
+    }
+
+    if (cancelarExcluirUsuario) {
+        cancelarExcluirUsuario.addEventListener('click', () => {
+            dialogExcluirUsuario.close();
+        });
+    }
     document.getElementById('fechar-editar-usuario').addEventListener('click', () => dialogUsuario.close());
     document.getElementById('cancelar-editar-usuario').addEventListener('click', () => dialogUsuario.close());
 
@@ -340,3 +471,21 @@ window.loadReciclagens = loadReciclagens;
     });
   }
 })();
+// FECHAR POPUP EXCLUIR RECICLAGEM
+const dialogExcluirRec = document.getElementById('dialog-excluir-reciclagem');
+
+const fecharExcluirRec = document.getElementById('fechar-excluir-reciclagem');
+
+const cancelarExcluirRec = document.getElementById('cancelar-excluir-reciclagem');
+
+if (fecharExcluirRec) {
+  fecharExcluirRec.addEventListener('click', () => {
+    dialogExcluirRec.close();
+  });
+}
+
+if (cancelarExcluirRec) {
+  cancelarExcluirRec.addEventListener('click', () => {
+    dialogExcluirRec.close();
+  });
+}

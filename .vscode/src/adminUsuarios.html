@@ -31,7 +31,7 @@
 
     <main class="admin-main">
         <div class="admin-container">
-            <h2>Gerenciar Usuários</h2>
+            <h2 id="gerenciar">Gerenciar Usuários</h2>
             <div class="admin-table-wrap">
                 <table class="admin-table" id="usuariosTable">
                     <thead>
@@ -87,6 +87,27 @@
         </form>
     </dialog>
 
+    <!-- POPUP EXCLUIR USUÁRIO -->
+    <dialog id="dialog-excluir-usuario" class="popup-grande">
+        <button id="fechar-excluir-usuario">X</button>
+
+        <h3>Excluir usuário</h3>
+
+        <p class="texto-popup">
+            Tem certeza que deseja excluir este usuário?
+            Essa ação não poderá ser desfeita.
+        </p>
+
+        <div class="botoes-dialog">
+            <button type="button" id="cancelar-excluir-usuario">
+                Cancelar
+            </button>
+
+            <button type="button" id="confirmar-excluir-usuario" class="btn-danger">
+                Excluir
+            </button>
+        </div>
+    </dialog>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="admin.js"></script>
 </body>
