@@ -597,5 +597,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("email");
     localStorage.removeItem("usuarioEmail");
-    window.location.href = "homeNaoLogado.html";
+    localStorage.removeItem("permissao");
+
+    window.location.replace("homeNaoLogado.html");
 });
