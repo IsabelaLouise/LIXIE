@@ -1,10 +1,90 @@
+
 /* admin common styles: keep background/header consistent with home.css */
+
 .admin-main{
   padding: 40px 20px;
   min-height: calc(100vh - 80px);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.admin-container {
+  width: 100%;
+  max-width: 1100px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  padding: 20px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.admin-container h2 {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+
+.admin-table-wrap {
+  width: 100%;
+  display: flex;
   justify-content: center;
-  align-items: flex-start;
+  background: #f5f5f5;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 24px 0 24px 0;
+  margin-bottom: 0;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  min-width: 600px;
+}
+
+@media (max-width: 900px) {
+  .admin-container {
+    max-width: 100vw;
+    padding: 10px;
+  }
+  .admin-table {
+    min-width: 400px;
+    font-size: 14px;
+  }
+  .admin-table-wrap {
+    padding: 10px 0;
+  }
+  .admin-container h2 {
+    font-size: 1.2em;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-table {
+    min-width: 320px;
+    font-size: 12px;
+  }
+  .admin-container h2 {
+    font-size: 1em;
+    margin-bottom: 18px;
+  }
+  .admin-table-wrap {
+    padding: 4px 0;
+  }
+}
+
+.admin-table {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .admin-container{
@@ -16,10 +96,288 @@
   padding: 20px;
 }
 
-.admin-table-wrap{overflow:auto}
-.admin-table{width:100%;border-collapse:collapse}
-.admin-table thead th{background:#f5f5f5;padding:12px;text-align:left;border-bottom:1px solid #e6e6e6}
-.admin-table tbody td{padding:12px;border-bottom:1px solid #eee}
+.admin-table-wrap{
+    overflow:auto
+}
 
-.btn.small{padding:6px 10px;border-radius:6px;border:none;background:#5b9e69;color:#fff;cursor:pointer}
-.btn.small.danger{background:#d32f2f}
+.admin-table{
+    width:100%;border-collapse:collapse
+}
+.admin-table thead th{
+    background:#f5f5f5;
+    padding:12px;
+    text-align:left;
+    border-bottom:1px solid #e6e6e6;
+    font-weight: 700;
+}
+
+.admin-table tbody td{
+    padding:12px;
+    border-bottom:1px solid #eee
+}
+
+.btn.small{
+    padding:6px 10px;
+    border-radius:6px;
+    border:none;
+    background:#5b9e69;
+    color:#fff;
+    cursor:pointer
+}
+
+.btn.small.danger{
+    background:#d32f2f
+}
+
+.admin-table tbody tr {
+    border-top: 2px solid rgba(91, 158, 105, 0.4);
+}
+
+
+/* =========================
+   MODAL EDITAR ADMIN
+========================= */
+
+.popup-grande {
+    border: none;
+    border-radius: 25px;
+    padding: 35px;
+    width: 95%;
+    max-width: 500px;
+    background: #ffffff;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    animation: aparecerDialog 0.22s ease;
+    overflow: visible;
+}
+
+/* fundo escuro */
+.popup-grande::backdrop {
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+}
+
+/* título */
+.popup-grande h3 {
+    font-family: "DynaPuff", system-ui;
+    color: #085b1c;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+/* campos */
+.popup-grande .campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+/* labels */
+.popup-grande label {
+    margin-bottom: 8px;
+    color: #5b9e69;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* inputs */
+.popup-grande input,
+.popup-grande select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #d9d9d9;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+/* focus */
+.popup-grande input:focus,
+.popup-grande select:focus {
+    outline: none;
+    border-color: #5b9e69;
+    box-shadow: 0 0 0 4px rgba(91,158,105,0.15);
+}
+
+/* botão fechar */
+#fechar-editar-usuario,
+#fechar-editar-reciclagem,
+#fechar-excluir-usuario,
+#fechar-excluir-reciclagem  {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(91,158,105,0.12);
+    color: #5b9e69;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+#fechar-editar-usuario:hover,
+#fechar-editar-reciclagem:hover,
+#fechar-excluir-usuario:hover,
+#fechar-excluir-reciclagem:hover  {
+    background: rgba(91,158,105,0.25);
+    transform: scale(1.08);
+}
+
+/* área dos botões */
+.botoes-dialog {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+/* botões */
+.botoes-dialog button {
+    flex: 1;
+    height: 45px;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* cancelar */
+#cancelar-editar-usuario,
+#cancelar-editar-reciclagem {
+    background: rgba(91,158,105,0.1);
+    color: #5b9e69;
+}
+
+#cancelar-editar-usuario:hover,
+#cancelar-editar-reciclagem:hover {
+    background: rgba(91,158,105,0.2);
+}
+
+/* salvar */
+.btn-confirmar {
+    background: #5b9e69;
+    color: white;
+}
+
+.btn-confirmar:hover {
+    background: #20582d;
+    transform: scale(1.02);
+}
+
+/* overlay sucesso */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+}
+
+.overlay.ativo {
+    display: flex;
+}
+
+/* popup sucesso */
+.popup {
+    background: white;
+    padding: 30px 45px;
+    border-radius: 22px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+    animation: aparecerPopup 0.22s ease;
+    transform: scale(1);
+}
+
+/* animação do popup pequeno */
+@keyframes aparecerPopup {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* animação do dialog grande */
+@keyframes aparecerDialog {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* RESPONSIVO */
+@media (max-width: 600px) {
+    .popup-grande {
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+    .popup-grande h3 {
+        font-size: 22px;
+    }
+    .botoes-dialog {
+        flex-direction: column;
+    }
+}
+
+.popup-grande {
+    margin: auto;
+}
+
+/* garante centralização */
+dialog.popup-grande[open] {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+}
+
+.texto-popup {
+    text-align: center;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+/* botão vermelho */
+.btn-danger {
+    background: #5b9e69 !important;
+    color: white !important;
+}
+
+.btn-danger:hover {
+    background: #4a8456!important;
+}

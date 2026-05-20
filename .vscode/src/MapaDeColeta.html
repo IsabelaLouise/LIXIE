@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
 
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -20,6 +19,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
    <link rel="stylesheet" href="MapaDeColeta.css">
 </head>
+
 <body>
 
   <!-- HEADER -->
@@ -36,9 +36,9 @@
 
             <nav class="navbar" id="navbar">
                 <a href="/.vscode/src/homeLogado.html" class="nav-link ">Home</a>
-                <a href="/.vscode/src/ranking.html" class="nav-link active">Ranking</a>
+                <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
                 <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
-                <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">Mapa de Coleta</a>
+                <a href="/.vscode/src/MapaDeColeta.html" class="nav-link active">Mapa de Coleta</a>
                 <a href="#" class="nav-link">Recompensas</a>
             </nav>
 
@@ -86,15 +86,13 @@
           </div>
 
           <div class="info-text">
-            <h3>37 pontos de coleta encontrados</h3>
+            <h3>10 pontos de coleta encontrados</h3>
             <p>Mostrando todos os pontos</p>
           </div>
 
         </div>
 
-        <button class="list-btn">
-          Ver lista
-        </button>
+      
 
       </div>
 
@@ -112,12 +110,18 @@
 
         <div class="materials">
 
-          <button class="material-btn">♻️ Todos</button>
-          <button class="material-btn">🧴 Plástico</button>
-          <button class="material-btn">📄 Papel</button>
-          <button class="material-btn">🍾 Vidro</button>
-          <button class="material-btn">🔩 Metal</button>
-          <button class="material-btn">💻 Eletrônicos</button>
+          <div id="materiais">
+      <button class="material-btn" data-tipo="plastico"><img src="/.vscode/src/img/plastico.png"> Plástico</button>
+      <button class="material-btn" data-tipo="papel"><img src="/.vscode/src/img/papel.png"> Papel</button>
+      <button class="material-btn" data-tipo="vidro"><img src="/.vscode/src/img/vidro.png"> Vidro</button>
+      <button class="material-btn" data-tipo="metal"><img src="/.vscode/src/img/metal.png"> Metal</button>
+      <button class="material-btn" data-tipo="organico"><img src="/.vscode/src/img/organico.png"> Orgânico</button>
+      <button class="material-btn" data-tipo="pilhas"><img src="/.vscode/src/img/bateria.png"> Pilhas</button>
+      <button class="material-btn" data-tipo="eletronico"><img src="/.vscode/src/img/eletronico.png"> Eletrônicos</button>
+      <button class="material-btn" data-tipo="tampinha"><img src="/.vscode/src/img/tampinha.png"> Tampinha</button>
+      <button class="material-btn" data-tipo="cartela"><img src="/.vscode/src/img/cartela.png"> Cartela</button>
+      <button class="material-btn" data-tipo="capsula"><img src="/.vscode/src/img/cafe.png"> Cápsula</button>
+    </div>
 
         </div>
 
@@ -127,45 +131,24 @@
 
         <h3>Bairro</h3>
 
-        <select>
+        <select id="bairroSelect">
           <option>Todos os bairros</option>
           <option>Centro</option>
           <option>Boqueirão</option>
           <option>Água Verde</option>
+          <option>Santa Felicidade</option>
+          <option>Portão</option>
+          <option>Batel</option>
+          <option>Rebouças</option>
+
         </select>
 
       </div>
 
-      <div class="filter-group">
-
-        <h3>Distância</h3>
-
-        <input type="range" class="range">
-
-      </div>
 
       <div class="filter-group">
 
-        <h3>Tipo de ponto</h3>
-
-        <div class="checkboxes">
-
-          <label>
-            <input type="checkbox" checked>
-            Ecopontos
-          </label>
-
-          <label>
-            <input type="checkbox" checked>
-            Cooperativas
-          </label>
-
-          <label>
-            <input type="checkbox" checked>
-            Pontos voluntários
-          </label>
-
-        </div>
+        
 
       </div>
 
@@ -181,66 +164,8 @@
 
   </div>
 
-  <script>
+  <script src="MapaDeColeta.js"></script>
 
-    // Inicializar mapa
-
-    const map = L.map('map').setView([-25.4284, -49.2733], 12);
-
-    // Camada do mapa
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    // Pontos de coleta
-
-    const pontos = [
-
-      {
-        nome:"Ecoponto Centro",
-        tipo:"Plástico",
-        lat:-25.4284,
-        lng:-49.2733
-      },
-
-      {
-        nome:"Coleta Bairro Alto",
-        tipo:"Vidro",
-        lat:-25.445,
-        lng:-49.29
-      },
-
-      {
-        nome:"Ponto Sustentável",
-        tipo:"Metal",
-        lat:-25.40,
-        lng:-49.25
-      },
-
-      {
-        nome:"Eco Verde",
-        tipo:"Papel",
-        lat:-25.47,
-        lng:-49.28
-      }
-
-    ];
-
-    // Adicionar marcadores
-
-    pontos.forEach(ponto => {
-
-      L.marker([ponto.lat, ponto.lng])
-        .addTo(map)
-        .bindPopup(`
-          <b>${ponto.nome}</b><br>
-          Material: ${ponto.tipo}
-        `);
-
-    });
-
-  </script>
 
 </body>
 </html>

@@ -1128,9 +1128,6 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
 
                 id_usuario = usuario[0]
 
-                # Inserir reciclagem usando colunas básicas (compatível com schemaseeder)
-                # Muitas versões do banco não têm Unidade/CEP/Pontos na tabela Reciclagem,
-                # então inserimos apenas nas colunas garantidas e calculamos os pontos à parte.
                 pontos = dados.get("pontos") if isinstance(dados.get("pontos"), (int, float)) else dados.get("pontos")
 
                 try:
