@@ -53,10 +53,6 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
   const userEmail = localStorage.getItem('email');
   console.log('[admin] permissao=', permissao, 'email=', userEmail);
   const IS_ADMIN = (typeof permissao === 'string' && permissao.toLowerCase() === 'admin');
-  if (!IS_ADMIN) {
-    // Não bloqueia carregamento — mostra aviso e carrega em modo leitura (sem ações)
-    alert('Acesso de administrador não detectado. Você verá os dados em modo leitura.');
-  }
 
   // Basic table population placeholders
   window.loadUsuarios = async function() {
