@@ -74,6 +74,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 🔥 PEGA EMAIL DO LOCALSTORAGE (Tenta as duas chaves possíveis)
     const emailUsuario = localStorage.getItem("email") || localStorage.getItem("usuarioEmail");
+    const permissoes = localStorage.getItem('permissao');
+    const perfilTitulo = document.getElementById('perfilTitulo');
+    if (perfilTitulo && permissoes && permissoes.toLowerCase() === 'admin') {
+        perfilTitulo.innerText = 'Perfil do Usuário (Administrador)';
+    }
 
     // =========================
     // 1. BUSCAR DADOS DO BANCO (Ao carregar a página)
