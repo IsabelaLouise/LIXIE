@@ -1,0 +1,82 @@
+/* FUNDO ESCURO */
+.tela-negada {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ede8d0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999999;
+    font-family: Arial, sans-serif;
+}
+
+/* CARD */
+.card-negado {
+    background: white;
+    padding: 50px;
+    border-radius: 20px;
+
+    width: 90%;
+    max-width: 500px;
+
+    text-align: center;
+
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+
+    animation: aparecer 0.3s ease;
+}
+
+/* TÍTULO */
+.card-negado h1 {
+    color: #dc2626;
+    font-size: 38px;
+    margin-bottom: 20px;
+}
+
+/* TEXTO */
+.card-negado p {
+    color: #475569;
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 35px;
+}
+
+/* BOTÃO */
+.card-negado button {
+    background: #5b9e69;
+    color: white;
+
+    border: none;
+    border-radius: 12px;
+
+    padding: 15px 35px;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* HOVER */
+.card-negado button:hover {
+    transform: scale(1.05);
+    background: #20582d;
+}
+
+/* ANIMAÇÃO */
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
