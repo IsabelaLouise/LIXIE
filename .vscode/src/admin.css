@@ -381,3 +381,100 @@ dialog.popup-grande[open] {
 .btn-danger:hover {
     background: #4a8456!important;
 }
+
+/* ===== POPUP GLOBAL ===== */
+
+.overlay-popup{
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.75);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2147483647;
+
+    backdrop-filter: blur(4px);
+}
+
+dialog[open]{
+    z-index: 1000;
+}
+
+dialog::backdrop{
+    z-index: 1000;
+}
+
+.overlay-popup{
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.75);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 999999999;
+
+    backdrop-filter: blur(4px);
+}
+
+.popup-global-box{
+    width: 90%;
+    max-width: 420px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 35px 30px;
+
+    text-align: center;
+
+    animation: aparecerPopup .25s ease;
+}
+
+.popup-global-box h3{
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #1c1c1c;
+}
+
+.popup-global-box p{
+    font-size: 17px;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.popup-global-box button{
+    border: none;
+    background: #5b9e69;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.popup-global-box button:hover{
+    transform: scale(1.03);
+    opacity: .9;
+}
+
+@keyframes aparecerPopup{
+    from{
+        opacity: 0;
+        transform: scale(.9);
+    }
+
+    to{
+        opacity: 1;
+        transform: scale(1);
+    }
+}

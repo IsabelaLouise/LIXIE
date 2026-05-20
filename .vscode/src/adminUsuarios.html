@@ -51,7 +51,6 @@
         </div>
     </main>
 
-    <!-- Modal de edição de usuário (reaproveita estilo de overlays do perfil) -->
     <div id="admin-mensagem-sucesso" class="overlay" style="display:none;">
         <div class="popup">
             <p>Alterações salvas com sucesso</p>
@@ -77,8 +76,8 @@
             <div class="campo">
                 <label for="edit-permissao">Permissão</label>
                 <select id="edit-permissao" name="permissao">
-                    <option value="usuario">usuario</option>
-                    <option value="admin">admin</option>
+                    <option value="usuario">Usuario</option>
+                    <option value="admin">Admin</option>
                 </select>
             </div>
             <div class="botoes-dialog">
@@ -109,6 +108,20 @@
             </button>
         </div>
     </dialog>
+    <!-- POPUP GLOBAL -->
+    <div id="popup-global" class="overlay-popup" style="display: none;">
+        <div class="popup-global-box">
+            <h3 id="popup-global-titulo">Aviso</h3>
+
+            <p id="popup-global-texto">
+                Mensagem aqui
+            </p>
+
+            <button id="popup-global-btn">
+                Fechar
+            </button>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="admin.js"></script>
     <script src="verificacaoAdmin.js"></script>

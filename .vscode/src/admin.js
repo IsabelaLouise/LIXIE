@@ -41,6 +41,52 @@
     .catch(err => console.error("Erro ao carregar foto:", err));
   });
 })();
+function mostrarPopup(titulo, mensagem) {
+  
+
+    const popup = document.getElementById("popup-global");
+
+    const tituloPopup = document.getElementById("popup-global-titulo");
+
+    const textoPopup = document.getElementById("popup-global-texto");
+
+    const botaoPopup = document.getElementById("popup-global-btn");
+
+    tituloPopup.textContent = titulo;
+
+    textoPopup.textContent = mensagem;
+
+    popup.style.display = "flex";
+
+    botaoPopup.onclick = () => {
+        popup.style.display = "none";
+    };
+        // FECHA TODOS OS DIALOGS ABERTOS
+    document.querySelectorAll('dialog[open]').forEach(dialog => {
+        dialog.close();
+    });
+
+    popup.classList.add('overlay-popup');
+
+    popup.innerHTML = `
+        <div class="popup-global-box">
+            <h3>${titulo}</h3>
+            <p>${mensagem}</p>
+
+            <button id="fecharPopupGlobal">
+                OK
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document
+        .getElementById('fecharPopupGlobal')
+        .addEventListener('click', () => {
+            popup.remove();
+        });
+}
 // Simple admin guard and table loader
 // Define base API URL: when the page origin is NOT the backend origin, point to backend at localhost:8000
 const BACKEND_ORIGIN = 'http://localhost:8000';
@@ -144,6 +190,7 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                       overlay.style.display = 'none';
                     }, 2000);
 
+<<<<<<< HEAD
                     loadUsuarios();
                   } else {
                     alert('Erro ao deletar usuário');
@@ -154,6 +201,36 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                 }
               };
             });
+=======
+                overlay.querySelector('p').textContent = 'Usuário deletado com sucesso';
+
+                overlay.style.display = '';
+                overlay.classList.add('ativo');
+
+                setTimeout(() => {
+                    overlay.classList.remove('ativo');
+                    overlay.style.display = 'none';
+                }, 2000);
+
+                loadUsuarios();
+
+                } else {
+                mostrarPopup(
+                    "Erro",
+                    "Ocorreu um erro inesperado."
+                );
+                }
+
+            } catch (err) {
+                console.error(err);
+                mostrarPopup(
+                    "Erro",
+                    "Ocorreu um erro inesperado."
+                );
+            }
+            };
+          });
+>>>>>>> 1814635 (mensagens sem alert)
           });
         }
       } else {
@@ -249,6 +326,7 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                       overlay.style.display = 'none';
                     }, 2000);
 
+<<<<<<< HEAD
                     loadReciclagens();
                   } else {
                     alert('Erro ao deletar reciclagem');
@@ -258,6 +336,48 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                   alert('Erro');
                 }
               };
+=======
+                    const resp = await fetch(`${API_BASE}/deletar-reciclagem`, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ requester, id })
+                    });
+
+                    if (resp.ok) {
+
+                        dialogExcluirRec.close();
+
+                        const overlay = document.getElementById('admin-mensagem-sucesso');
+
+                        overlay.querySelector('p').textContent =
+                        'Reciclagem deletada com sucesso';
+
+                        overlay.style.display = '';
+                        overlay.classList.add('ativo');
+
+                        setTimeout(() => {
+                        overlay.classList.remove('ativo');
+                        overlay.style.display = 'none';
+                        }, 2000);
+
+                        loadReciclagens();
+
+                    } else {
+                        mostrarPopup(
+                        "Erro ao deletar usuário",
+                    );
+                    }
+
+                    } catch (err) {
+                    console.error(err);
+                    mostrarPopup(
+                        "Erro",
+                        "Ocorreu um erro inesperado."
+                    );
+                    }
+                };
+                });
+>>>>>>> 1814635 (mensagens sem alert)
             });
           });
         }
@@ -366,7 +486,9 @@ window.loadReciclagens = loadReciclagens;
             overlay.style.display = '';
             overlay.classList.add('ativo');
             setTimeout(() => { overlay.classList.remove('ativo'); overlay.style.display='none'; }, 2000);
-          } else alert('Salvo');
+          } else mostrarPopup(
+            "Erro",
+        );
 
           dialogUsuario.close();
           // recarrega usuários
@@ -376,9 +498,15 @@ window.loadReciclagens = loadReciclagens;
           let bodyText = '';
           try { bodyText = JSON.stringify(j); } catch(e){ bodyText = String(j); }
           console.error('[admin] /editar-usuario erro', res.status, bodyText);
-          alert('Erro ao salvar: ' + (j.mensagem || bodyText || 'Verifique o servidor'));
+          mostrarPopup(
+            "Erro",
+            "Ocorreu um erro inesperado ao salvar, verifique o servidor."
+        );
         }
-      } catch (err) { console.error(err); alert('Erro ao salvar'); }
+      } catch (err) { console.error(err); mostrarPopup(
+        "Erro",
+        "Ocorreu um erro inesperado."
+    );; }
     });
   }
 
@@ -450,16 +578,24 @@ window.loadReciclagens = loadReciclagens;
             overlay.style.display = '';
             overlay.classList.add('ativo');
             setTimeout(() => { overlay.classList.remove('ativo'); overlay.style.display='none'; }, 2000);
-          } else alert('Salvo');
+          } else mostrarPopup(
+            "Salvo!",
+        );;
 
           dialogRec.close();
           await loadReciclagens();
         } else {
           let txt = await res.text().catch(()=>'');
           console.error('[admin] /editar-reciclagem erro', res.status, txt);
-          alert('Erro ao salvar alteração: ' + (txt || res.status));
+          mostrarPopup(
+                "Erro",
+                "Ao salvar alterações."
+            );
         }
-      } catch (err) { console.error(err); alert('Erro') }
+      } catch (err) { console.error(err); mostrarPopup(
+        "Erro",
+        "Ocorreu um erro inesperado."
+    ); }
     });
   }
 })();
