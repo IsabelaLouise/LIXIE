@@ -452,6 +452,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    const botaoFecharPerfil = document.getElementById('bnt-fechar');
+    if (botaoFecharPerfil) {
+        botaoFecharPerfil.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (document.referrer) {
+                window.location.href = document.referrer;
+                return;
+            }
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            window.location.href = 'homeLogado.html';
+        });
+    }
+
     document.getElementById("confirmar-apagar").addEventListener("click", async () => {
         const senha = document.getElementById("senha").value;
         const mensagemApagado = document.getElementById("mensagem-apagado");
