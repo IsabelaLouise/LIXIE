@@ -236,6 +236,11 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
 
           });
         }
+      }
+    } catch (e) {
+      console.error('Erro ao carregar usuarios:', e);
+    }
+  };
 
   window.loadReciclagens = async function() {
     try {
@@ -321,8 +326,6 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                       overlay.classList.remove('ativo');
                       overlay.style.display = 'none';
                     }, 2000);
-
-<<<<<<< HEAD
                     loadReciclagens();
                   } else {
                     alert('Erro ao deletar reciclagem');
@@ -332,48 +335,6 @@ console.log('[admin] API_BASE resolved to', API_BASE || '(same origin)');
                   alert('Erro');
                 }
               };
-=======
-                    const resp = await fetch(`${API_BASE}/deletar-reciclagem`, {
-                        method: 'POST',
-                        headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({ requester, id })
-                    });
-
-                    if (resp.ok) {
-
-                        dialogExcluirRec.close();
-
-                        const overlay = document.getElementById('admin-mensagem-sucesso');
-
-                        overlay.querySelector('p').textContent =
-                        'Reciclagem deletada com sucesso';
-
-                        overlay.style.display = '';
-                        overlay.classList.add('ativo');
-
-                        setTimeout(() => {
-                        overlay.classList.remove('ativo');
-                        overlay.style.display = 'none';
-                        }, 2000);
-
-                        loadReciclagens();
-
-                    } else {
-                        mostrarPopup(
-                        "Erro ao deletar usuário",
-                    );
-                    }
-
-                    } catch (err) {
-                    console.error(err);
-                    mostrarPopup(
-                        "Erro",
-                        "Ocorreu um erro inesperado."
-                    );
-                    }
-                };
-                });
->>>>>>> 1814635 (mensagens sem alert)
             });
           });
         }
@@ -545,9 +506,6 @@ window.loadReciclagens = loadReciclagens;
       const quantidade = document.getElementById('edit-quantidade').value;
       const pontos = Number(document.getElementById('edit-pontos').value) || 0;
 
-
-      const quantidade = Number(document.getElementById('edit-quantidade').value);
-      const pontos = Number(document.getElementById('edit-pontos').value) || 0;
 
 // bloqueia negativos
       if (quantidade < 0 || pontos < 0) {
