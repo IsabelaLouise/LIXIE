@@ -1,86 +1,75 @@
-// session.js - responsável por controle de sessão e exibição do modal de sessão expirada
+const TEMPO_MAXIMO = 0.1 * 60 * 1000; // 6 segundos em milissegundos
+setInterval(verificarSessao, 10000); // verifica a cada 10s
 
-// Lê valor do cookie pelo nome
-function readCookie(name) {
-    const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]*)'));
-    return match ? decodeURIComponent(match[2]) : null;
-}
+function verificarSessao() {
+    const logado = localStorage.getItem("logado");
+    const ultimoAcesso = localStorage.getItem("ultimoAcesso");
 
-function showSessionExpiredModal() {
-    const modal = document.getElementById('sessionModal');
-    if (!modal) return;
-    modal.classList.add('active');
-}
+    // Se não estiver logado → NÃO mostra modal
+    if (logado !== "true") {
+        return;
+    }
 
-function ensureSessionModalExists() {
-    if (document.getElementById('sessionModal')) return;
-    const modal = document.createElement('div');
-    modal.id = 'sessionModal';
-    modal.className = 'session-modal';
-    modal.innerHTML = `
-        <div class="session-box">
-            <h2>Sessão expirada</h2>
-            <p>Você ficou inativo por muito tempo.<br>Faça login novamente para continuar.</p>
-            <button id="sessionModalBtn">Voltar ao login</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    document.getElementById('sessionModalBtn').addEventListener('click', fecharModal);
-}
+    // Se não tem timestamp → cria um (primeiro acesso)
+    if (!ultimoAcesso) {
+        localStorage.setItem("ultimoAcesso", Date.now());
+        return;
+    }
 
-function fecharModal() {
-    const modal = document.getElementById('sessionModal');
-    if (modal) modal.classList.remove('active');
-    try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
-    window.location.href = '/.vscode/src/homeNaoLogado.html';
-}
+    const agora = Date.now();
+    const tempoParado = agora - ultimoAcesso;
 
-function scheduleSessionTimeout() {
-    const expires = readCookie('session_expires');
-    if (!expires) return;
-
-    const expiresTs = parseInt(expires, 10);
-    if (isNaN(expiresTs)) return;
-
-    const now = Math.floor(Date.now() / 1000);
-    const remaining = (expiresTs - now) * 1000;
-
-    if (remaining <= 0) {
-        showSessionExpiredModal();
-    } else {
-        setTimeout(() => { showSessionExpiredModal(); }, remaining + 250);
+    if (tempoParado > TEMPO_MAXIMO) {
+        mostrarModalSessao();
     }
 }
 
-// intercept fetch to show modal on 401
-(function(){
-    const originalFetch = window.fetch;
-    if (!originalFetch) return;
-    window.fetch = function(input, init) {
-        try {
-            let url = input;
-            if (input && input.url) url = input.url; // Request object
-            // If request targets the backend, ensure credentials are included
-            if (typeof url === 'string' && url.includes('lixie-production.up.railway.app')) {
-                init = init || {};
-                if (!init.credentials) init.credentials = 'include';
-            }
-        } catch(e) {
-            // ignore
-        }
+function tratarInteracao() {
+    const logado = localStorage.getItem("logado");
 
-        return originalFetch.call(this, input, init).then(res => {
-            if (res && res.status === 401) {
-                ensureSessionModalExists();
-                showSessionExpiredModal();
-            }
-            return res;
-        }).catch(err => { throw err; });
-    };
-})();
+    if (logado !== "true") return;
 
-// On load
-document.addEventListener('DOMContentLoaded', () => {
-    ensureSessionModalExists();
-    scheduleSessionTimeout();
-});
+    const ultimoAcesso = localStorage.getItem("ultimoAcesso");
+
+    if (!ultimoAcesso) {
+        localStorage.setItem("ultimoAcesso", Date.now());
+        return;
+    }
+
+    const agora = Date.now();
+    const tempoParado = agora - ultimoAcesso;
+
+    // verifica ANTES de atualizar
+    if (tempoParado > TEMPO_MAXIMO) {
+        mostrarModalSessao();
+        return;
+    }
+
+    // só atualiza se ainda está válido
+    localStorage.setItem("ultimoAcesso", Date.now());
+}
+
+function redirecionarLogin() {
+    window.location.href = "/.vscode/src/login.html";
+}
+
+// eventos de atividade
+document.addEventListener("click", tratarInteracao);
+document.addEventListener("keydown", tratarInteracao);
+
+// roda automaticamente
+verificarSessao();
+
+function mostrarModalSessao() {
+    const modal = document.getElementById("sessionModal");
+
+    if (modal) {
+        modal.classList.add("active");
+    }
+
+    localStorage.clear();
+}
+
+function fecharModal() {
+    window.location.href = "login.html";
+}
