@@ -268,7 +268,7 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                         resposta = {"sucesso": True, "mensagem": "Login realizado", "permissao": perm_nome}
                     else:
                         resposta = {"sucesso": False, "mensagem": "Email e/ou senha incorreto(s)"}
-
+                self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps(resposta).encode())
