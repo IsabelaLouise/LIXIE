@@ -1,4 +1,4 @@
-const TEMPO_MAXIMO = 0.1 * 60 * 1000; // 6 segundos em milissegundos
+const TEMPO_MAXIMO = 30 * 60 * 1000; // 30 minutos em milissegundos
 setInterval(verificarSessao, 10000); // verifica a cada 10s
 
 function verificarSessao() {
