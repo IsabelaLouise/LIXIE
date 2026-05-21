@@ -210,9 +210,14 @@ const TEMPO_MAXIMO = 0.1 * 60 * 1000; // 6 segundos em milissegundos
 setInterval(verificarSessao, 10000); // verifica a cada 10s
 
 function verificarSessao() {
-    const logado = localStorage.getItem("logado");
-    const ultimoAcesso = localStorage.getItem("ultimoAcesso");
 
+  if (dados.sucesso) {
+    localStorage.setItem("email", email);
+    localStorage.setItem("permissao", dados.permissao);
+    window.location.href = "/.vscode/src/homeLogado.html";
+    localStorage.setItem("logado", "true");
+    localStorage.setItem("ultimoAcesso", Date.now());
+  }
     // Se não estiver logado → NÃO mostra modal
     if (logado !== "true") {
         return;
