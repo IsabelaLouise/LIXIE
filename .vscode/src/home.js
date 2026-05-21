@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">
                 Registrar Reciclagem
             </a>
-            <a href="#" class="nav-link">
+            <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">
                 Mapa de Coleta
             </a>
             <a href="#" class="nav-link">
