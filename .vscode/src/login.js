@@ -6,10 +6,6 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
   const mensagem = document.getElementById("mensagem");
   const overlayErroLogin = document.getElementById("mensagem-erro-login");
 
-  
-  localStorage.setItem("logado", "true");
-  localStorage.setItem("ultimoAcesso", Date.now());
-
   try {
     const resposta = await fetch("http://localhost:8000/login", {
       method: "POST",
@@ -22,8 +18,10 @@ document.getElementById("formLogin").addEventListener("submit", async function(e
     const dados = await resposta.json();
 
     if (dados.sucesso) {
+      localStorage.setItem("logado", "true");
+      localStorage.setItem("ultimoAcesso", Date.now());
       localStorage.setItem("email", email);
-      localStorage.setItem("permissao", dados.permissao); // 👈 NOVO
+      localStorage.setItem("permissao", dados.permissao);
 
       window.location.href = "/.vscode/src/homeLogado.html";
     }else {
@@ -76,5 +74,3 @@ function toggleSenhaLogin(elemento) {
     elemento.classList.add("fa-eye");
   }
 }
-
-localStorage.setItem("logado", "true");
