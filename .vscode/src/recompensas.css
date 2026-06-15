@@ -1,0 +1,359 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BASE */
+body {
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+    background: #ede8d0;
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    font-weight: bold;
+    background: #ede8d0;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .navbar {
+        gap: 15px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+    }
+
+    .btn-auth {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* LOGO */
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    max-height: 50px;
+    width: auto;
+    transition: transform 0.2s;
+}
+
+.logo-link:hover .logo-img {
+    transform: scale(1.05);
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    flex: 1;
+    margin: 0 20px;
+}
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-link:hover {
+    color: #5b9e69;
+    border-bottom-color: #5b9e69;
+}
+
+.nav-link.active {
+    color: #5b9e69;
+    border-bottom-color: #5b9e69;
+    font-weight: 600;
+}
+
+/* MENU TOGGLE (MOBILE) */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #085b1c;
+    cursor: pointer;
+    padding: 5px;
+    transition: 0.2s;
+}
+
+.menu-toggle:hover {
+    color: #5b9e69;
+}
+
+/* BUTTON AUTH */
+.btn-auth {
+    background-color: #5b9e69;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-auth:hover {
+    background-color: #20582d;
+    transform: scale(1.05);
+}
+
+.btn-auth i {
+    font-size: 16px;
+}
+
+/* PROFILE LINK */
+.profile-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.profile {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #cfd8cc;
+    border: 2px solid #e0e0e0;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.profile-link:hover .profile {
+    transform: translateY(-2px);
+    background: #d6e7d3;
+}
+
+/* MAIN */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 40px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+main h1 {
+    font-family: "DynaPuff", system-ui;
+    color: #085b1c;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* SECTIONS */
+.section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.section.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.recompensas-header {
+    text-align: center;
+    margin: 40px auto 60px;
+}
+
+.recompensas-header h2 {
+    color: #085b1c;
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.recompensas-header p {
+    color: #555;
+    font-size: 17px;
+}
+
+.recompensas-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+}
+
+.recompensas-section h3 {
+    color: #085b1c;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+.recompensas-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.reward-card {
+    position: relative;
+
+    background: linear-gradient(
+        145deg,
+        #ffffff,
+        #f3f7f2
+    );
+
+    border-radius: 22px;
+    padding: 25px;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,.05);
+
+    transition: .3s;
+}
+
+.reward-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,.08);
+}
+
+.reward-points {
+    position: absolute;
+    top: -12px;
+    left: 15px;
+
+    background: #5b9e69;
+    color: white;
+
+    padding: 8px 15px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.reward-card h4 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+
+    color: #085b1c;
+    font-size: 20px;
+}
+
+.reward-card p {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.reward-btn {
+    width: 100%;
+
+    background: #5b9e69;
+    color: white;
+
+    border: none;
+
+    padding: 12px;
+
+    border-radius: 999px;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.reward-btn:hover {
+    background: #4a8456;
+    transform: scale(1.03);
+}
+
+/* sessão/modal usado para ações relacionadas à conta (login, confirmação) */
+.session-modal { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; }
+.session-modal.active { opacity:1; pointer-events:auto; }
+.session-box { background:#f1f8f2; padding:30px; border-radius:20px; text-align:center; width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.15); transform:translateY(20px); transition:0.3s; }
+.session-modal.active .session-box { transform:translateY(0); }
+.session-box h2 { color:#085b1c; margin-bottom:10px; }
+.session-box p { color:#555; margin-bottom:20px; }
+.session-box button { background:#5b9e69; color:white; border:none; padding:10px 20px; border-radius:999px; cursor:pointer; font-weight:bold; transition:0.2s; }
+.session-box button:hover { background:#4a8456; transform:scale(1.05); }
+
+/* FOOTER */
+footer {
+    width: 100%;
+    padding: 20px;
+    background: #ede8d0;
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #6b7b6b;
+    font-size: 14px;
+}
+
+/* texto central */
+footer span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* botão sair fixo à direita */
+.logout-footer {
+    position: absolute;
+    right: 20px;
+
+    text-decoration: none;
+    color: #c0392b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.logout-footer:hover {
+    color: #922b21;
+    transform: scale(1.05);
+}
