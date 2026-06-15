@@ -1,31 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Reciclagem</title>
-  <link rel="stylesheet" href="/.vscode/src/home.css">
-  <link rel="stylesheet" href="registrarReciclagem.css">
-  <!-- Google Fonts (match outras páginas) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
-  <!-- Font Awesome (ícones do menu) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/.vscode/src/home.css">
+    <link rel="stylesheet" href="registrarReciclagem.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
-  
-<header>
+
+    <header>
         <div class="header-container">
             <a href="/.vscode/src/homeLogado.html" class="logo-link">
                 <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
             </a>
-
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
             </button>
-
             <nav class="navbar" id="navbar">
                 <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
                 <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
@@ -33,80 +28,107 @@
                 <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">Mapa de Coleta</a>
                 <a href="#" class="nav-link">Recompensas</a>
             </nav>
-
             <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
-                <img id="fotoHome" class="profile" src="img/avatar.png">
+                <img id="fotoHome" class="profile" src="img/avatar.png" alt="Foto de perfil">
             </a>
         </div>
     </header>
 
-<div class="container">
-
-  <!-- 🔥 ESQUERDA: MATERIAIS -->
-  <div id="materiais-container">
-    <h2>Materiais</h2>
-
-    <div id="materiais">
-      <button type="button" data-tipo="plastico"><img src="/.vscode/src/img/plastico.png"> Plástico</button>
-      <button type="button" data-tipo="papel"><img src="/.vscode/src/img/papel.png"> Papel</button>
-      <button type="button" data-tipo="vidro"><img src="/.vscode/src/img/vidro.png"> Vidro</button>
-      <button type="button" data-tipo="metal"><img src="/.vscode/src/img/metal.png"> Metal</button>
-      <button type="button" data-tipo="organico"><img src="/.vscode/src/img/organico.png"> Orgânico</button>
-      <button type="button" data-tipo="pilhas"><img src="/.vscode/src/img/bateria.png"> Pilhas</button>
-      <button type="button" data-tipo="eletronico"><img src="/.vscode/src/img/eletronico.png"> Eletrônicos</button>
-      <button type="button" data-tipo="tampinha"><img src="/.vscode/src/img/tampinha.png"> Tampinha</button>
-      <button type="button" data-tipo="cartela"><img src="/.vscode/src/img/cartela.png"> Cartela</button>
-      <button type="button" data-tipo="capsula"><img src="/.vscode/src/img/cafe.png"> Cápsula</button>
-    </div>
-  </div>
-
-<div class="lado-direito">
-
-  <!-- F
-   ORM -->
-  <form id="formReciclagem" novalidate>
-
-    <h2>Registrar Reciclagem</h2>
-
-    <div class="linha">
-      <input type="number" id="quantidade" placeholder="Quantidade" required>
-        <span class="erro" id="erroQuantidade"></span>
-
-      <select id="unidade">
-        <option value="kg">kg (Kilogramas)</option>
-        <option value="g">g (Gramas)</option>
-        <option value="ton">ton (Toneladas)</option>
-        <option value="un">Unidades</option>
-      </select>
+    <div class="page-header">
+        <h1>♻️ Registrar Reciclagem</h1>
+        <p>Selecione o material, informe a quantidade e registre sua contribuição</p>
     </div>
 
-    <p id="resultado"></p>
+    <div class="container">
 
-    <label>Digite o CEP:</label>
-    <input type="text" id="cep" placeholder="Digite o CEP">
-      <span id="erroCep"></span>
+        <!-- ESQUERDA: MATERIAIS -->
+        <div id="materiais-container">
+            <h2>Selecione o material</h2>
+            <div id="materiais">
+                <button type="button" data-tipo="plastico"><img src="/.vscode/src/img/plastico.png" alt="Plástico"> Plástico</button>
+                <button type="button" data-tipo="papel"><img src="/.vscode/src/img/papel.png" alt="Papel"> Papel</button>
+                <button type="button" data-tipo="vidro"><img src="/.vscode/src/img/vidro.png" alt="Vidro"> Vidro</button>
+                <button type="button" data-tipo="metal"><img src="/.vscode/src/img/metal.png" alt="Metal"> Metal</button>
+                <button type="button" data-tipo="organico"><img src="/.vscode/src/img/organico.png" alt="Orgânico"> Orgânico</button>
+                <button type="button" data-tipo="pilhas"><img src="/.vscode/src/img/bateria.png" alt="Pilhas"> Pilhas</button>
+                <button type="button" data-tipo="eletronico"><img src="/.vscode/src/img/eletronico.png" alt="Eletrônicos"> Eletrônicos</button>
+                <button type="button" data-tipo="tampinha"><img src="/.vscode/src/img/tampinha.png" alt="Tampinha"> Tampinha</button>
+                <button type="button" data-tipo="cartela"><img src="/.vscode/src/img/cartela.png" alt="Cartela"> Cartela</button>
+                <button type="button" data-tipo="capsula"><img src="/.vscode/src/img/cafe.png" alt="Cápsula"> Cápsula</button>
+            </div>
+        </div>
 
-    <label>Comprove com uma foto:</label>
-    <input type="file" id="foto" accept="image/*">
+        <!-- DIREITA: FORM -->
+        <div class="lado-direito">
+            <form id="formReciclagem" novalidate>
+                <h2>Detalhes do registro</h2>
 
-  </form>
+                <div class="material-badge" id="materialBadge" style="display:none;">
+                    <img id="badgeImg" src="" alt="">
+                    <div>
+                        <div class="material-badge-text" id="badgeNome">Nenhum material selecionado</div>
+                        <div class="material-badge-sub">Clique em outro material para trocar</div>
+                    </div>
+                </div>
 
-  <!-- BOTÃO -->
-  <button type="submit" form="formReciclagem">
-    Registrar
-  </button>
+                <div id="resultado"></div>
 
-</div>
+                <div class="linha">
+                    <div>
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidade" placeholder="Ex: 2,5" required>
+                        <span class="erro" id="erroQuantidade"></span>
+                    </div>
+                    <div>
+                        <label for="unidade">Unidade</label>
+                        <select id="unidade">
+                            <option value="kg">kg (Kilogramas)</option>
+                            <option value="g">g (Gramas)</option>
+                            <option value="ton">ton (Toneladas)</option>
+                            <option value="un">Unidades</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label for="cep">CEP do local</label>
+                <input type="text" id="cep" placeholder="00000-000" style="margin-bottom:6px;">
+                <span id="erroCep"></span>
+
+                <label for="foto" style="margin-top:14px;">Comprove com uma foto</label>
+                <label for="foto" class="upload-area" id="uploadArea">
+                    <i class="fas fa-camera"></i>
+                    <span class="upload-text">Clique para escolher ou arraste a foto</span>
+                    <span class="upload-sub" id="uploadNome">JPG, PNG ou HEIC · máx. 10MB</span>
+                </label>
+                <input type="file" id="foto" accept="image/*">
+
+                <button type="submit">🌱 Registrar reciclagem</button>
+            </form>
+        </div>
+
+        <!-- CARD DE PONTOS — ocupa a coluna esquerda, abaixo dos materiais -->
+        <div class="pontos-card">
+            <i class="fas fa-star"></i>
+            <div>
+                <div class="pontos-label">Seus pontos atuais</div>
+                <div class="pontos-value" id="totalPontos">— pts</div>
+                <div class="pontos-sub">Registre para acumular mais pontos</div>
+            </div>
+        </div>
+
+    </div>
 
     <div id="sessionModal" class="session-modal">
-    <div class="session-box">
-        <h2>Sessão expirada</h2>
-        <p>Você ficou inativo por muito tempo.<br>Faça login novamente para continuar.</p>
-        <button onclick="fecharModal()">Voltar ao login</button>
+        <div class="session-box">
+            <h2>Sessão expirada</h2>
+            <p>Você ficou inativo por muito tempo.<br>Faça login novamente para continuar.</p>
+            <button onclick="fecharModal()">Voltar ao login</button>
+        </div>
     </div>
-    </div>
-<script src="registrarReciclagem.js"></script>
-<script src="verificacao.js"></script>
-<script src=".vscode/src/session.js"></script>
+
+    <script src="registrarReciclagem.js"></script>
+    <script src="verificacao.js"></script>
+    <script src="/.vscode/src/session.js"></script>
+
 </body>
 </html>

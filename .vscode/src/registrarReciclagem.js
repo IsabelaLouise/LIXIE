@@ -1,336 +1,293 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // MENU MOBILE TOGGLE (comum a ambas) - protegido por DOMContentLoaded
+
+  // =============================================================
+  // ESTADO
+  // =============================================================
+  let tipoSelecionado = '';
+  let cepValido = false;
+
+
+  // =============================================================
+  // MENU MOBILE
+  // =============================================================
   const menuToggle = document.getElementById('menuToggle');
   const navbar = document.getElementById('navbar');
-  const navLinks = document.querySelectorAll('.nav-link');
 
-  // Toggle menu ao clicar no botão
   if (menuToggle && navbar) {
     menuToggle.addEventListener('click', () => {
       navbar.classList.toggle('active');
       menuToggle.classList.toggle('active');
     });
-  }
 
-  // Fechar menu ao clicar em um link
-  if (navLinks && navLinks.length) {
-    navLinks.forEach(link => {
+    document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', () => {
-        if (navbar) navbar.classList.remove('active');
-        if (menuToggle) menuToggle.classList.remove('active');
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
       });
     });
-  }
 
-  // Fechar menu ao redimensionar para desktop
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      if (navbar) navbar.classList.remove('active');
-      if (menuToggle) menuToggle.classList.remove('active');
-    }
-  });
-
-  // FOTO DO USUÁRIO (se estiver logado)
-  const email = localStorage.getItem('email');
-  if (email) {
-    fetch("http://localhost:8000/perfil", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `email=${encodeURIComponent(email)}`
-    })
-    .then(res => res.json())
-    .then(usuario => {
-      const fotoHome = document.getElementById("fotoHome");
-      if (!fotoHome) return;
-      if (usuario.foto && usuario.foto.trim().startsWith("http")) {
-        fotoHome.src = usuario.foto.trim();
-      } else {
-        fotoHome.src = "img/avatar.png";
-      }
-    })
-    .catch(err => console.error("Erro ao carregar foto:", err));
-  }
-
-  let tipoSelecionado = "";
-  let pontosTotais = 0;
-  let cepValido = false;
-
-  // material e quantidade
-  const quantidadeEl = document.getElementById("quantidade");
-  if (quantidadeEl) {
-    quantidadeEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-
-        const quantidade = parseFloat(document.getElementById("quantidade").value);
-        const resultado = document.getElementById("resultado");
-
-        if (!tipoSelecionado) {
-          if (resultado) {
-            resultado.className = "erro";
-            resultado.innerHTML =  "⚠️ Selecione um material primeiro!";
-          }
-          return;
-        }
-
-        if (!quantidade || quantidade <= 0) {
-          if (resultado) {
-            resultado.className = "erro";
-            resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
-          }
-          return;
-        }
-
-        if (resultado) {
-          resultado.innerHTML = "";
-          resultado.className = "";
-        }
-
-        const cepInput = document.getElementById("cep");
-        if (cepInput) cepInput.focus();
-        verificarPreenchimento();
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('active');
       }
     });
   }
 
-// pontos por material
-const pontosPorMaterial = {
-  plastico: 8,
-  papel: 3,
-  vidro: 6,
-  metal: 15,
-  organico: 7,
-  pilhas: 10,
-  eletronicos: 20,
-  tampinha: 2,
-  cartela: 5,
-  capsula: 4,
-};
 
-// converter
-function converterParaKg(valor, unidade) {
-  switch (unidade) {
-    case "g": return valor / 1000;
-    case "kg": return valor;
-    case "ton": return valor * 1000;
-    case "un": return valor;
-    default: return valor;
+  // =============================================================
+  // FOTO DO USUÁRIO
+  // =============================================================
+  const email = localStorage.getItem('email');
+  const fotoHome = document.getElementById('fotoHome');
+
+  if (email && fotoHome) {
+    fetch('http://localhost:8000/perfil', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `email=${encodeURIComponent(email)}`
+    })
+      .then(res => res.json())
+      .then(usuario => {
+        fotoHome.src = usuario.foto?.trim().startsWith('http')
+          ? usuario.foto.trim()
+          : 'img/avatar.png';
+      })
+      .catch(err => console.error('Erro ao carregar foto:', err));
   }
-}
 
-// verificação de preenchimento
-    function verificarPreenchimento() {
-    const quantidade = parseFloat(document.getElementById("quantidade").value);
-
-    if (tipoSelecionado === "" || !quantidade || quantidade <= 0) {
-        const erroCep = document.getElementById("erroCep");
-        if (erroCep) {
-            erroCep.innerText = "";
-            erroCep.className = "";
+  // Carrega pontos do usuário no card
+  if (email) {
+    fetch('http://localhost:8000/perfil', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `email=${encodeURIComponent(email)}`
+    })
+      .then(res => res.json())
+      .then(usuario => {
+        const el = document.getElementById('totalPontos');
+        if (el && usuario.pontos != null) {
+          el.textContent = `${usuario.pontos} pts`;
         }
-    }
-}
+      })
+      .catch(() => {});
+  }
 
 
-// selecionar material
-document.querySelectorAll("#materiais button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    tipoSelecionado = btn.dataset.tipo;
+  // =============================================================
+  // CONSTANTES
+  // =============================================================
+  const PONTOS_POR_MATERIAL = {
+    plastico:   8,
+    papel:      3,
+    vidro:      6,
+    metal:      15,
+    organico:   7,
+    pilhas:     10,
+    eletronico: 20,
+    tampinha:   2,
+    cartela:    5,
+    capsula:    4,
+  };
 
-    document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
-    btn.classList.add("ativo");
+  const KG_MULTIPLIER = { g: 1 / 1000, kg: 1, ton: 1000, un: 1 };
 
-    verificarPreenchimento();
+
+  // =============================================================
+  // UTILITÁRIOS
+  // =============================================================
+  function converterParaKg(valor, unidade) {
+    return valor * (KG_MULTIPLIER[unidade] ?? 1);
+  }
+
+  function setFeedback(el, classe, html) {
+    if (!el) return;
+    el.className = classe;
+    el.innerHTML = html;
+  }
+
+  function limparFeedback(...els) {
+    els.forEach(el => { if (el) { el.className = ''; el.innerHTML = ''; } });
+  }
+
+
+  // =============================================================
+  // SELEÇÃO DE MATERIAL
+  // =============================================================
+  const botoesMaterial = document.querySelectorAll('#materiais button');
+  const badge = document.getElementById('materialBadge');
+  const badgeImg = document.getElementById('badgeImg');
+  const badgeNome = document.getElementById('badgeNome');
+
+  botoesMaterial.forEach(btn => {
+    btn.addEventListener('click', () => {
+      botoesMaterial.forEach(b => b.classList.remove('ativo'));
+      btn.classList.add('ativo');
+      tipoSelecionado = btn.dataset.tipo;
+
+      // Atualiza badge no formulário
+      if (badge && badgeImg && badgeNome) {
+        const img = btn.querySelector('img');
+        badgeImg.src = img?.src ?? '';
+        badgeImg.alt = btn.textContent.trim();
+        badgeNome.textContent = `${btn.textContent.trim()} selecionado`;
+        badge.style.display = 'flex';
+      }
+    });
   });
-});
-
-// submit
-document.getElementById("formReciclagem").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const quantidade = parseFloat(document.getElementById("quantidade").value);
-  const unidade = document.getElementById("unidade").value;
-  const resultado = document.getElementById("resultado");
-  const erroCep = document.getElementById("erroCep");
-
-  resultado.innerHTML = "";
-  resultado.className = "";
-  erroCep.innerHTML = "";
-  erroCep.className = "";
-
-  // validações
-  if (!tipoSelecionado) {
-    resultado.className = "erro";
-    resultado.innerHTML = "⚠️ Selecione um material!";
-    return;
-  }
-
-  if (!quantidade || quantidade <= 0) {
-    resultado.className = "erro";
-    resultado.innerHTML = "⚠️ Digite uma quantidade válida!";
-    return;
-  }
-
-  if (!cepValido) {
-    erroCep.className = "erro";
-    erroCep.innerHTML = "⚠️ Finalize o CEP antes de registrar";
-    return;
-  }
-
-  // cálculo
-  const quantidadeKg = converterParaKg(quantidade, unidade);
-
-  const pontos = Math.round(
-    quantidadeKg * (pontosPorMaterial[tipoSelecionado] || 0)
-  );
-
-  pontosTotais += pontos;
-
-  atualizarPainel();
-
-  // sucesso
-  resultado.className = "sucesso";
-
-  const email = localStorage.getItem("email");
-
-fetch("http://localhost:8000/registrar-reciclagem",  {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    email: email,
-    tipo: tipoSelecionado,
-    quantidade: quantidade,
-    unidade: unidade,
-    pontos: pontos,
-    cep: document.getElementById("cep").value
-  })
-})
-.then(res => res.json())
-.then(data => {
-  console.log("SALVO NO BACK:", data);
-})
-.catch(err => {
-  console.error("ERRO AO SALVAR:", err);
-});
 
 
-  let mensagem = `
-  ✅ Registrado com sucesso! <br>
-  ♻️ Material: ${tipoSelecionado} <br>
-  ⚖️ Quantidade: ${quantidade} ${unidade} <br>
-  `;
+  // =============================================================
+  // CAMPO DE QUANTIDADE — Enter avança para CEP
+  // =============================================================
+  const quantidadeEl = document.getElementById('quantidade');
+  const resultadoEl = document.getElementById('resultado');
+  const cepEl = document.getElementById('cep');
 
-  if (unidade !== "un") {
-    mensagem += `📦 Equivalente: ${quantidadeKg.toFixed(2)} kg <br>`;
-  }
+  quantidadeEl?.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
 
-  mensagem += `⭐ Pontos ganhos: ${pontos}`;
+    const quantidade = parseFloat(quantidadeEl.value);
 
-  resultado.innerHTML = mensagem;
-  resultado.style.display = "block";
+    if (!tipoSelecionado) {
+      setFeedback(resultadoEl, 'erro', '⚠️ Selecione um material primeiro!');
+      return;
+    }
+    if (!quantidade || quantidade <= 0) {
+      setFeedback(resultadoEl, 'erro', '⚠️ Digite uma quantidade válida!');
+      return;
+    }
 
-  // limpar
-  document.getElementById("quantidade").value = "";
-  document.getElementById("cep").value = "";
-  document.getElementById("foto").value = "";
-  erroCep.innerText = "";
-  erroCep.className = "";
-  cepValido = false;
-  tipoSelecionado = "";
-  document.querySelectorAll("#materiais button").forEach(b => b.classList.remove("ativo"));
-});
+    limparFeedback(resultadoEl);
+    cepEl?.focus();
+  });
 
-// painel
-function atualizarPainel() {
-  const nivelEl = document.getElementById("nivel");
-  const pontosEl = document.getElementById("pontos");
-  const barra = document.getElementById("barraProgresso");
 
-  if (pontosEl) {
-    pontosEl.innerText = `Pontos: ${pontosTotais}`;
-  }
+  // =============================================================
+  // CEP — máscara + busca automática
+  // =============================================================
+  const erroCepEl = document.getElementById('erroCep');
 
-  let nivel = "Iniciante 🌱";
-  let progresso = pontosTotais;
+  cepEl?.addEventListener('input', async e => {
+    let valor = e.target.value.replace(/\D/g, '').slice(0, 8);
+    if (valor.length > 5) valor = valor.slice(0, 5) + '-' + valor.slice(5);
+    e.target.value = valor;
 
-  if (pontosTotais >= 100) {
-    nivel = "Consciente ♻️";
-    progresso = pontosTotais - 100;
-  }
-  if (pontosTotais >= 300) {
-    nivel = "Sustentável 🌍";
-    progresso = pontosTotais - 300;
-  }
-  if (pontosTotais >= 600) {
-    nivel = "Mestre 🏆";
-    progresso = pontosTotais - 600;
-  }
+    cepValido = false;
+    limparFeedback(erroCepEl);
 
-  if (nivelEl) {
-    nivelEl.innerText = `Nível: ${nivel}`;
-  }
-
-  if (barra) {
-    let porcentagem = (progresso / 100) * 100;
-    if (porcentagem > 100) porcentagem = 100;
-    barra.style.width = porcentagem + "%";
-  }
-}
-
-// CEP
-const cep = document.getElementById("cep");
-const erroCep = document.getElementById("erroCep");
-
-cep.addEventListener("input", async (e) => {
-
-  let valor = e.target.value;
-
-  valor = valor.replace(/\D/g, "");
-  valor = valor.slice(0, 8);
-
-  if (valor.length > 5) {
-    valor = valor.slice(0, 5) + "-" + valor.slice(5);
-  }
-
-  e.target.value = valor;
-
-  const cepLimpo = valor.replace(/\D/g, "");
-
-  cepValido = false;
-
-  if (cepLimpo.length === 8) {
-
-    // erroCep.className = "loading";
-    //erroCep.innerText = "🔄 Buscando CEP...";
+    if (valor.replace(/\D/g, '').length < 8) return;
 
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const res = await fetch(`https://viacep.com.br/ws/${valor.replace(/\D/g, '')}/json/`);
       const data = await res.json();
 
       if (data.erro) {
-        erroCep.className = "erro";
-        erroCep.innerText = "❌ CEP não encontrado!";
+        setFeedback(erroCepEl, 'erro', '❌ CEP não encontrado!');
         return;
       }
 
       e.target.value = `${data.logradouro} - ${data.localidade}, ${data.uf}`;
-
-     // erroCep.className = "sucesso";
-     // erroCep.innerText = "✔️ CEP encontrado";
-
       cepValido = true;
 
     } catch {
-      erroCep.className = "erro";
-      erroCep.innerText = "❌ Erro ao buscar CEP";
+      setFeedback(erroCepEl, 'erro', '❌ Erro ao buscar CEP. Tente novamente.');
+    }
+  });
+
+
+  // =============================================================
+  // UPLOAD — mostra nome do arquivo
+  // =============================================================
+  document.getElementById('foto')?.addEventListener('change', function () {
+    const uploadNome = document.getElementById('uploadNome');
+    if (uploadNome) {
+      uploadNome.textContent = this.files[0]?.name ?? 'Nenhum arquivo escolhido';
+    }
+  });
+
+
+  // =============================================================
+  // SUBMIT
+  // =============================================================
+  document.getElementById('formReciclagem')?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const quantidade = parseFloat(quantidadeEl?.value);
+    const unidade = document.getElementById('unidade')?.value;
+
+    limparFeedback(resultadoEl, erroCepEl);
+
+    // Validações
+    if (!tipoSelecionado) {
+      setFeedback(resultadoEl, 'erro', '⚠️ Selecione um material!');
+      return;
+    }
+    if (!quantidade || quantidade <= 0) {
+      setFeedback(resultadoEl, 'erro', '⚠️ Digite uma quantidade válida!');
+      return;
+    }
+    if (!cepValido) {
+      setFeedback(erroCepEl, 'erro', '⚠️ Finalize o CEP antes de registrar.');
+      return;
     }
 
-  } else {
-    erroCep.innerText = "";
-    erroCep.className = "";
-  }
-});
+    // Cálculo de pontos
+    const quantidadeKg = converterParaKg(quantidade, unidade);
+    const pontos = Math.round(quantidadeKg * (PONTOS_POR_MATERIAL[tipoSelecionado] ?? 0));
+
+    // Envia para o backend
+    try {
+      const res = await fetch('http://localhost:8000/registrar-reciclagem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          tipo: tipoSelecionado,
+          quantidade,
+          unidade,
+          pontos,
+          cep: cepEl?.value,
+        }),
+      });
+      const data = await res.json();
+      console.log('Salvo no backend:', data);
+
+      // Atualiza card de pontos com valor real do backend
+      const el = document.getElementById('totalPontos');
+      if (el && data.pontos_totais != null) {
+        el.textContent = `${data.pontos_totais} pts`;
+      }
+
+    } catch (err) {
+      console.error('Erro ao salvar:', err);
+    }
+
+    // Mensagem de sucesso
+    let mensagem = `✅ Registrado com sucesso!<br>
+      ♻️ Material: ${tipoSelecionado}<br>
+      ⚖️ Quantidade: ${quantidade} ${unidade}`;
+
+    if (unidade !== 'un') {
+      mensagem += `<br>📦 Equivalente: ${quantidadeKg.toFixed(2)} kg`;
+    }
+    mensagem += `<br>⭐ Pontos ganhos: ${pontos}`;
+
+    setFeedback(resultadoEl, 'sucesso', mensagem);
+    resultadoEl.style.display = 'block';
+
+    // Reset do formulário
+    quantidadeEl.value = '';
+    if (cepEl) cepEl.value = '';
+    document.getElementById('foto').value = '';
+    const uploadNome = document.getElementById('uploadNome');
+    if (uploadNome) uploadNome.textContent = 'JPG, PNG ou HEIC · máx. 10MB';
+    limparFeedback(erroCepEl);
+    cepValido = false;
+    tipoSelecionado = '';
+    botoesMaterial.forEach(b => b.classList.remove('ativo'));
+    if (badge) badge.style.display = 'none';
+  });
 
 });

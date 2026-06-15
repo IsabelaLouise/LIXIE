@@ -31,7 +31,7 @@ import cloudinary
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "PUC@1234",
+    "password": "PUC@123",
     "database": "Lixie",
     "port": 3306
 }
@@ -710,7 +710,8 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
             cursor = conexao.cursor()
 
             cursor.execute("""
-                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento, Foto
+                SELECT Nome, Email, Telefone, Data_Nasc, CEP, Rua, Cidade, Estado, Numero_casa, Complemento, Foto,
+                    COALESCE(Pontuacao_Total_Acumulada_, 0) as pontos
                 FROM Usuario WHERE Email = %s
             """, (email,))
 
@@ -747,7 +748,9 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     "estado": norm(usuario[7]),
                     "numero": norm(usuario[8]),
                     "complemento": norm(usuario[9]),
-                    "foto": norm(usuario[10])
+                    "foto": norm(usuario[10]),
+                    "pontos": usuario[11]   
+
                 }
 
             self.send_response(200)
@@ -1100,110 +1103,72 @@ class ServidorCadastro(http.server.BaseHTTPRequestHandler):
                     "SELECT ID_usuario FROM Usuario WHERE Email = %s",
                     (dados["email"],)
                 )
-
                 usuario = cursor.fetchone()
 
                 if not usuario:
                     self.send_response(400)
                     self.send_header('Content-Type', 'application/json')
                     self.end_headers()
-
                     self.wfile.write(json.dumps({
                         "sucesso": False,
                         "mensagem": "Usuário não encontrado"
                     }).encode())
-
                     return
 
                 id_usuario = usuario[0]
+                pontos = dados.get("pontos")
 
-                pontos = dados.get("pontos") if isinstance(dados.get("pontos"), (int, float)) else dados.get("pontos")
-
+                # Inserção da reciclagem
                 try:
                     cursor.execute("""
-                        INSERT INTO Reciclagem (
-                            Tipo_Material,
-                            Data,
-                            Quantidade,
-                            Pontos,
-                            fk_Usuario_ID_usuario
-                        )
+                        INSERT INTO Reciclagem (Tipo_Material, Data, Quantidade, Pontos, fk_Usuario_ID_usuario)
                         VALUES (%s, NOW(), %s, %s, %s)
-                    """, (
-                        dados["tipo"],
-                        dados["quantidade"],
-                        pontos,
-                        id_usuario
-                    ))
-                    # Log do ID inserido (útil para diagnosticar problemas de chave primária)
-                    try:
-                        last_id = cursor.lastrowid
-                        print(f"[DEBUG] Reciclagem inserida com ID: {last_id}")
-                    except Exception:
-                        last_id = None
-                except Exception as insert_err:
-                    # Se a tabela não tiver AUTO_INCREMENT para ID_reciclagem, tentar calcular próximo ID e inserir explicitamente
-                    print('[WARN] Inserção direta em Reciclagem falhou, tentando fallback com ID explícito:', insert_err)
-                    try:
-                        cursor.execute("SELECT COALESCE(MAX(ID_reciclagem), 0) + 1 FROM Reciclagem")
-                        next_id = cursor.fetchone()[0]
-                        cursor.execute("""
-                            INSERT INTO Reciclagem (
-                                ID_reciclagem,
-                                Tipo_Material,
-                                Data,
-                                Quantidade,
-                                Pontos,
-                                fk_Usuario_ID_usuario
-                            )
-                            VALUES (%s, %s, NOW(), %s, %s, %s)
-                        """, (
-                            next_id,
-                            dados["tipo"],
-                            dados["quantidade"],
-                            pontos,
-                            id_usuario
-                        ))
-                        last_id = next_id
-                        print(f"[DEBUG] Reciclagem inserida com ID (fallback): {last_id}")
-                    except Exception as e2:
-                        print('[ERROR] Fallback de inserção também falhou:', e2)
-                        raise
+                    """, (dados["tipo"], dados["quantidade"], pontos, id_usuario))
+                    print(f"[DEBUG] Reciclagem inserida com ID: {cursor.lastrowid}")
 
-                # Atualiza pontos do usuário (se fornecido)
-                try:
-                    if pontos is not None:
-                        cursor.execute("""
-                            UPDATE Usuario 
-                            SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_,0) + %s
-                            WHERE ID_usuario = %s
-                        """, (
-                            pontos,
-                            id_usuario
-                        ))
-                    else:
-                        print('[WARN] Nenhum campo "pontos" enviado na requisição; pulando atualização de pontos')
-                except Exception as e:
-                    print('[ERROR] Falha ao atualizar pontos do usuário:', e)
+                except Exception as insert_err:
+                    print('[WARN] Inserção direta falhou, tentando fallback:', insert_err)
+                    cursor.execute("SELECT COALESCE(MAX(ID_reciclagem), 0) + 1 FROM Reciclagem")
+                    next_id = cursor.fetchone()[0]
+                    cursor.execute("""
+                        INSERT INTO Reciclagem (ID_reciclagem, Tipo_Material, Data, Quantidade, Pontos, fk_Usuario_ID_usuario)
+                        VALUES (%s, %s, NOW(), %s, %s, %s)
+                    """, (next_id, dados["tipo"], dados["quantidade"], pontos, id_usuario))
+                    print(f"[DEBUG] Reciclagem inserida com ID (fallback): {next_id}")
+
+                # Atualiza pontos do usuário
+                if pontos is not None:
+                    cursor.execute("""
+                        UPDATE Usuario
+                        SET Pontuacao_Total_Acumulada_ = COALESCE(Pontuacao_Total_Acumulada_, 0) + %s
+                        WHERE ID_usuario = %s
+                    """, (pontos, id_usuario))
+                else:
+                    print('[WARN] Campo "pontos" não enviado; pontuação não atualizada.')
 
                 conexao.commit()
+
+                # Busca o total atualizado para devolver ao frontend
+                cursor.execute(
+                    "SELECT COALESCE(Pontuacao_Total_Acumulada_, 0) FROM Usuario WHERE ID_usuario = %s",
+                    (id_usuario,)
+                )
+                pontos_totais = cursor.fetchone()[0]
 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-
                 self.wfile.write(json.dumps({
                     "sucesso": True,
-                    "mensagem": "Reciclagem registrada"
+                    "mensagem": "Reciclagem registrada",
+                    "pontos_totais": pontos_totais
                 }).encode())
 
             except Exception as e:
                 print("ERRO AO REGISTRAR:", e)
-
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-
                 self.wfile.write(json.dumps({
                     "sucesso": False,
                     "erro": str(e)
