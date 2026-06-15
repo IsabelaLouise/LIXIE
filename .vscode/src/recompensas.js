@@ -192,3 +192,67 @@ if (logoutBtn) {
         window.location.href = "/.vscode/src/homeNaoLogado.html";
     });
 }
+
+async function carregarProgresso() {
+  const email = localStorage.getItem("email");
+  const container = document.getElementById("progresso-usuario");
+
+  if (!email) {
+    container.innerHTML = "<p>Usuário não logado</p>";
+    return;
+  }
+
+  try {
+    // 🔥 pega dados do usuário
+    const resUser = await fetch("http://localhost:8000/dados-usuario", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `email=${email}`
+    });
+
+    const usuario = await resUser.json();
+
+    // 🔥 pega ranking completo
+    const resRanking = await fetch("http://localhost:8000/ranking", {
+      method: 'POST'
+    });
+
+    const ranking = await resRanking.json();
+
+    //  acha posição real
+    // Preferir a posição fornecida pelo endpoint /dados-usuario (inclui usuários fora do top-10)
+    let posicao = (typeof usuario.posicao !== 'undefined' && usuario.posicao !== null) ? usuario.posicao : null;
+
+    if (!posicao) {
+      // se backend não forneceu, tenta achar pelo nome entre os top retornados
+      posicao = ranking.find(user => user.nome === usuario.nome)?.posicao || "-";
+    }
+
+    // 🔥calcula barra (quando não for possível determinar posição, evita NaN)
+    const total = ranking.length;
+    let porcentagem = 0;
+    if (typeof posicao === 'number' || !isNaN(parseInt(posicao))) {
+      const posNum = parseInt(posicao);
+      porcentagem = ((total - posNum + 1) / Math.max(total, posNum)) * 100;
+      porcentagem = Math.max(0, Math.min(100, porcentagem));
+    }
+
+    container.innerHTML = `
+      <h2>Seu Progresso</h2>
+      <p>Você está em: <strong>${posicao}º Lugar</strong></p>
+      <p><strong>${usuario.pontos} Pontos</strong></p>
+
+      <div class="progress-bar">
+        <div class="progress" style="width: ${porcentagem}%"></div>
+      </div>
+    `;
+
+  } catch (erro) {
+    console.error(erro);
+    container.innerHTML = "<p>Erro ao carregar progresso</p>";
+  }
+}
+
+if (usuarioLogado) {
+document.addEventListener('DOMContentLoaded', carregarProgresso);
+}

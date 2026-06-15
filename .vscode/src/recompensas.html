@@ -17,7 +17,8 @@
 </head>
 
 <body>
-    <div class="header-container">
+    <header>
+        <div class="header-container">
             <a href="/.vscode/src/homeLogado.html" class="logo-link">
                 <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
             </a>
@@ -42,14 +43,20 @@
 
     <main>
 
-        <div class="recompensas-header">
-            <h2>Recompensas</h2>
-            <p>Troque seus pontos por benefícios exclusivos e continue ajudando o planeta.</p>
+        <div class="container">
+
+        <div class="grid">
+
+        <!-- LEFT -->
+        <div class="left-col">
+        <div class="title" id="recompensas-titulo">
+            <h1>Recompensas</h1>
+            <p>Troque seus pontos por benefícios exclusivos e continue ajudando o planeta!</p>
         </div>
 
         <!-- BRINDES -->
         <section class="recompensas-section">
-            <h3>🎁 Brindes</h3>
+            <h3>Brindes</h3>
 
             <div class="recompensas-cards">
 
@@ -100,7 +107,7 @@
 
         <!-- DESCONTOS -->
         <section class="recompensas-section">
-            <h3>🏷️ Descontos</h3>
+            <h3>Descontos</h3>
 
             <div class="recompensas-cards">
 
@@ -148,6 +155,35 @@
 
             </div>
         </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-col">
+
+            <div class="card" id="progresso-usuario">
+            <h2>Seu Progresso</h2>
+
+            <p class="progress-text">
+            Carregando..
+            </p>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+
+            <div class="info-box">
+            <img src="/.vscode/src/img/sinal-de-reciclagem.png" alt="reciclagem" class="reciclagem-img"> 12 reciclagens essa semana
+            </div>
+
+            <div class="info-box">
+            <img src="/.vscode/src/img/presente.png" alt="presente" class="presente-img">   3 recompensas ganhas
+            </div>
+
+        </div>
+
+        </div>
 
     </main>
 
