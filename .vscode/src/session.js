@@ -53,9 +53,17 @@ function redirecionarLogin() {
     window.location.href = "/.vscode/src/login.html";
 }
 
-// eventos de atividade
+// Eventos que representam interação do usuário — atualizam o último acesso
 document.addEventListener("click", tratarInteracao);
 document.addEventListener("keydown", tratarInteracao);
+document.addEventListener("mousemove", tratarInteracao);
+document.addEventListener("touchstart", tratarInteracao);
+document.addEventListener("scroll", tratarInteracao);
+
+// Quando a aba volta a ficar visível, tratamos como interação
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === 'visible') tratarInteracao();
+});
 
 // roda automaticamente
 verificarSessao();
@@ -71,5 +79,5 @@ function mostrarModalSessao() {
 }
 
 function fecharModal() {
-    window.location.href = "login.html";
+    window.location.href = "/.vscode/src/login.html";
 }

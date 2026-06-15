@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Recompensas</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/.vscode/src/recompensas.css">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-container">
+            <a href="/.vscode/src/homeLogado.html" class="logo-link">
+                <img src="/.vscode/src/img/logo.png" alt="Lixie" class="logo-img">
+            </a>
+
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="navbar" id="navbar">
+                <a href="/.vscode/src/homeLogado.html" class="nav-link">Home</a>
+                <a href="/.vscode/src/ranking.html" class="nav-link">Ranking</a>
+                <a href="/.vscode/src/registrarReciclagem.html" class="nav-link">Registrar Reciclagem</a>
+                <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">Mapa de Coleta</a>
+                <a href="/.vscode/src/recompensas.html" class="nav-link active">Recompensas</a>
+            </nav>
+
+            <a href="/.vscode/src/PerfilUsuario.html" class="profile-link">
+                <img id="fotoHome" class="profile" src="img/avatar.png">
+            </a>
+        </div>
+    </header>
+
+    <main>
+
+        <div class="container">
+
+        <div class="grid">
+
+        <!-- LEFT -->
+        <div class="left-col">
+        <div class="title" id="recompensas-titulo">
+            <h1>Recompensas</h1>
+            <p>Troque seus pontos por benefícios exclusivos e continue ajudando o planeta!</p>
+        </div>
+
+        <!-- BRINDES -->
+        <section class="recompensas-section">
+            <h3>Brindes</h3>
+
+            <div class="recompensas-cards">
+
+                <div class="reward-card">
+                    <span class="reward-points">500 pts</span>
+
+                    <h4>Ecobag Sustentável</h4>
+
+                    <p>
+                        Sacola reutilizável produzida com material reciclado.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+                <div class="reward-card">
+                    <span class="reward-points">1000 pts</span>
+
+                    <h4>Garrafa Ecológica</h4>
+
+                    <p>
+                        Garrafa reutilizável para reduzir o consumo de plástico.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+                <div class="reward-card">
+                    <span class="reward-points">1500 pts</span>
+
+                    <h4>Kit Sustentável</h4>
+
+                    <p>
+                        Conjunto com canudo reutilizável e talheres ecológicos.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- DESCONTOS -->
+        <section class="recompensas-section">
+            <h3>Descontos</h3>
+
+            <div class="recompensas-cards">
+
+                <div class="reward-card">
+                    <span class="reward-points">300 pts</span>
+
+                    <h4>10% OFF</h4>
+
+                    <p>
+                        Desconto em parceiros sustentáveis.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+                <div class="reward-card">
+                    <span class="reward-points">700 pts</span>
+
+                    <h4>15% OFF</h4>
+
+                    <p>
+                        Cupom para produtos ecológicos.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+                <div class="reward-card">
+                    <span class="reward-points">1200 pts</span>
+
+                    <h4>20% OFF</h4>
+
+                    <p>
+                        Desconto especial em lojas parceiras.
+                    </p>
+
+                    <button class="reward-btn">
+                        Resgatar
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right-col">
+
+            <div class="card" id="progresso-usuario">
+            <h2>Seu Progresso</h2>
+
+            <p class="progress-text">
+            Carregando..
+            </p>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+
+            <div class="info-box">
+            <img src="/.vscode/src/img/sinal-de-reciclagem.png" alt="reciclagem" class="reciclagem-img"> 12 reciclagens essa semana
+            </div>
+
+            <div class="info-box">
+            <img src="/.vscode/src/img/presente.png" alt="presente" class="presente-img">   3 recompensas ganhas
+            </div>
+
+        </div>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <span>Lixie ©</span>
+    </footer>
+
+    <div id="sessionModal" class="session-modal">
+    <div class="session-box">
+        <h2>Sessão expirada</h2>
+        <p>Você ficou inativo por muito tempo.<br>Faça login novamente para continuar.</p>
+        <button onclick="fecharModal()">Voltar ao login</button>
+    </div>
+    </div>
+
+    <script src="/.vscode/src/recompensas.js"></script>
+    <script src="/.vscode/src/verificacao.js"></script>
+    <script src="/.vscode/src/session.js"></script>
+</body>
+</html>

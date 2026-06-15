@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <a href="/.vscode/src/MapaDeColeta.html" class="nav-link">
                 Mapa de Coleta
             </a>
-            <a href="#" class="nav-link">
+            <a href="/.vscode/src/recompensas.html" class="nav-link">
                 Recompensas
             </a>
         `;
